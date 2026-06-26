@@ -1,80 +1,26 @@
-<script setup>
-import OnboardingFeatureCard from './OnboardingFeatureCard.vue';
-import { computed } from 'vue';
-import { useI18n } from 'vue-i18n';
-import { useStoreGetters } from 'dashboard/composables/store';
-
-const getters = useStoreGetters();
-const { t } = useI18n();
-const globalConfig = computed(() => getters['globalConfig/get'].value);
-const currentUser = computed(() => getters.getCurrentUser.value);
-
-const greetingMessage = computed(() => {
-  const hours = new Date().getHours();
-  let translationKey;
-  if (hours < 12) {
-    translationKey = 'ONBOARDING.GREETING_MORNING';
-  } else if (hours < 18) {
-    translationKey = 'ONBOARDING.GREETING_AFTERNOON';
-  } else {
-    translationKey = 'ONBOARDING.GREETING_EVENING';
-  }
-  return t(translationKey, {
-    name: currentUser.value.name,
-    installationName: globalConfig.value.installationName,
-  });
-});
-</script>
-
+<!-- eslint-disable vue/no-bare-strings-in-template -->
+<!-- eslint-disable @intlify/vue-i18n/no-raw-text -->
 <template>
   <div
-    class="min-h-screen lg:max-w-5xl max-w-4xl mx-auto grid grid-cols-2 grid-rows-[auto_1fr_1fr] auto-rows-min gap-4 p-8 w-full font-inter overflow-auto"
+    class="flex flex-col items-center justify-center min-h-screen w-full gap-6 text-center p-8"
   >
-    <div class="col-span-full self-start">
-      <p
-        class="text-xl font-semibold text-n-slate-12 font-interDisplay tracking-[0.3px]"
+    <div class="flex flex-col items-center gap-2">
+      <span
+        class="text-4xl font-bold text-n-slate-12 font-interDisplay tracking-tight"
       >
-        {{ greetingMessage }}
-      </p>
-      <p class="text-n-slate-11 max-w-2xl text-base">
-        {{
-          $t('ONBOARDING.DESCRIPTION', {
-            installationName: globalConfig.installationName,
-          })
-        }}
-      </p>
+        Aptus
+      </span>
+      <span
+        class="text-sm font-medium text-n-slate-9 uppercase tracking-widest"
+      >
+        Atendimento inteligente
+      </span>
     </div>
-    <OnboardingFeatureCard
-      image-src="/dashboard/images/onboarding/omnichannel-inbox.png"
-      image-alt="Omnichannel"
-      to="settings_inbox_new"
-      :title="$t('ONBOARDING.ALL_CONVERSATION.TITLE')"
-      :description="$t('ONBOARDING.ALL_CONVERSATION.DESCRIPTION')"
-      :link-text="$t('ONBOARDING.ALL_CONVERSATION.NEW_LINK')"
-    />
-    <OnboardingFeatureCard
-      image-src="/dashboard/images/onboarding/teams.png"
-      image-alt="Teams"
-      to="settings_teams_new"
-      :title="$t('ONBOARDING.TEAM_MEMBERS.TITLE')"
-      :description="$t('ONBOARDING.TEAM_MEMBERS.DESCRIPTION')"
-      :link-text="$t('ONBOARDING.TEAM_MEMBERS.NEW_LINK')"
-    />
-    <OnboardingFeatureCard
-      image-src="/dashboard/images/onboarding/canned-responses.png"
-      image-alt="Canned responses"
-      to="canned_list"
-      :title="$t('ONBOARDING.CANNED_RESPONSES.TITLE')"
-      :description="$t('ONBOARDING.CANNED_RESPONSES.DESCRIPTION')"
-      :link-text="$t('ONBOARDING.CANNED_RESPONSES.NEW_LINK')"
-    />
-    <OnboardingFeatureCard
-      image-src="/dashboard/images/onboarding/labels.png"
-      image-alt="Labels"
-      to="labels_list"
-      :title="$t('ONBOARDING.LABELS.TITLE')"
-      :description="$t('ONBOARDING.LABELS.DESCRIPTION')"
-      :link-text="$t('ONBOARDING.LABELS.NEW_LINK')"
-    />
+
+    <div class="w-12 h-px bg-n-slate-6" />
+
+    <p class="text-n-slate-11 text-base max-w-xs leading-relaxed">
+      Selecione uma conversa na lista ao lado para começar o atendimento.
+    </p>
   </div>
 </template>

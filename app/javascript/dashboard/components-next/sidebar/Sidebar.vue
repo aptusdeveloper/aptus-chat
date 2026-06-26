@@ -285,6 +285,7 @@ const closeMobileSidebar = () => {
   emit('closeMobileSidebar');
 };
 
+/* APTUS-HIDDEN: newReportRoutes + reportRoutes — seção Reports removida do MVP
 const newReportRoutes = () => [
   {
     name: 'Reports Agent',
@@ -310,8 +311,8 @@ const newReportRoutes = () => [
     activeOn: ['team_reports_show'],
   },
 ];
-
 const reportRoutes = computed(() => newReportRoutes());
+*/
 
 const menuItems = computed(() => {
   return [
@@ -434,6 +435,7 @@ const menuItems = computed(() => {
         },
       ],
     },
+    /* APTUS-HIDDEN: Captain — não faz parte do MVP
     {
       name: 'Captain',
       icon: 'i-woot-captain',
@@ -505,6 +507,7 @@ const menuItems = computed(() => {
         },
       ],
     },
+    */
     {
       name: 'Contacts',
       label: t('SIDEBAR.CONTACTS'),
@@ -572,6 +575,7 @@ const menuItems = computed(() => {
         },
       ],
     },
+    /* APTUS-HIDDEN: Companies — não faz parte do MVP
     {
       name: 'Companies',
       label: t('SIDEBAR.COMPANIES'),
@@ -589,6 +593,8 @@ const menuItems = computed(() => {
         },
       ],
     },
+    */
+    /* APTUS-HIDDEN: Reports — não faz parte do MVP
     {
       name: 'Reports',
       label: t('SIDEBAR.REPORTS'),
@@ -622,6 +628,8 @@ const menuItems = computed(() => {
         },
       ],
     },
+    */
+    /* APTUS-HIDDEN: Campaigns — não faz parte do MVP
     {
       name: 'Campaigns',
       label: t('SIDEBAR.CAMPAIGNS'),
@@ -644,6 +652,8 @@ const menuItems = computed(() => {
         },
       ],
     },
+    */
+    /* APTUS-HIDDEN: Portals/Help Center — não faz parte do MVP
     {
       name: 'Portals',
       label: t('SIDEBAR.HELP_CENTER.TITLE'),
@@ -691,6 +701,7 @@ const menuItems = computed(() => {
         },
       ],
     },
+    */
     {
       name: 'Settings',
       label: t('SIDEBAR.SETTINGS'),

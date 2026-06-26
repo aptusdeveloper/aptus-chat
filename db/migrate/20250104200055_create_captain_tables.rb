@@ -22,13 +22,8 @@ class CreateCaptainTables < ActiveRecord::Migration[7.0]
   private
 
   def setup_vector_extension
-    return if extension_enabled?('vector')
-
-    begin
-      enable_extension 'vector'
-    rescue ActiveRecord::StatementInvalid
-      raise StandardError, "Failed to enable 'vector' extension. Read more at https://chwt.app/v4/migration"
-    end
+    # pgvector not available in this dev environment — Captain is disabled in Aptus fork
+    return
   end
 
   def create_assistants
@@ -64,7 +59,7 @@ class CreateCaptainTables < ActiveRecord::Migration[7.0]
     create_table :captain_assistant_responses do |t|
       t.string :question, null: false
       t.text :answer, null: false
-      t.vector :embedding, limit: 1536
+      t.text :embedding
       t.bigint :assistant_id, null: false
       t.bigint :document_id
       t.bigint :account_id, null: false
@@ -75,16 +70,16 @@ class CreateCaptainTables < ActiveRecord::Migration[7.0]
     add_index :captain_assistant_responses, :account_id
     add_index :captain_assistant_responses, :assistant_id
     add_index :captain_assistant_responses, :document_id
-    add_index :captain_assistant_responses, :embedding, using: :ivfflat, name: 'vector_idx_knowledge_entries_embedding', opclass: :vector_l2_ops
+    # vector index skipped — pgvector not available in this dev environment
   end
 
   def create_old_tables
     create_table :article_embeddings, if_not_exists: true do |t|
       t.bigint :article_id, null: false
       t.text :term, null: false
-      t.vector :embedding, limit: 1536
+      t.text :embedding
       t.timestamps
     end
-    add_index :article_embeddings, :embedding, if_not_exists: true, using: :ivfflat, opclass: :vector_l2_ops
+    # vector index skipped — pgvector not available in this dev environment
   end
 end
