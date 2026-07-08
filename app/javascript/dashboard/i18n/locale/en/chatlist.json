@@ -19,6 +19,10 @@
       "unassigned": "Unassigned",
       "all": "All"
     },
+    "ASSIGNEE_TYPE_TABS_CONTEXT_MENU": {
+      "SET_AS_DEFAULT": "Set as default",
+      "IS_DEFAULT": "Default tab"
+    },
     "CHAT_STATUS_FILTER_ITEMS": {
       "open": {
         "TEXT": "Open"

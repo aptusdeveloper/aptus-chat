@@ -74,3 +74,10 @@ remove_orphan_conversations_job:
   cron: '0 */12 * * *'
   class: 'Internal::RemoveOrphanConversationsJob'
   queue: housekeeping
+
+# executed daily at 0800 UTC
+# checks CRM deals for time-based automation triggers (stagnant, close_date_approaching)
+crm_deal_time_check_job:
+  cron: '0 8 * * *'
+  class: 'CrmDealTimeCheckJob'
+  queue: scheduled_jobs

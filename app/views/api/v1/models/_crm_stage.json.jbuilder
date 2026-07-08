@@ -1,0 +1,9 @@
+json.id resource.id
+json.name resource.name
+json.color resource.color
+json.position resource.position
+json.is_win resource.is_win
+json.is_loss resource.is_loss
+json.crm_pipeline_id resource.crm_pipeline_id
+json.created_at resource.created_at.to_i
+json.updated_at resource.updated_at.to_i

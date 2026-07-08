@@ -72,6 +72,7 @@ const store = useStore();
 
 const resolveAttributesModalRef = ref(null);
 
+const tabOrder = ref([]);
 const activeAssigneeTab = ref(wootConstants.ASSIGNEE_TYPE.ME);
 const activeStatus = ref(wootConstants.STATUS_TYPE.OPEN);
 const activeSortBy = ref(wootConstants.SORT_BY_TYPE.LAST_ACTIVITY_AT_DESC);
@@ -175,8 +176,58 @@ const userPermissions = computed(() => {
   return getUserPermissions(currentUser.value, currentAccountId.value);
 });
 
+function tabPrefsKey() {
+  return `aptus_tab_prefs_${currentAccountId.value}_${currentUser.value?.id}`;
+}
+
+function loadTabOrder(availableKeys) {
+  try {
+    const saved = localStorage.getItem(tabPrefsKey());
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (
+        Array.isArray(parsed) &&
+        parsed.length === availableKeys.length &&
+        parsed.every(k => availableKeys.includes(k))
+      ) {
+        return parsed;
+      }
+    }
+  } catch (_) {
+    // ignore
+  }
+  return availableKeys;
+}
+
+function saveTabOrder(order) {
+  try {
+    localStorage.setItem(tabPrefsKey(), JSON.stringify(order));
+  } catch (_) {
+    // ignore
+  }
+}
+
+const baseTabKeys = computed(() =>
+  filterItemsByPermission(
+    ASSIGNEE_TYPE_TAB_PERMISSIONS,
+    userPermissions.value,
+    item => item.permissions
+  ).map(({ key }) => key)
+);
+
+watch(
+  baseTabKeys,
+  keys => {
+    if (keys.length && !tabOrder.value.length) {
+      tabOrder.value = loadTabOrder(keys);
+      activeAssigneeTab.value = tabOrder.value[0];
+    }
+  },
+  { immediate: true }
+);
+
 const assigneeTabItems = computed(() => {
-  return filterItemsByPermission(
+  const base = filterItemsByPermission(
     ASSIGNEE_TYPE_TAB_PERMISSIONS,
     userPermissions.value,
     item => item.permissions
@@ -185,7 +236,22 @@ const assigneeTabItems = computed(() => {
     name: t(`CHAT_LIST.ASSIGNEE_TYPE_TABS.${key}`),
     count: conversationStats.value[countKey] || 0,
   }));
+
+  if (!tabOrder.value.length) return base;
+
+  const ordered = tabOrder.value
+    .map(key => base.find(i => i.key === key))
+    .filter(Boolean);
+  base.forEach(i => {
+    if (!ordered.find(x => x.key === i.key)) ordered.push(i);
+  });
+  return ordered;
 });
+
+function handleReorderTabs(newOrder) {
+  tabOrder.value = newOrder;
+  saveTabOrder(newOrder);
+}
 
 const showAssigneeInConversationCard = computed(() => {
   return (
@@ -614,6 +680,17 @@ function updateAssigneeTab(selectedTab) {
   }
 }
 
+function handleSetDefaultTab(key) {
+  const order = [...tabOrder.value];
+  const idx = order.indexOf(key);
+  if (idx <= 0) return;
+  order.splice(idx, 1);
+  order.unshift(key);
+  tabOrder.value = order;
+  saveTabOrder(order);
+  updateAssigneeTab(key);
+}
+
 function onBasicFilterChange(value, type) {
   if (type === 'status') {
     activeStatus.value = value;
@@ -931,8 +1008,9 @@ watch(conversationFilters, (newVal, oldVal) => {
       v-if="!hasAppliedFiltersOrActiveFolders"
       :items="assigneeTabItems"
       :active-tab="activeAssigneeTab"
-      is-compact
       @chat-tab-change="updateAssigneeTab"
+      @set-default="handleSetDefaultTab"
+      @reorder="handleReorderTabs"
     />
 
     <p

@@ -509,6 +509,13 @@ const menuItems = computed(() => {
     },
     */
     {
+      name: 'CRM',
+      label: t('SIDEBAR.CRM'),
+      icon: 'i-lucide-kanban',
+      to: accountScopedRoute('crm_kanban'),
+      activeOn: ['crm_kanban'],
+    },
+    {
       name: 'Contacts',
       label: t('SIDEBAR.CONTACTS'),
       icon: 'i-lucide-contact',

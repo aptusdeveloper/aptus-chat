@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_06_20_000000) do
+ActiveRecord::Schema[7.1].define(version: 2026_07_01_120000) do
   # These extensions should be enabled to support this database
   enable_extension "pg_stat_statements"
   enable_extension "pg_trgm"
@@ -765,6 +765,104 @@ ActiveRecord::Schema[7.1].define(version: 2026_06_20_000000) do
     t.index ["user_id"], name: "index_copilot_threads_on_user_id"
   end
 
+  create_table "crm_automation_executions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "crm_automation_rule_id", null: false
+    t.uuid "crm_deal_id", null: false
+    t.string "trigger_type", null: false
+    t.string "status", null: false
+    t.datetime "executed_at", null: false
+    t.text "error_message"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["crm_automation_rule_id", "status"], name: "idx_on_crm_automation_rule_id_status_a04a609b54"
+    t.index ["crm_automation_rule_id"], name: "index_crm_automation_executions_on_crm_automation_rule_id"
+    t.index ["crm_deal_id", "crm_automation_rule_id", "executed_at"], name: "idx_crm_executions_idempotency"
+    t.index ["crm_deal_id", "executed_at"], name: "index_crm_automation_executions_on_crm_deal_id_and_executed_at"
+    t.index ["crm_deal_id"], name: "index_crm_automation_executions_on_crm_deal_id"
+  end
+
+  create_table "crm_automation_rules", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.uuid "crm_pipeline_id"
+    t.string "name", null: false
+    t.string "trigger_type", null: false
+    t.jsonb "conditions", default: [], null: false
+    t.jsonb "actions", default: [], null: false
+    t.boolean "active", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "active"], name: "index_crm_automation_rules_on_account_id_and_active"
+    t.index ["conditions"], name: "index_crm_automation_rules_on_conditions", using: :gin
+    t.index ["crm_pipeline_id"], name: "index_crm_automation_rules_on_crm_pipeline_id"
+    t.index ["trigger_type"], name: "index_crm_automation_rules_on_trigger_type"
+  end
+
+  create_table "crm_deal_conversations", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "crm_deal_id", null: false
+    t.bigint "conversation_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["conversation_id"], name: "index_crm_deal_conversations_on_conversation_id"
+    t.index ["crm_deal_id", "conversation_id"], name: "idx_on_crm_deal_id_conversation_id_71bc7ef779", unique: true
+    t.index ["crm_deal_id"], name: "index_crm_deal_conversations_on_crm_deal_id"
+  end
+
+  create_table "crm_deals", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.uuid "crm_pipeline_id", null: false
+    t.uuid "crm_stage_id", null: false
+    t.bigint "contact_id"
+    t.bigint "assignee_id"
+    t.string "name", null: false
+    t.decimal "amount", precision: 15, scale: 2
+    t.string "currency", default: "BRL", null: false
+    t.date "close_date"
+    t.integer "probability"
+    t.float "position", default: 0.0, null: false
+    t.jsonb "custom_attributes", default: {}, null: false
+    t.datetime "stage_entered_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "close_date"], name: "index_crm_deals_on_account_id_and_close_date"
+    t.index ["account_id", "crm_stage_id"], name: "index_crm_deals_on_account_id_and_crm_stage_id"
+    t.index ["account_id", "stage_entered_at"], name: "index_crm_deals_on_account_id_and_stage_entered_at"
+    t.index ["account_id"], name: "index_crm_deals_on_account_id"
+    t.index ["assignee_id"], name: "index_crm_deals_on_assignee_id"
+    t.index ["contact_id"], name: "index_crm_deals_on_contact_id"
+    t.index ["crm_pipeline_id"], name: "index_crm_deals_on_crm_pipeline_id"
+    t.index ["crm_stage_id"], name: "index_crm_deals_on_crm_stage_id"
+    t.index ["custom_attributes"], name: "index_crm_deals_on_custom_attributes", using: :gin
+  end
+
+  create_table "crm_pipelines", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.string "name", null: false
+    t.text "description"
+    t.boolean "active", default: true, null: false
+    t.float "position", default: 0.0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "is_default", default: false, null: false
+    t.index ["account_id", "active"], name: "index_crm_pipelines_on_account_id_and_active"
+    t.index ["account_id", "is_default"], name: "index_crm_pipelines_one_default_per_account", unique: true, where: "(is_default = true)"
+    t.index ["account_id"], name: "index_crm_pipelines_on_account_id"
+  end
+
+  create_table "crm_stages", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "crm_pipeline_id", null: false
+    t.bigint "account_id", null: false
+    t.string "name", null: false
+    t.string "color", default: "#6B7280"
+    t.float "position", default: 0.0, null: false
+    t.boolean "is_win", default: false, null: false
+    t.boolean "is_loss", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_crm_stages_on_account_id"
+    t.index ["crm_pipeline_id", "position"], name: "index_crm_stages_on_crm_pipeline_id_and_position"
+    t.index ["crm_pipeline_id"], name: "index_crm_stages_on_crm_pipeline_id"
+  end
+
   create_table "csat_survey_responses", force: :cascade do |t|
     t.bigint "account_id", null: false
     t.bigint "conversation_id", null: false
@@ -1360,6 +1458,13 @@ ActiveRecord::Schema[7.1].define(version: 2026_06_20_000000) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "crm_automation_executions", "crm_automation_rules"
+  add_foreign_key "crm_automation_executions", "crm_deals"
+  add_foreign_key "crm_automation_rules", "crm_pipelines"
+  add_foreign_key "crm_deal_conversations", "crm_deals"
+  add_foreign_key "crm_deals", "crm_pipelines"
+  add_foreign_key "crm_deals", "crm_stages"
+  add_foreign_key "crm_stages", "crm_pipelines"
   add_foreign_key "inboxes", "portals"
   add_foreign_key "user_sessions", "users"
   create_trigger("accounts_after_insert_row_tr", :generated => true, :compatibility => 1).

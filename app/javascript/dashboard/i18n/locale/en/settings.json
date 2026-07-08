@@ -320,6 +320,7 @@
     "SETTINGS": "Settings",
     "CONTACTS": "Contacts",
     "ACTIVE": "Active",
+    "CRM": "CRM",
     "COMPANIES": "Companies",
     "ALL_COMPANIES": "All Companies",
     "CAPTAIN": "Captain",
@@ -950,6 +951,48 @@
       "DESCRIPTION": "Are you sure you want to delete this policy? This action cannot be undone.",
       "CONFIRM_BUTTON_LABEL": "Delete",
       "CANCEL_BUTTON_LABEL": "Cancel"
+    }
+  },
+  "CRM": {
+    "AMOUNT": "Amount",
+    "CLOSE_DATE": "Close Date",
+    "PROBABILITY": "Probability",
+    "ASSIGNEE": "Assignee",
+    "CONTACT": "Contact",
+    "DELETE": "Delete",
+    "CANCEL": "Cancel",
+    "DELETING": "Deleting...",
+    "CONFIRM_DELETE": "Confirm",
+    "LOADING": "Loading...",
+    "NO_PIPELINES": "No pipelines found.",
+    "NO_STAGES": "No stages in this pipeline.",
+    "WON": "Won",
+    "LOST": "Lost",
+    "FORM": {
+      "CREATE_DEAL": "New Deal",
+      "EDIT_DEAL": "Edit Deal",
+      "NAME": "Name",
+      "NAME_PLACEHOLDER": "Deal name",
+      "NAME_REQUIRED": "Name is required.",
+      "STAGE": "Stage",
+      "AMOUNT_PLACEHOLDER": "0.00",
+      "PROBABILITY_LABEL": "Probability %",
+      "PROBABILITY_PLACEHOLDER": "0",
+      "SAVE": "Save",
+      "SAVING": "Saving..."
+    },
+    "SETTINGS": {
+      "TITLE": "Pipeline Settings",
+      "PIPELINES": "Pipelines",
+      "STAGES": "Stages",
+      "PIPELINE_NAME_PLACEHOLDER": "Pipeline name",
+      "STAGE_NAME_PLACEHOLDER": "Stage name",
+      "COLOR": "Color",
+      "WIN_STAGE": "Win",
+      "LOSS_STAGE": "Loss",
+      "ACTIVE": "Active",
+      "INACTIVE": "Inactive",
+      "SELECT_PIPELINE": "Select a pipeline to manage its stages."
     }
   }
 }

@@ -1,9 +1,25 @@
 # Chatwoot Development Guidelines
 
+## Rodar localmente (APTUS)
+
+```bash
+./dev.sh             # inicia (ou reinicia) e expõe via ngrok
+./dev.sh --no-ngrok  # apenas sobe os servidores, sem ngrok
+```
+
+O script gerencia automaticamente:
+- **PATH**: inclui `~/.nvm/versions/node/v24.14.0/bin` (onde está o `pnpm`) e `rbenv`
+- **Overmind**: detecta sock stale, reinicia se já estiver rodando, ou sobe do zero
+- **ngrok**: expõe porta 3000 publicamente e imprime a URL
+
+> **Problema raiz conhecido:** `pnpm` fica no PATH do NVM e não está disponível no PATH padrão do sistema. O `dev.sh` já resolve isso. Nunca rode `overmind start` diretamente sem garantir o PATH correto — o processo Vite vai falhar silenciosamente e derrubar tudo.
+
+Logs em `/tmp/overmind-aptus.log` e `/tmp/ngrok-aptus.log`.
+
 ## Build / Test / Lint
 
 - **Setup**: `bundle install && pnpm install`
-- **Run Dev**: `pnpm dev` or `overmind start -f ./Procfile.dev`
+- **Run Dev**: use `./dev.sh` (veja seção acima)
 - **Seed Local Test Data**: `bundle exec rails db:seed` (quickly populates minimal data for standard feature verification)
 - **Seed Search Test Data**: `bundle exec rails search:setup_test_data` (bulk fixture generation for search/performance/manual load scenarios)
 - **Seed Account Sample Data (richer test data)**: `Seeders::AccountSeeder` is available as an internal utility and is exposed through Super Admin `Accounts#seed`, but can be used directly in dev workflows too:

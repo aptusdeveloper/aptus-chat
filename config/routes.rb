@@ -197,6 +197,14 @@ Rails.application.routes.draw do
               resources :notes, only: [:index]
             end
           end
+          resources :crm_pipelines, only: [:index, :show, :create, :update, :destroy] do
+            scope module: :crm_pipelines do
+              resources :stages, only: [:index, :create, :update, :destroy]
+            end
+          end
+          resources :crm_deals, only: [:index, :show, :create, :update, :destroy] do
+            member { patch :move }
+          end
           resources :contacts, only: [:index, :show, :update, :create, :destroy] do
             collection do
               get :active
