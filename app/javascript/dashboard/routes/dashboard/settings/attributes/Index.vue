@@ -32,7 +32,15 @@ const uiFlags = computed(() => getters['attributes/getUIFlags'].value);
 const [showEditPopup, toggleEditPopup] = useToggle(false);
 const [showDeletePopup, toggleDeletePopup] = useToggle(false);
 const selectedAttribute = ref({});
-const attributeModels = ['conversation_attribute', 'contact_attribute'];
+const attributeModels = [
+  'conversation_attribute',
+  'contact_attribute',
+  'deal_attribute',
+];
+// attribute_model enum ids on the backend, in the same order as the tabs/
+// attributeModels above (deal_attribute is enum index 3, not 2, because
+// company_attribute occupies index 2 without a tab in this UI).
+const attributeModelIds = [0, 1, 3];
 
 const openAddPopup = () => {
   toggleAddPopup(true);
@@ -58,6 +66,10 @@ const tabs = computed(() => {
     {
       key: 1,
       name: t('ATTRIBUTES_MGMT.TABS.CONTACT'),
+    },
+    {
+      key: 2,
+      name: t('ATTRIBUTES_MGMT.TABS.DEAL'),
     },
   ];
 });
@@ -228,7 +240,7 @@ const filteredAttributes = computed(() => {
       v-if="showAddPopup"
       v-model:show="showAddPopup"
       :on-close="hideAddPopup"
-      :selected-attribute-model-tab="selectedTabIndex"
+      :selected-attribute-model-tab="attributeModelIds[selectedTabIndex]"
     />
     <woot-modal v-model:show="showEditPopup" :on-close="hideEditPopup">
       <EditAttribute

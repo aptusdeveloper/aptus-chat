@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_07_01_120000) do
+ActiveRecord::Schema[7.1].define(version: 2026_07_14_150000) do
   # These extensions should be enabled to support this database
   enable_extension "pg_stat_statements"
   enable_extension "pg_trgm"
@@ -897,8 +897,10 @@ ActiveRecord::Schema[7.1].define(version: 2026_07_01_120000) do
     t.jsonb "attribute_values", default: []
     t.string "regex_pattern"
     t.string "regex_cue"
+    t.uuid "crm_pipeline_id"
     t.index ["account_id"], name: "index_custom_attribute_definitions_on_account_id"
-    t.index ["attribute_key", "attribute_model", "account_id"], name: "attribute_key_model_index", unique: true
+    t.index ["attribute_key", "attribute_model", "account_id", "crm_pipeline_id"], name: "attribute_key_model_pipeline_index", unique: true, where: "(crm_pipeline_id IS NOT NULL)"
+    t.index ["attribute_key", "attribute_model", "account_id"], name: "attribute_key_model_index", unique: true, where: "(crm_pipeline_id IS NULL)"
   end
 
   create_table "custom_filters", force: :cascade do |t|
@@ -1465,6 +1467,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_07_01_120000) do
   add_foreign_key "crm_deals", "crm_pipelines"
   add_foreign_key "crm_deals", "crm_stages"
   add_foreign_key "crm_stages", "crm_pipelines"
+  add_foreign_key "custom_attribute_definitions", "crm_pipelines"
   add_foreign_key "inboxes", "portals"
   add_foreign_key "user_sessions", "users"
   create_trigger("accounts_after_insert_row_tr", :generated => true, :compatibility => 1).

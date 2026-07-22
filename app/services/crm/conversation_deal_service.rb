@@ -15,7 +15,8 @@ module Crm
       deal = @account.crm_deals.create!(
         name: deal_name,
         crm_pipeline: pipeline,
-        crm_stage: first_stage
+        crm_stage: first_stage,
+        contact_id: @conversation.contact_id
       )
       CrmDealConversation.create!(crm_deal: deal, conversation: @conversation)
     rescue ActiveRecord::RecordInvalid => e

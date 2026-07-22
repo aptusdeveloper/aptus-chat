@@ -25,6 +25,7 @@ export default {
     values: { type: Array, default: () => [] },
     value: { type: [String, Number, Boolean], default: '' },
     showActions: { type: Boolean, default: false },
+    hideLabel: { type: Boolean, default: false },
     attributeType: { type: String, default: 'text' },
     attributeRegex: {
       type: String,
@@ -205,7 +206,7 @@ export default {
 
 <template>
   <div class="px-4 py-3">
-    <div class="flex items-center mb-1">
+    <div v-if="!hideLabel" class="flex items-center mb-1">
       <h4 class="flex items-center w-full m-0 text-sm error">
         <div v-if="isAttributeTypeCheckbox" class="flex items-center">
           <input

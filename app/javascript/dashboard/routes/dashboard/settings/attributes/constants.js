@@ -1,6 +1,7 @@
 export const ATTRIBUTE_MODELS = [
   { id: 0, key: 'CONVERSATION' },
   { id: 1, key: 'CONTACT' },
+  { id: 3, key: 'DEAL' },
 ];
 
 export const ATTRIBUTE_TYPES = [

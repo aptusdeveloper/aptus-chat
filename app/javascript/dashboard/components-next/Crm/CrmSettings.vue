@@ -120,7 +120,7 @@ async function confirmDelete(type, id) {
       if (type === 'pipeline') {
         await store.dispatch('crmDeals/deletePipeline', id);
         if (selectedPipelineId.value === id) selectedPipelineId.value = null;
-      } else {
+      } else if (type === 'stage') {
         await store.dispatch('crmDeals/deleteStage', {
           pipelineId: selectedPipelineId.value,
           stageId: id,
@@ -280,7 +280,7 @@ async function confirmDelete(type, id) {
           <p
             class="text-xs font-semibold text-n-slate-9 uppercase tracking-wide"
           >
-            {{ t('CRM.SETTINGS.STAGES') }} — {{ selectedPipeline.name }}
+            {{ t('CRM.SETTINGS.STAGES') }} - {{ selectedPipeline.name }}
           </p>
           <button
             class="p-1 rounded text-n-slate-9 hover:text-n-slate-12 hover:bg-n-alpha-2 transition-colors"

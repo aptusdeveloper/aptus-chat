@@ -164,6 +164,7 @@ en:
     custom_attribute_definition:
       attribute_key_format: must only contain letters, numbers, underscores, hyphens, and dots
       key_conflict: The provided key is not allowed as it might conflict with default attributes.
+      crm_pipeline_not_allowed: can only be set when the attribute model is a deal attribute
     mfa:
       already_enabled: MFA is already enabled
       not_enabled: MFA is not enabled

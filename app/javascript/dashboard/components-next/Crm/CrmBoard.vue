@@ -14,20 +14,24 @@ const pipelines = useMapGetter('crmDeals/pipelines');
 const activePipeline = useMapGetter('crmDeals/activePipeline');
 const uiFlags = useMapGetter('crmDeals/uiFlags');
 const dealsByStage = useMapGetter('crmDeals/dealsByStage');
+const allDeals = useMapGetter('crmDeals/allDeals');
 
-const selectedDeal = ref(null);
+const selectedDealId = ref(null);
 const activePipelineId = ref(null);
 const showSettings = ref(false);
 const activeFormStageId = ref(null);
 
 const stages = computed(() => activePipeline.value?.stages ?? []);
+const selectedDeal = computed(
+  () => allDeals.value.find(deal => deal.id === selectedDealId.value) ?? null
+);
 
 function handleSelectDeal(deal) {
-  selectedDeal.value = deal;
+  selectedDealId.value = deal.id;
 }
 
 function handleSidebarClose() {
-  selectedDeal.value = null;
+  selectedDealId.value = null;
 }
 
 async function loadDeals(pipelineId) {
@@ -80,7 +84,7 @@ onMounted(async () => {
           class="p-1.5 rounded text-n-slate-9 hover:text-n-slate-12 hover:bg-n-alpha-2 transition-colors"
           @click="
             showSettings = !showSettings;
-            selectedDeal = null;
+            selectedDealId = null;
           "
         >
           <i class="i-lucide-settings w-4 h-4" />
@@ -97,6 +101,19 @@ onMounted(async () => {
     </div>
 
     <div class="flex flex-1 overflow-hidden">
+      <Transition name="crm-lead-sidebar">
+        <div
+          v-if="selectedDeal && !showSettings"
+          class="h-full w-80 shrink-0 overflow-hidden"
+        >
+          <CrmDealSidebar
+            :deal="selectedDeal"
+            @close="handleSidebarClose"
+            @deleted="handleSidebarClose"
+          />
+        </div>
+      </Transition>
+
       <div class="flex gap-3 p-4 overflow-x-auto flex-1">
         <CrmKanbanColumn
           v-for="stage in stages"
@@ -122,14 +139,31 @@ onMounted(async () => {
         </div>
       </div>
 
-      <CrmDealSidebar
-        v-if="selectedDeal && !showSettings"
-        :deal="selectedDeal"
-        @close="handleSidebarClose"
-        @deleted="handleSidebarClose"
-      />
-
       <CrmSettings v-if="showSettings" @close="showSettings = false" />
     </div>
   </div>
 </template>
+
+<style scoped>
+.crm-lead-sidebar-enter-active,
+.crm-lead-sidebar-leave-active {
+  transition:
+    width 180ms ease,
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.crm-lead-sidebar-enter-from,
+.crm-lead-sidebar-leave-to {
+  width: 0;
+  opacity: 0;
+  transform: translateX(-12px);
+}
+
+.crm-lead-sidebar-enter-to,
+.crm-lead-sidebar-leave-from {
+  width: 20rem;
+  opacity: 1;
+  transform: translateX(0);
+}
+</style>

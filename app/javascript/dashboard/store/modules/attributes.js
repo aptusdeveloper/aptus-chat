@@ -40,6 +40,13 @@ export const getters = {
       record => record.attribute_model === attributeModel
     );
   },
+  getDealAttributesByPipeline: _state => crmPipelineId => {
+    return _state.records.filter(
+      record =>
+        record.attribute_model === 'deal_attribute' &&
+        record.crm_pipeline_id === crmPipelineId
+    );
+  },
 };
 
 export const actions = {

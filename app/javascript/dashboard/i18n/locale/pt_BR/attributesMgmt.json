@@ -11,11 +11,14 @@
     "ATTRIBUTE_MODELS": {
       "CONVERSATION": "Conversas",
       "CONTACT": "Contato",
-      "COMPANY": "Empresa"
+      "COMPANY": "Empresa",
+      "DEAL": "Negócio"
     },
     "ATTRIBUTE_TYPES": {
       "TEXT": "Texto",
       "NUMBER": "Número",
+      "CURRENCY": "Moeda",
+      "PERCENT": "Percentual",
       "LINK": "Link",
       "DATE": "Data",
       "LIST": "Lista",
@@ -40,6 +43,11 @@
           "LABEL": "Aplica-se a",
           "PLACEHOLDER": "Por favor, selecione um",
           "ERROR": "O modelo é necessário"
+        },
+        "CRM_PIPELINE": {
+          "LABEL": "Funil",
+          "PLACEHOLDER": "Selecione um funil",
+          "ERROR": "O funil é obrigatório para atributos de negócio"
         },
         "TYPE": {
           "LABEL": "Tipo",
@@ -110,7 +118,8 @@
       "HEADER": "Atributos Personalizados",
       "CONVERSATION": "Conversas",
       "CONTACT": "Contato",
-      "COMPANY": "Empresa"
+      "COMPANY": "Empresa",
+      "DEAL": "Negócio"
     },
     "LIST": {
       "TABLE_HEADER": {

@@ -27,9 +27,6 @@ const defaultStageId = computed(
 
 const form = ref({
   name: props.deal?.name ?? '',
-  amount: props.deal?.amount ?? '',
-  close_date: props.deal?.close_date ?? '',
-  probability: props.deal?.probability ?? '',
   crm_stage_id: defaultStageId.value,
   crm_pipeline_id: props.pipelineId,
 });
@@ -44,13 +41,7 @@ async function handleSubmit() {
   }
   isSaving.value = true;
   try {
-    const payload = {
-      ...form.value,
-      amount: form.value.amount !== '' ? form.value.amount : null,
-      probability:
-        form.value.probability !== '' ? form.value.probability : null,
-      close_date: form.value.close_date || null,
-    };
+    const payload = { ...form.value };
     if (isEdit.value) {
       await store.dispatch('crmDeals/updateDeal', {
         id: props.deal.id,
@@ -110,46 +101,6 @@ async function handleSubmit() {
             {{ stage.name }}
           </option>
         </select>
-      </div>
-
-      <div class="grid grid-cols-2 gap-3">
-        <div>
-          <label class="block text-xs text-n-slate-9 mb-1">{{
-            t('CRM.AMOUNT')
-          }}</label>
-          <input
-            v-model="form.amount"
-            type="number"
-            min="0"
-            step="0.01"
-            :placeholder="t('CRM.FORM.AMOUNT_PLACEHOLDER')"
-            class="w-full text-sm px-3 py-2 rounded-lg border border-n-weak bg-white dark:bg-n-solid-3 text-n-slate-12 placeholder-n-slate-9 focus:outline-none focus:ring-1 focus:ring-woot-500"
-          />
-        </div>
-        <div>
-          <label class="block text-xs text-n-slate-9 mb-1">
-            {{ t('CRM.FORM.PROBABILITY_LABEL') }}
-          </label>
-          <input
-            v-model="form.probability"
-            type="number"
-            min="0"
-            max="100"
-            :placeholder="t('CRM.FORM.PROBABILITY_PLACEHOLDER')"
-            class="w-full text-sm px-3 py-2 rounded-lg border border-n-weak bg-white dark:bg-n-solid-3 text-n-slate-12 placeholder-n-slate-9 focus:outline-none focus:ring-1 focus:ring-woot-500"
-          />
-        </div>
-      </div>
-
-      <div>
-        <label class="block text-xs text-n-slate-9 mb-1">{{
-          t('CRM.CLOSE_DATE')
-        }}</label>
-        <input
-          v-model="form.close_date"
-          type="date"
-          class="w-full text-sm px-3 py-2 rounded-lg border border-n-weak bg-white dark:bg-n-solid-3 text-n-slate-12 focus:outline-none focus:ring-1 focus:ring-woot-500"
-        />
       </div>
 
       <div class="flex gap-2 pt-1">

@@ -20,8 +20,10 @@ end
 
 if resource.contact
   json.contact do
-    json.id   resource.contact.id
-    json.name resource.contact.name
+    json.id           resource.contact.id
+    json.name         resource.contact.name
+    json.email        resource.contact.email
+    json.phone_number resource.contact.phone_number
   end
 end
 

@@ -15,18 +15,25 @@
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  account_id             :bigint
+#  crm_pipeline_id        :uuid
 #
 # Indexes
 #
-#  attribute_key_model_index                         (attribute_key,attribute_model,account_id) UNIQUE
+#  attribute_key_model_index                         (attribute_key,attribute_model,account_id) UNIQUE WHERE (crm_pipeline_id IS NULL)
+#  attribute_key_model_pipeline_index                (attribute_key,attribute_model,account_id,crm_pipeline_id) UNIQUE WHERE (crm_pipeline_id IS NOT NULL)
 #  index_custom_attribute_definitions_on_account_id  (account_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (crm_pipeline_id => crm_pipelines.id)
 #
 class CustomAttributeDefinition < ApplicationRecord
   STANDARD_ATTRIBUTES = {
     :conversation => %w[status priority assignee_id inbox_id team_id display_id campaign_id labels browser_language country_code referer created_at
                         last_activity_at],
     :contact => %w[name email phone_number identifier country_code city company_name created_at last_activity_at referer blocked],
-    :company => %w[name domain description contacts_count created_at updated_at last_activity_at]
+    :company => %w[name domain description contacts_count created_at updated_at last_activity_at],
+    :deal => %w[name amount currency close_date probability crm_pipeline_id crm_stage_id contact_id assignee_id position]
   }.freeze
 
   scope :with_attribute_model, ->(attribute_model) { attribute_model.presence && where(attribute_model: attribute_model) }
@@ -35,25 +42,42 @@ class CustomAttributeDefinition < ApplicationRecord
 
   validates :attribute_key,
             presence: true,
-            uniqueness: { scope: [:account_id, :attribute_model] },
+            uniqueness: { scope: [:account_id, :attribute_model, :crm_pipeline_id] },
             format: { with: /\A[\p{L}\p{N}_.\-]+\z/, message: I18n.t('errors.custom_attribute_definition.attribute_key_format') }
 
   validates :attribute_display_type, presence: true
   validates :attribute_model, presence: true
+  validates :crm_pipeline_id, presence: true, if: :deal_attribute?
   validate :attribute_must_not_conflict, on: :create
+  validate :crm_pipeline_must_be_blank_unless_deal
+  validate :crm_pipeline_must_belong_to_account, if: :deal_attribute?
 
-  enum attribute_model: { conversation_attribute: 0, contact_attribute: 1, company_attribute: 2 }
+  enum attribute_model: { conversation_attribute: 0, contact_attribute: 1, company_attribute: 2, deal_attribute: 3 }
   enum attribute_display_type: { text: 0, number: 1, currency: 2, percent: 3, link: 4, date: 5, list: 6, checkbox: 7 }
 
   belongs_to :account
-  after_update :update_widget_pre_chat_custom_fields, unless: :company_attribute?
-  after_destroy :sync_widget_pre_chat_custom_fields, unless: :company_attribute?
+  belongs_to :crm_pipeline, optional: true
+  after_update :update_widget_pre_chat_custom_fields, unless: -> { company_attribute? || deal_attribute? }
+  after_destroy :sync_widget_pre_chat_custom_fields, unless: -> { company_attribute? || deal_attribute? }
 
   private
 
   def normalize_attribute_fields
     self.attribute_key = attribute_key.strip if attribute_key.present?
     self.attribute_display_name = attribute_display_name.strip if attribute_display_name.present?
+  end
+
+  def crm_pipeline_must_be_blank_unless_deal
+    return if deal_attribute? || crm_pipeline_id.blank?
+
+    errors.add(:crm_pipeline_id, I18n.t('errors.custom_attribute_definition.crm_pipeline_not_allowed'))
+  end
+
+  def crm_pipeline_must_belong_to_account
+    return if crm_pipeline_id.blank?
+    return if account.crm_pipelines.exists?(id: crm_pipeline_id)
+
+    errors.add(:crm_pipeline_id, :invalid)
   end
 
   def sync_widget_pre_chat_custom_fields

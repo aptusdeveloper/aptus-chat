@@ -11,11 +11,14 @@
     "ATTRIBUTE_MODELS": {
       "CONVERSATION": "Conversation",
       "CONTACT": "Contact",
-      "COMPANY": "Company"
+      "COMPANY": "Company",
+      "DEAL": "Deal"
     },
     "ATTRIBUTE_TYPES": {
       "TEXT": "Text",
       "NUMBER": "Number",
+      "CURRENCY": "Currency",
+      "PERCENT": "Percent",
       "LINK": "Link",
       "DATE": "Date",
       "LIST": "List",
@@ -40,6 +43,11 @@
           "LABEL": "Applies to",
           "PLACEHOLDER": "Please select one",
           "ERROR": "Model is required"
+        },
+        "CRM_PIPELINE": {
+          "LABEL": "Pipeline",
+          "PLACEHOLDER": "Select a pipeline",
+          "ERROR": "Pipeline is required for deal attributes"
         },
         "TYPE": {
           "LABEL": "Type",
@@ -110,7 +118,8 @@
       "HEADER": "Custom Attributes",
       "CONVERSATION": "Conversation",
       "CONTACT": "Contact",
-      "COMPANY": "Company"
+      "COMPANY": "Company",
+      "DEAL": "Deal"
     },
     "LIST": {
       "TABLE_HEADER": {

@@ -333,6 +333,7 @@
     "APPLICATIONS": "Aplicações",
     "LABELS": "Etiquetas",
     "CUSTOM_ATTRIBUTES": "Atributos Personalizados",
+    "CRM": "CRM",
     "AUTOMATION": "Automação",
     "MACROS": "Macros",
     "TEAMS": "Times",
@@ -918,6 +919,57 @@
       "DESCRIPTION": "Tem certeza de que deseja excluir esta política? Essa ação não pode ser desfeita.",
       "CONFIRM_BUTTON_LABEL": "Excluir",
       "CANCEL_BUTTON_LABEL": "Cancelar"
+    }
+  },
+  "CRM": {
+    "AMOUNT": "Valor",
+    "CLOSE_DATE": "Data de Fechamento",
+    "PROBABILITY": "Probabilidade",
+    "ASSIGNEE": "Responsável",
+    "CONTACT": "Contato",
+    "DELETE": "Excluir",
+    "CANCEL": "Cancelar",
+    "DELETING": "Excluindo...",
+    "CONFIRM_DELETE": "Confirmar",
+    "LOADING": "Carregando...",
+    "NO_PIPELINES": "Nenhum funil encontrado.",
+    "NO_STAGES": "Nenhuma etapa neste funil.",
+    "WON": "Ganho",
+    "LOST": "Perdido",
+    "CUSTOM_FIELDS": {
+      "TITLE": "Campos Personalizados",
+      "ADD_FIELD": "Adicionar campo personalizado",
+      "UPDATE_SUCCESS": "Campo personalizado atualizado com sucesso",
+      "UPDATE_ERROR": "Não foi possível atualizar o campo personalizado. Tente novamente."
+    },
+    "FORM": {
+      "CREATE_DEAL": "Novo Lead",
+      "EDIT_DEAL": "Editar Lead",
+      "NAME": "Nome",
+      "NAME_PLACEHOLDER": "Nome do lead",
+      "NAME_REQUIRED": "O nome é obrigatório.",
+      "STAGE": "Etapa",
+      "AMOUNT_PLACEHOLDER": "0,00",
+      "PROBABILITY_LABEL": "Probabilidade %",
+      "PROBABILITY_PLACEHOLDER": "0",
+      "SAVE": "Salvar",
+      "SAVING": "Salvando..."
+    },
+    "SETTINGS": {
+      "TITLE": "Configurações do Funil",
+      "PIPELINES": "Funis",
+      "STAGES": "Etapas",
+      "CUSTOM_FIELDS": "Campos personalizados",
+      "PIPELINE_NAME_PLACEHOLDER": "Nome do funil",
+      "STAGE_NAME_PLACEHOLDER": "Nome da etapa",
+      "CUSTOM_FIELD_NAME_PLACEHOLDER": "Nome do campo",
+      "CUSTOM_FIELD_OPTIONS_PLACEHOLDER": "Opcoes separadas por virgula",
+      "COLOR": "Cor",
+      "WIN_STAGE": "Ganho",
+      "LOSS_STAGE": "Perda",
+      "ACTIVE": "Ativo",
+      "INACTIVE": "Inativo",
+      "SELECT_PIPELINE": "Selecione um funil para gerenciar suas etapas."
     }
   }
 }

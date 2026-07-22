@@ -46,13 +46,22 @@ export default {
       values: [],
       show: true,
       tagInputTouched: false,
+      crmPipelineId: '',
+      pipelineTouched: false,
     };
   },
 
   computed: {
     ...mapGetters({
       uiFlags: 'getUIFlags',
+      pipelines: 'crmDeals/pipelines',
     }),
+    isModelDeal() {
+      return this.attributeModel === 3;
+    },
+    isPipelineInvalid() {
+      return this.isModelDeal && this.pipelineTouched && !this.crmPipelineId;
+    },
     models() {
       return ATTRIBUTE_MODELS.map(item => ({
         ...item,
@@ -79,7 +88,8 @@ export default {
         this.v$.displayName.$invalid ||
         this.v$.description.$invalid ||
         this.uiFlags.isCreating ||
-        this.isTagInputEmpty
+        this.isTagInputEmpty ||
+        (this.isModelDeal && !this.crmPipelineId)
       );
     },
     keyErrorMessage() {
@@ -117,6 +127,14 @@ export default {
       this.tagInputTouched = false;
       this.values = [];
     },
+    attributeModel() {
+      this.crmPipelineId = '';
+      this.pipelineTouched = false;
+    },
+  },
+
+  created() {
+    this.$store.dispatch('crmDeals/fetchPipelines');
   },
 
   methods: {
@@ -128,7 +146,8 @@ export default {
     },
     async addAttributes() {
       this.v$.$touch();
-      if (this.v$.$invalid) {
+      this.pipelineTouched = true;
+      if (this.v$.$invalid || this.isPipelineInvalid) {
         return;
       }
       if (!this.regexEnabled) {
@@ -145,6 +164,7 @@ export default {
           attribute_values: this.attributeListValues,
           regex_pattern: normalizeRegexPattern(this.regexPattern),
           regex_cue: this.regexCue,
+          crm_pipeline_id: this.isModelDeal ? this.crmPipelineId : null,
         });
         this.alertMessage = this.$t('ATTRIBUTES_MGMT.ADD.API.SUCCESS_MESSAGE');
         this.onClose();
@@ -176,6 +196,24 @@ export default {
             </select>
             <span v-if="v$.attributeModel.$error" class="message">
               {{ $t('ATTRIBUTES_MGMT.ADD.FORM.MODEL.ERROR') }}
+            </span>
+          </label>
+          <label v-if="isModelDeal" :class="{ error: isPipelineInvalid }">
+            {{ $t('ATTRIBUTES_MGMT.ADD.FORM.CRM_PIPELINE.LABEL') }}
+            <select v-model="crmPipelineId" @blur="pipelineTouched = true">
+              <option value="" disabled>
+                {{ $t('ATTRIBUTES_MGMT.ADD.FORM.CRM_PIPELINE.PLACEHOLDER') }}
+              </option>
+              <option
+                v-for="pipeline in pipelines"
+                :key="pipeline.id"
+                :value="pipeline.id"
+              >
+                {{ pipeline.name }}
+              </option>
+            </select>
+            <span v-if="isPipelineInvalid" class="message">
+              {{ $t('ATTRIBUTES_MGMT.ADD.FORM.CRM_PIPELINE.ERROR') }}
             </span>
           </label>
           <woot-input
