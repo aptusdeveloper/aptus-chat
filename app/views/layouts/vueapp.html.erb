@@ -1,9 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>
-      <%= @global_config['INSTALLATION_NAME'] %>
-    </title>
+    <title>AptusChat</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=0"/>
     <% if @global_config['DISPLAY_MANIFEST'] %>
       <meta name="msapplication-TileColor" content="#1f93ff">
@@ -28,7 +26,18 @@
       <link class="favicon" rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
       <link rel="manifest" href="/manifest.json">
     <% end %>
-    <link rel="icon" type="image/png" sizes="512x512" href="<%= @global_config['LOGO_THUMBNAIL'] %>">
+    <link rel="icon" type="image/svg+xml" id="theme-favicon" href="/brand-assets/robo-azul.svg">
+    <script>
+      (function () {
+        var darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        function updateFavicon(isDark) {
+          var el = document.getElementById('theme-favicon');
+          if (el) el.href = isDark ? '/brand-assets/robo-branco.svg' : '/brand-assets/robo-azul.svg';
+        }
+        updateFavicon(darkQuery.matches);
+        darkQuery.addEventListener('change', function (e) { updateFavicon(e.matches); });
+      })();
+    </script>
     <%= csrf_meta_tags %>
     <script>
       window.chatwootConfig = {

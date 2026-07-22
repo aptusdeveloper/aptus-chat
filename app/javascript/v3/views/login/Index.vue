@@ -7,7 +7,6 @@ import { required, email } from '@vuelidate/validators';
 import { useVuelidate } from '@vuelidate/core';
 import { SESSION_STORAGE_KEYS } from 'dashboard/constants/sessionStorage';
 import SessionStorage from 'shared/helpers/sessionStorage';
-import { useBranding } from 'shared/composables/useBranding';
 import AnalyticsHelper from 'dashboard/helper/AnalyticsHelper';
 import { SESSION_EVENTS } from 'dashboard/helper/AnalyticsHelper/events';
 
@@ -50,14 +49,14 @@ export default {
     authError: { type: String, default: '' },
   },
   setup() {
-    const { replaceInstallationName } = useBranding();
     return {
-      replaceInstallationName,
       v$: useVuelidate(),
     };
   },
   data() {
     return {
+      lightLogo: '/brand-assets/logo-azul.svg',
+      darkLogo: '/brand-assets/logo-branca.svg',
       // We need to initialize the component with any
       // properties that will be used in it
       credentials: {
@@ -294,19 +293,15 @@ export default {
   >
     <section class="max-w-5xl mx-auto">
       <img
-        :src="globalConfig.logo"
+        :src="lightLogo"
         :alt="globalConfig.installationName"
-        class="block w-auto h-8 mx-auto dark:hidden"
+        class="block w-auto h-32 mx-auto dark:hidden"
       />
       <img
-        v-if="globalConfig.logoDark"
-        :src="globalConfig.logoDark"
+        :src="darkLogo"
         :alt="globalConfig.installationName"
-        class="hidden w-auto h-8 mx-auto dark:block"
+        class="hidden w-auto h-32 mx-auto dark:block"
       />
-      <h2 class="mt-6 text-3xl font-medium text-center text-n-slate-12">
-        {{ replaceInstallationName($t('LOGIN.TITLE')) }}
-      </h2>
       <p v-if="showSignupLink" class="mt-3 text-sm text-center text-n-slate-11">
         {{ $t('COMMON.OR') }}
         <router-link to="auth/signup" class="lowercase text-link text-n-brand">
