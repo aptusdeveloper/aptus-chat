@@ -65,7 +65,8 @@
         "CONNECT_YOUR_TIKTOK_PROFILE": "Conecte seu perfil do TikTok",
         "HELP": "Para adicionar seu perfil do TikTok como um canal, é necessário autenticar seu perfil clicando em 'Continuar com TikTok'. ",
         "ERROR_MESSAGE": "Ocorreu um erro ao conectar com o TikTok, por favor, tente novamente",
-        "ERROR_AUTH": "Ocorreu um erro ao conectar com o TikTok, por favor, tente novamente"
+        "ERROR_AUTH": "Ocorreu um erro ao conectar com o TikTok, por favor, tente novamente",
+        "NORTH_AMERICA_WARNING": "As conexões TikTok para contas norte-americanas estão temporariamente indisponíveis enquanto aguardamos uma atualização da equipe TikTok."
       },
       "TWITTER": {
         "HELP": "Para adicionar seu perfil do Twitter como um canal, você precisa autenticar seu perfil do Twitter clicando em 'Entrar com o Twitter' ",
@@ -653,6 +654,10 @@
       },
       "CREDENTIALS": {
         "DESCRIPTION": "Chamada de voz requer credenciais de chave da API Twilio. Elas são usadas para gerar tokens para conexões de voz do agente."
+      },
+      "INBOUND": {
+        "LABEL": "Permitir chamadas recebidas",
+        "DESCRIPTION": "Permita que os clientes liguem para este número. Quando desativado, as chamadas recebidas são recusadas automaticamente — os agentes não são notificados e nenhuma conversa é criada. Os agentes ainda podem fazer chamadas."
       }
     },
     "WHATSAPP_CALLING": {

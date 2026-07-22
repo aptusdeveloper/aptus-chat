@@ -1,16 +1,14 @@
 openapi: '3.1.0'
 info:
-  title: Chatwoot
-  description: This is the API documentation for Chatwoot server.
-  version: 1.1.0
-  termsOfService: https://www.chatwoot.com/terms-of-service/
-  contact:
-    email: hello@chatwoot.com
+  title: AptusChat API
+  description: Documentação completa das APIs HTTP do servidor AptusChat.
+  version: 2.0.0
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
 servers:
-  - url: https://app.chatwoot.com/
+  - url: /
+    description: Servidor AptusChat atual
 paths:
   $ref: ./paths/index.yml
 components:
@@ -23,34 +21,56 @@ components:
       type: apiKey
       in: header
       name: api_access_token
-      description: This token can be obtained by visiting the profile page or via rails console. Provides access to  endpoints based on the user permissions levels. This token can be saved by an external system when user is created via API, to perform activities on behalf of the user.
+      description: Token obtido na página de perfil ou pelo console Rails. O acesso respeita as permissões do usuário.
     agentBotApiKey:
       type: apiKey
       in: header
       name: api_access_token
-      description: This token should be provided by system admin or obtained via rails console. This token can be used to build bot integrations and can only access limited apis.
+      description: Token fornecido pelo administrador para integrações com bots, com acesso limitado às APIs permitidas.
     platformAppApiKey:
       type: apiKey
       in: header
       name: api_access_token
-      description: This token can be obtained by the system admin after creating a platformApp. This token should be used to provision agent bots, accounts, users and their roles.
+      description: Token criado pelo administrador para provisionar contas, usuários, funções e bots da plataforma.
 tags:
+  - name: API da Aplicação
+    description: Endpoints internos utilizados pelo dashboard e por integrações autenticadas.
+  - name: API da Plataforma
+    description: Provisionamento e administração por aplicativos da plataforma.
+  - name: API Pública
+    description: Endpoints públicos destinados a contatos e ao Help Center.
+  - name: Widget
+    description: Operações utilizadas pelo widget de atendimento.
+  - name: Autenticação
+    description: Sessões, tokens, confirmação e recuperação de acesso.
+  - name: Webhooks e callbacks
+    description: Recebimento de eventos e retornos de serviços externos.
+  - name: CRM
+    description: Pipelines, estágios e negócios do CRM AptusChat.
+  - name: Captain e Copilot
+    description: Desabilitada no AptusChat — recursos de inteligência artificial ocultos no MVP.
+  - name: Empresas
+    description: Desabilitada no AptusChat — módulo Empresas oculto no MVP.
+  - name: Campanhas
+    description: Desabilitada no AptusChat — módulo Campanhas oculto no MVP.
+  - name: Portais e Help Center
+    description: Desabilitada no AptusChat — portais e Help Center ocultos no MVP.
   - name: Accounts
-    description: Account management APIs
+    description: APIs de gerenciamento de contas
   - name: Account Users
-    description: Account user management APIs
+    description: APIs de usuários das contas
   - name: AgentBots
-    description: Bot integrations
+    description: Integrações com bots
   - name: Users
-    description: User management APIs
+    description: APIs de gerenciamento de usuários
   - name: Account AgentBots
     description: Account-specific Agent Bots
   - name: Agents
-    description: Agent management APIs
+    description: APIs de gerenciamento de agentes
   - name: Canned Responses
-    description: Pre-defined responses for common queries
+    description: Respostas predefinidas para dúvidas frequentes
   - name: Contacts
-    description: Contact management APIs
+    description: APIs de gerenciamento de contatos
   - name: Contact Labels
     description: Manage contact labels
   - name: Conversation Assignments
@@ -58,23 +78,23 @@ tags:
   - name: Conversation Labels
     description: Manage conversation labels
   - name: Conversations
-    description: Conversation management APIs
+    description: APIs de gerenciamento de conversas
   - name: Custom Attributes
     description: Custom fields for contacts and conversations
   - name: Custom Filters
     description: Saved filters for conversations
   - name: Inboxes
-    description: Communication channels setup
+    description: Configuração dos canais de comunicação
   - name: Integrations
-    description: Third-party integrations
+    description: Integrações com serviços externos
   - name: Labels
     description: Account label management APIs
   - name: Messages
-    description: Message management APIs
+    description: APIs de gerenciamento de mensagens
   - name: Profile
     description: User profile APIs
   - name: Reports
-    description: Analytics and reporting APIs
+    description: Desabilitada no AptusChat — APIs de análises e relatórios
   - name: Teams
     description: Team management APIs
   - name: Webhooks
@@ -82,7 +102,7 @@ tags:
   - name: Automation Rule
     description: Workflow automation rules
   - name: Help Center
-    description: Knowledge base management
+    description: Desabilitada no AptusChat — gerenciamento da base de conhecimento
   - name: Contacts API
     description: Public contact APIs
   - name: Conversations API
@@ -94,12 +114,19 @@ tags:
 x-tagGroups:
   - name: Platform
     tags:
+      - API da Plataforma
       - Accounts
       - Account Users
       - AgentBots
       - Users
   - name: Application
     tags:
+      - API da Aplicação
+      - CRM
+      - Captain e Copilot
+      - Empresas
+      - Campanhas
+      - Portais e Help Center
       - Account AgentBots
       - Account
       - Agents
@@ -124,9 +151,13 @@ x-tagGroups:
       - Help Center
   - name: Client
     tags:
+      - API Pública
+      - Widget
       - Contacts API
       - Conversations API
       - Messages API
   - name: Others
     tags:
+      - Autenticação
+      - Webhooks e callbacks
       - CSAT Survey Page

@@ -149,5 +149,10 @@
   },
   "FOOTER_REPLY_TO": {
     "REPLY_TO": "Respondendo a:"
+  },
+  "EMOJI_ICON_PICKER": {
+    "SEARCH_EMOJI": "Pesquisar emoticons…",
+    "FREQUENTLY_USED": "Usado com frequência",
+    "NO_EMOJI": "Nenhum emoji corresponde à sua pesquisa"
   }
 }

@@ -13,5 +13,14 @@ describe '/swagger', type: :request do
       get '/swagger/%2Fetc%2Fpasswd'
       expect(response).to have_http_status(:not_found)
     end
+
+    it 'permanece indisponível em produção' do
+      allow(Rails.env).to receive(:development?).and_return(false)
+      allow(Rails.env).to receive(:test?).and_return(false)
+
+      get '/swagger'
+
+      expect(response).to have_http_status(:not_found)
+    end
   end
 end

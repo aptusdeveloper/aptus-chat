@@ -43,6 +43,10 @@ const getTemplateHeader = template => {
   return findComponentByType(template, COMPONENT_TYPES.HEADER);
 };
 
+const getTemplateCarousel = template => {
+  return findComponentByType(template, COMPONENT_TYPES.CAROUSEL);
+};
+
 const getTemplateFooter = template => {
   return findComponentByType(template, COMPONENT_TYPES.FOOTER);
 };
@@ -114,6 +118,19 @@ const refreshTemplates = async () => {
               >
                 {{ t('WHATSAPP_TEMPLATES.PICKER.LABELS.LANGUAGE') }}:
                 {{ template.language }}
+              </span>
+            </div>
+            <!-- Carousel badge -->
+            <div v-if="getTemplateCarousel(template)" class="mb-3">
+              <span
+                class="inline-block px-2 py-1 text-xs leading-none rounded-lg cursor-default bg-n-amber-3 text-n-amber-12"
+              >
+                {{ t('WHATSAPP_TEMPLATES.PICKER.CAROUSEL_BADGE') }} ·
+                {{
+                  t('WHATSAPP_TEMPLATES.PICKER.CAROUSEL_CARD_COUNT', {
+                    count: getTemplateCarousel(template).cards?.length || 0,
+                  })
+                }}
               </span>
             </div>
             <!-- Header -->

@@ -17,10 +17,12 @@ export default {
 
 <template>
   <div
-    class="bg-n-slate-12 dark:bg-n-slate-7 rounded-md drop-shadow-md mb-4 max-w-[40rem] inline-flex items-center min-w-[22rem] py-3 px-4"
+    class="bg-n-slate-12 dark:bg-n-slate-7 rounded-md drop-shadow-md mb-4 max-w-[48rem] inline-flex items-start min-w-[22rem] py-4 px-5"
     :class="isActionPresent ? 'justify-between' : 'justify-center'"
   >
-    <div class="text-sm font-medium text-white">
+    <div
+      class="text-sm font-medium leading-6 text-left text-white whitespace-pre-line"
+    >
       {{ message }}
     </div>
     <div v-if="isActionPresent" class="ml-4">

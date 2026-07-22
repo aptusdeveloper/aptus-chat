@@ -1,13 +1,9 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Chatwoot",
-    "description": "This is the API documentation for Chatwoot server.",
-    "version": "1.1.0",
-    "termsOfService": "https://www.chatwoot.com/terms-of-service/",
-    "contact": {
-      "email": "hello@chatwoot.com"
-    },
+    "title": "AptusChat API",
+    "description": "Documentação completa das APIs HTTP do servidor AptusChat.",
+    "version": "2.0.0",
     "license": {
       "name": "MIT License",
       "url": "https://opensource.org/licenses/MIT"
@@ -15,10 +11,2054 @@
   },
   "servers": [
     {
-      "url": "https://app.chatwoot.com/"
+      "url": "/",
+      "description": "Servidor AptusChat atual"
     }
   ],
   "paths": {
+    "/auth/sign_in": {
+      "get": {
+        "tags": [
+          "Autenticação"
+        ],
+        "operationId": "get-devise_overrides-sessions-new-auth-sign_in",
+        "summary": "Executar operação de sessions",
+        "description": "Executa `GET /auth/sign_in`. Operação implementada por `devise_overrides/sessions#new`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "devise_overrides/sessions#new",
+        "x-aptus-status": "enabled"
+      },
+      "post": {
+        "tags": [
+          "Autenticação"
+        ],
+        "operationId": "post-devise_overrides-sessions-create-auth-sign_in",
+        "summary": "Criar sessions",
+        "description": "Executa `POST /auth/sign_in`. Operação implementada por `devise_overrides/sessions#create`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "devise_overrides/sessions#create",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/sign_out": {
+      "delete": {
+        "tags": [
+          "Autenticação"
+        ],
+        "operationId": "delete-devise_overrides-sessions-destroy-auth-sign_out",
+        "summary": "Excluir sessions",
+        "description": "Executa `DELETE /auth/sign_out`. Operação implementada por `devise_overrides/sessions#destroy`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "devise_overrides/sessions#destroy",
+        "x-aptus-status": "enabled"
+      }
+    },
+    "/auth/password/new": {
+      "get": {
+        "tags": [
+          "Autenticação"
+        ],
+        "operationId": "get-devise_overrides-passwords-new-auth-password-new",
+        "summary": "Executar operação de passwords",
+        "description": "Executa `GET /auth/password/new`. Operação implementada por `devise_overrides/passwords#new`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "devise_overrides/passwords#new",
+        "x-aptus-status": "enabled"
+      }
+    },
+    "/auth/password/edit": {
+      "get": {
+        "tags": [
+          "Autenticação"
+        ],
+        "operationId": "get-devise_overrides-passwords-edit-auth-password-edit",
+        "summary": "Executar operação de passwords",
+        "description": "Executa `GET /auth/password/edit`. Operação implementada por `devise_overrides/passwords#edit`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "devise_overrides/passwords#edit",
+        "x-aptus-status": "enabled"
+      }
+    },
+    "/auth/password": {
+      "patch": {
+        "tags": [
+          "Autenticação"
+        ],
+        "operationId": "patch-devise_overrides-passwords-update-auth-password",
+        "summary": "Atualizar passwords",
+        "description": "Executa `PATCH /auth/password`. Operação implementada por `devise_overrides/passwords#update`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "devise_overrides/passwords#update",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Autenticação"
+        ],
+        "operationId": "put-devise_overrides-passwords-update-auth-password",
+        "summary": "Atualizar passwords",
+        "description": "Executa `PUT /auth/password`. Operação implementada por `devise_overrides/passwords#update`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "devise_overrides/passwords#update",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Autenticação"
+        ],
+        "operationId": "post-devise_overrides-passwords-create-auth-password",
+        "summary": "Criar passwords",
+        "description": "Executa `POST /auth/password`. Operação implementada por `devise_overrides/passwords#create`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "devise_overrides/passwords#create",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/cancel": {
+      "get": {
+        "tags": [
+          "Autenticação"
+        ],
+        "operationId": "get-devise_token_auth-registrations-cancel-auth-cancel",
+        "summary": "Executar operação de registrations",
+        "description": "Executa `GET /auth/cancel`. Operação implementada por `devise_token_auth/registrations#cancel`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "devise_token_auth/registrations#cancel",
+        "x-aptus-status": "enabled"
+      }
+    },
+    "/auth/sign_up": {
+      "get": {
+        "tags": [
+          "Autenticação"
+        ],
+        "operationId": "get-devise_token_auth-registrations-new-auth-sign_up",
+        "summary": "Executar operação de registrations",
+        "description": "Executa `GET /auth/sign_up`. Operação implementada por `devise_token_auth/registrations#new`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "devise_token_auth/registrations#new",
+        "x-aptus-status": "enabled"
+      }
+    },
+    "/auth/edit": {
+      "get": {
+        "tags": [
+          "Autenticação"
+        ],
+        "operationId": "get-devise_token_auth-registrations-edit-auth-edit",
+        "summary": "Executar operação de registrations",
+        "description": "Executa `GET /auth/edit`. Operação implementada por `devise_token_auth/registrations#edit`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "devise_token_auth/registrations#edit",
+        "x-aptus-status": "enabled"
+      }
+    },
+    "/auth": {
+      "patch": {
+        "tags": [
+          "Autenticação"
+        ],
+        "operationId": "patch-devise_token_auth-registrations-update-auth",
+        "summary": "Atualizar registrations",
+        "description": "Executa `PATCH /auth`. Operação implementada por `devise_token_auth/registrations#update`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "devise_token_auth/registrations#update",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Autenticação"
+        ],
+        "operationId": "put-devise_token_auth-registrations-update-auth",
+        "summary": "Atualizar registrations",
+        "description": "Executa `PUT /auth`. Operação implementada por `devise_token_auth/registrations#update`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "devise_token_auth/registrations#update",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Autenticação"
+        ],
+        "operationId": "delete-devise_token_auth-registrations-destroy-auth",
+        "summary": "Excluir registrations",
+        "description": "Executa `DELETE /auth`. Operação implementada por `devise_token_auth/registrations#destroy`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "devise_token_auth/registrations#destroy",
+        "x-aptus-status": "enabled"
+      },
+      "post": {
+        "tags": [
+          "Autenticação"
+        ],
+        "operationId": "post-devise_token_auth-registrations-create-auth",
+        "summary": "Criar registrations",
+        "description": "Executa `POST /auth`. Operação implementada por `devise_token_auth/registrations#create`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "devise_token_auth/registrations#create",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/confirmation/new": {
+      "get": {
+        "tags": [
+          "Autenticação"
+        ],
+        "operationId": "get-devise_overrides-confirmations-new-auth-confirmation-new",
+        "summary": "Executar operação de confirmations",
+        "description": "Executa `GET /auth/confirmation/new`. Operação implementada por `devise_overrides/confirmations#new`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "devise_overrides/confirmations#new",
+        "x-aptus-status": "enabled"
+      }
+    },
+    "/auth/confirmation": {
+      "get": {
+        "tags": [
+          "Autenticação"
+        ],
+        "operationId": "get-devise_overrides-confirmations-show-auth-confirmation",
+        "summary": "Consultar confirmations",
+        "description": "Executa `GET /auth/confirmation`. Operação implementada por `devise_overrides/confirmations#show`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "devise_overrides/confirmations#show",
+        "x-aptus-status": "enabled"
+      },
+      "post": {
+        "tags": [
+          "Autenticação"
+        ],
+        "operationId": "post-devise_overrides-confirmations-create-auth-confirmation",
+        "summary": "Criar confirmations",
+        "description": "Executa `POST /auth/confirmation`. Operação implementada por `devise_overrides/confirmations#create`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "devise_overrides/confirmations#create",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/validate_token": {
+      "get": {
+        "tags": [
+          "Autenticação"
+        ],
+        "operationId": "get-devise_overrides-token_validations-validate_token-auth-validate_token",
+        "summary": "Executar operação de token validations",
+        "description": "Executa `GET /auth/validate_token`. Operação implementada por `devise_overrides/token_validations#validate_token`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "devise_overrides/token_validations#validate_token",
+        "x-aptus-status": "enabled"
+      }
+    },
+    "/auth/failure": {
+      "get": {
+        "tags": [
+          "Autenticação"
+        ],
+        "operationId": "get-devise_overrides-omniauth_callbacks-omniauth_failure-auth-failure",
+        "summary": "Executar operação de omniauth callbacks",
+        "description": "Executa `GET /auth/failure`. Operação implementada por `devise_overrides/omniauth_callbacks#omniauth_failure`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "devise_overrides/omniauth_callbacks#omniauth_failure",
+        "x-aptus-status": "enabled"
+      },
+      "post": {
+        "tags": [
+          "Autenticação"
+        ],
+        "operationId": "post-devise_overrides-omniauth_callbacks-omniauth_failure-auth-failure",
+        "summary": "Executar operação de omniauth callbacks",
+        "description": "Executa `POST /auth/failure`. Operação implementada por `devise_overrides/omniauth_callbacks#omniauth_failure`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "devise_overrides/omniauth_callbacks#omniauth_failure",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/{provider}/callback": {
+      "get": {
+        "tags": [
+          "Autenticação"
+        ],
+        "operationId": "get-devise_overrides-omniauth_callbacks-omniauth_success-auth-provider-callback",
+        "summary": "Executar operação de omniauth callbacks",
+        "description": "Executa `GET /auth/{provider}/callback`. Operação implementada por `devise_overrides/omniauth_callbacks#omniauth_success`.",
+        "parameters": [
+          {
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `provider`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "devise_overrides/omniauth_callbacks#omniauth_success",
+        "x-aptus-status": "enabled"
+      },
+      "post": {
+        "tags": [
+          "Autenticação"
+        ],
+        "operationId": "post-devise_overrides-omniauth_callbacks-omniauth_success-auth-provider-callback",
+        "summary": "Executar operação de omniauth callbacks",
+        "description": "Executa `POST /auth/{provider}/callback`. Operação implementada por `devise_overrides/omniauth_callbacks#omniauth_success`.",
+        "parameters": [
+          {
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `provider`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "devise_overrides/omniauth_callbacks#omniauth_success",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/{provider}": {
+      "get": {
+        "tags": [
+          "Autenticação"
+        ],
+        "operationId": "get-auth-provider",
+        "summary": "Executar operação de ",
+        "description": "Executa `GET /auth/{provider}`. Operação implementada por `#`.",
+        "parameters": [
+          {
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `provider`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "#",
+        "x-aptus-status": "enabled"
+      },
+      "post": {
+        "tags": [
+          "Autenticação"
+        ],
+        "operationId": "post-auth-provider",
+        "summary": "Executar operação de ",
+        "description": "Executa `POST /auth/{provider}`. Operação implementada por `#`.",
+        "parameters": [
+          {
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `provider`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "#",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/resend_confirmation": {
+      "post": {
+        "tags": [
+          "Autenticação"
+        ],
+        "operationId": "post-auth-resend_confirmations-create-resend_confirmation",
+        "summary": "Criar resend confirmations",
+        "description": "Executa `POST /resend_confirmation`. Operação implementada por `auth/resend_confirmations#create`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "auth/resend_confirmations#create",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/accounts/{account_id}/callbacks/register_facebook_page": {
+      "post": {
+        "tags": [
+          "Webhooks e callbacks"
+        ],
+        "operationId": "post-api-v1-accounts-callbacks-register_facebook_page-api-v1-accounts-account_id-callbacks-register_facebook_page",
+        "summary": "Executar operação de callbacks",
+        "description": "Executa `POST /api/v1/accounts/{account_id}/callbacks/register_facebook_page`. Operação implementada por `api/v1/accounts/callbacks#register_facebook_page`.",
+        "parameters": [
+          {
+            "name": "account_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `account_id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/accounts/callbacks#register_facebook_page",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Webhooks e callbacks"
+        ],
+        "operationId": "get-api-v1-accounts-callbacks-register_facebook_page-api-v1-accounts-account_id-callbacks-register_facebook_page",
+        "summary": "Executar operação de callbacks",
+        "description": "Executa `GET /api/v1/accounts/{account_id}/callbacks/register_facebook_page`. Operação implementada por `api/v1/accounts/callbacks#register_facebook_page`.",
+        "parameters": [
+          {
+            "name": "account_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `account_id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/accounts/callbacks#register_facebook_page",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/v1/accounts/{account_id}/callbacks/facebook_pages": {
+      "post": {
+        "tags": [
+          "Webhooks e callbacks"
+        ],
+        "operationId": "post-api-v1-accounts-callbacks-facebook_pages-api-v1-accounts-account_id-callbacks-facebook_pages",
+        "summary": "Executar operação de callbacks",
+        "description": "Executa `POST /api/v1/accounts/{account_id}/callbacks/facebook_pages`. Operação implementada por `api/v1/accounts/callbacks#facebook_pages`.",
+        "parameters": [
+          {
+            "name": "account_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `account_id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/accounts/callbacks#facebook_pages",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/accounts/{account_id}/callbacks/reauthorize_page": {
+      "post": {
+        "tags": [
+          "Webhooks e callbacks"
+        ],
+        "operationId": "post-api-v1-accounts-callbacks-reauthorize_page-api-v1-accounts-account_id-callbacks-reauthorize_page",
+        "summary": "Executar operação de callbacks",
+        "description": "Executa `POST /api/v1/accounts/{account_id}/callbacks/reauthorize_page`. Operação implementada por `api/v1/accounts/callbacks#reauthorize_page`.",
+        "parameters": [
+          {
+            "name": "account_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `account_id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/accounts/callbacks#reauthorize_page",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/accounts/{account_id}/inboxes/{id}/register_webhook": {
+      "post": {
+        "tags": [
+          "Webhooks e callbacks"
+        ],
+        "operationId": "post-api-v1-accounts-inboxes-register_webhook-api-v1-accounts-account_id-inboxes-id-register_webhook",
+        "summary": "Executar operação de inboxes",
+        "description": "Executa `POST /api/v1/accounts/{account_id}/inboxes/{id}/register_webhook`. Operação implementada por `api/v1/accounts/inboxes#register_webhook`.",
+        "parameters": [
+          {
+            "name": "account_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `account_id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/accounts/inboxes#register_webhook",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/accounts/{account_id}/webhooks": {
+      "get": {
+        "tags": [
+          "Webhooks e callbacks"
+        ],
+        "operationId": "get-api-v1-accounts-webhooks-index-api-v1-accounts-account_id-webhooks",
+        "summary": "Listar webhooks",
+        "description": "Executa `GET /api/v1/accounts/{account_id}/webhooks`. Operação implementada por `api/v1/accounts/webhooks#index`.",
+        "parameters": [
+          {
+            "name": "account_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `account_id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "description": "Array of webhook objects",
+                  "items": {
+                    "$ref": "#/components/schemas/webhook"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bad_request_error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/accounts/webhooks#index",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Webhooks e callbacks"
+        ],
+        "operationId": "post-api-v1-accounts-webhooks-create-api-v1-accounts-account_id-webhooks",
+        "summary": "Criar webhooks",
+        "description": "Executa `POST /api/v1/accounts/{account_id}/webhooks`. Operação implementada por `api/v1/accounts/webhooks#create`.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/account_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/webhook"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/bad_request_error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/accounts/webhooks#create",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true,
+                "$ref": "#/components/schemas/webhook_create_update_payload"
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "$ref": "#/components/parameters/account_id"
+        }
+      ]
+    },
+    "/api/v1/accounts/{account_id}/webhooks/{id}": {
+      "patch": {
+        "tags": [
+          "Webhooks e callbacks"
+        ],
+        "operationId": "patch-api-v1-accounts-webhooks-update-api-v1-accounts-account_id-webhooks-id",
+        "summary": "Atualizar webhooks",
+        "description": "Executa `PATCH /api/v1/accounts/{account_id}/webhooks/{id}`. Operação implementada por `api/v1/accounts/webhooks#update`.",
+        "parameters": [
+          {
+            "name": "account_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `account_id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/accounts/webhooks#update",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Webhooks e callbacks"
+        ],
+        "operationId": "put-api-v1-accounts-webhooks-update-api-v1-accounts-account_id-webhooks-id",
+        "summary": "Atualizar webhooks",
+        "description": "Executa `PUT /api/v1/accounts/{account_id}/webhooks/{id}`. Operação implementada por `api/v1/accounts/webhooks#update`.",
+        "parameters": [
+          {
+            "name": "account_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `account_id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/accounts/webhooks#update",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Webhooks e callbacks"
+        ],
+        "operationId": "delete-api-v1-accounts-webhooks-destroy-api-v1-accounts-account_id-webhooks-id",
+        "summary": "Excluir webhooks",
+        "description": "Executa `DELETE /api/v1/accounts/{account_id}/webhooks/{id}`. Operação implementada por `api/v1/accounts/webhooks#destroy`.",
+        "parameters": [
+          {
+            "name": "account_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `account_id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/accounts/webhooks#destroy",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/v1/integrations/webhooks": {
+      "post": {
+        "tags": [
+          "Webhooks e callbacks"
+        ],
+        "operationId": "post-api-v1-integrations-webhooks-create-api-v1-integrations-webhooks",
+        "summary": "Criar webhooks",
+        "description": "Executa `POST /api/v1/integrations/webhooks`. Operação implementada por `api/v1/integrations/webhooks#create`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/integrations/webhooks#create",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhooks/twitter": {
+      "get": {
+        "tags": [
+          "Webhooks e callbacks"
+        ],
+        "operationId": "get-api-v1-webhooks-twitter_crc-webhooks-twitter",
+        "summary": "Executar operação de webhooks",
+        "description": "Executa `GET /webhooks/twitter`. Operação implementada por `api/v1/webhooks#twitter_crc`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "api/v1/webhooks#twitter_crc",
+        "x-aptus-status": "enabled"
+      },
+      "post": {
+        "tags": [
+          "Webhooks e callbacks"
+        ],
+        "operationId": "post-api-v1-webhooks-twitter_events-webhooks-twitter",
+        "summary": "Executar operação de webhooks",
+        "description": "Executa `POST /webhooks/twitter`. Operação implementada por `api/v1/webhooks#twitter_events`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "api/v1/webhooks#twitter_events",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhooks/line/{line_channel_id}": {
+      "post": {
+        "tags": [
+          "Webhooks e callbacks"
+        ],
+        "operationId": "post-webhooks-line-process_payload-webhooks-line-line_channel_id",
+        "summary": "Processar evento line",
+        "description": "Executa `POST /webhooks/line/{line_channel_id}`. Operação implementada por `webhooks/line#process_payload`.",
+        "parameters": [
+          {
+            "name": "line_channel_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `line_channel_id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "webhooks/line#process_payload",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhooks/telegram/{bot_token}": {
+      "post": {
+        "tags": [
+          "Webhooks e callbacks"
+        ],
+        "operationId": "post-webhooks-telegram-process_payload-webhooks-telegram-bot_token",
+        "summary": "Processar evento telegram",
+        "description": "Executa `POST /webhooks/telegram/{bot_token}`. Operação implementada por `webhooks/telegram#process_payload`.",
+        "parameters": [
+          {
+            "name": "bot_token",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `bot_token`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "webhooks/telegram#process_payload",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhooks/sms/{phone_number}": {
+      "post": {
+        "tags": [
+          "Webhooks e callbacks"
+        ],
+        "operationId": "post-webhooks-sms-process_payload-webhooks-sms-phone_number",
+        "summary": "Processar evento sms",
+        "description": "Executa `POST /webhooks/sms/{phone_number}`. Operação implementada por `webhooks/sms#process_payload`.",
+        "parameters": [
+          {
+            "name": "phone_number",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `phone_number`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "webhooks/sms#process_payload",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhooks/whatsapp/{phone_number}": {
+      "get": {
+        "tags": [
+          "Webhooks e callbacks"
+        ],
+        "operationId": "get-webhooks-whatsapp-verify-webhooks-whatsapp-phone_number",
+        "summary": "Verificar whatsapp",
+        "description": "Executa `GET /webhooks/whatsapp/{phone_number}`. Operação implementada por `webhooks/whatsapp#verify`.",
+        "parameters": [
+          {
+            "name": "phone_number",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `phone_number`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "webhooks/whatsapp#verify",
+        "x-aptus-status": "enabled"
+      },
+      "post": {
+        "tags": [
+          "Webhooks e callbacks"
+        ],
+        "operationId": "post-webhooks-whatsapp-process_payload-webhooks-whatsapp-phone_number",
+        "summary": "Processar evento whatsapp",
+        "description": "Executa `POST /webhooks/whatsapp/{phone_number}`. Operação implementada por `webhooks/whatsapp#process_payload`.",
+        "parameters": [
+          {
+            "name": "phone_number",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `phone_number`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "webhooks/whatsapp#process_payload",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhooks/instagram": {
+      "get": {
+        "tags": [
+          "Webhooks e callbacks"
+        ],
+        "operationId": "get-webhooks-instagram-verify-webhooks-instagram",
+        "summary": "Verificar instagram",
+        "description": "Executa `GET /webhooks/instagram`. Operação implementada por `webhooks/instagram#verify`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "webhooks/instagram#verify",
+        "x-aptus-status": "enabled"
+      },
+      "post": {
+        "tags": [
+          "Webhooks e callbacks"
+        ],
+        "operationId": "post-webhooks-instagram-events-webhooks-instagram",
+        "summary": "Receber eventos instagram",
+        "description": "Executa `POST /webhooks/instagram`. Operação implementada por `webhooks/instagram#events`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "webhooks/instagram#events",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhooks/tiktok": {
+      "post": {
+        "tags": [
+          "Webhooks e callbacks"
+        ],
+        "operationId": "post-webhooks-tiktok-events-webhooks-tiktok",
+        "summary": "Receber eventos tiktok",
+        "description": "Executa `POST /webhooks/tiktok`. Operação implementada por `webhooks/tiktok#events`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "webhooks/tiktok#events",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/webhooks/shopify": {
+      "post": {
+        "tags": [
+          "Webhooks e callbacks"
+        ],
+        "operationId": "post-webhooks-shopify-events-webhooks-shopify",
+        "summary": "Receber eventos shopify",
+        "description": "Executa `POST /webhooks/shopify`. Operação implementada por `webhooks/shopify#events`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "webhooks/shopify#events",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/twitter/callback": {
+      "get": {
+        "tags": [
+          "Webhooks e callbacks"
+        ],
+        "operationId": "get-twitter-callbacks-show-twitter-callback",
+        "summary": "Consultar callbacks",
+        "description": "Executa `GET /twitter/callback`. Operação implementada por `twitter/callbacks#show`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "twitter/callbacks#show",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ]
+      }
+    },
+    "/linear/callback": {
+      "get": {
+        "tags": [
+          "Webhooks e callbacks"
+        ],
+        "operationId": "get-linear-callbacks-show-linear-callback",
+        "summary": "Consultar callbacks",
+        "description": "Executa `GET /linear/callback`. Operação implementada por `linear/callbacks#show`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "linear/callbacks#show",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ]
+      }
+    },
+    "/shopify/callback": {
+      "get": {
+        "tags": [
+          "Webhooks e callbacks"
+        ],
+        "operationId": "get-shopify-callbacks-show-shopify-callback",
+        "summary": "Consultar callbacks",
+        "description": "Executa `GET /shopify/callback`. Operação implementada por `shopify/callbacks#show`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "shopify/callbacks#show",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ]
+      }
+    },
+    "/twilio/callback": {
+      "post": {
+        "tags": [
+          "Webhooks e callbacks"
+        ],
+        "operationId": "post-twilio-callback-create-twilio-callback",
+        "summary": "Criar callback",
+        "description": "Executa `POST /twilio/callback`. Operação implementada por `twilio/callback#create`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "twilio/callback#create",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/microsoft/callback": {
+      "get": {
+        "tags": [
+          "Webhooks e callbacks"
+        ],
+        "operationId": "get-microsoft-callbacks-show-microsoft-callback",
+        "summary": "Consultar callbacks",
+        "description": "Executa `GET /microsoft/callback`. Operação implementada por `microsoft/callbacks#show`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "microsoft/callbacks#show",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ]
+      }
+    },
+    "/google/callback": {
+      "get": {
+        "tags": [
+          "Webhooks e callbacks"
+        ],
+        "operationId": "get-google-callbacks-show-google-callback",
+        "summary": "Consultar callbacks",
+        "description": "Executa `GET /google/callback`. Operação implementada por `google/callbacks#show`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "google/callbacks#show",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ]
+      }
+    },
+    "/instagram/callback": {
+      "get": {
+        "tags": [
+          "Webhooks e callbacks"
+        ],
+        "operationId": "get-instagram-callbacks-show-instagram-callback",
+        "summary": "Consultar callbacks",
+        "description": "Executa `GET /instagram/callback`. Operação implementada por `instagram/callbacks#show`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "instagram/callbacks#show",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ]
+      }
+    },
+    "/tiktok/callback": {
+      "get": {
+        "tags": [
+          "Webhooks e callbacks"
+        ],
+        "operationId": "get-tiktok-callbacks-show-tiktok-callback",
+        "summary": "Consultar callbacks",
+        "description": "Executa `GET /tiktok/callback`. Operação implementada por `tiktok/callbacks#show`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "tiktok/callbacks#show",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ]
+      }
+    },
+    "/notion/callback": {
+      "get": {
+        "tags": [
+          "Webhooks e callbacks"
+        ],
+        "operationId": "get-notion-callbacks-show-notion-callback",
+        "summary": "Consultar callbacks",
+        "description": "Executa `GET /notion/callback`. Operação implementada por `notion/callbacks#show`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "notion/callbacks#show",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ]
+      }
+    },
     "/survey/responses/{conversation_uuid}": {
       "parameters": [
         {
@@ -35,7 +2075,7 @@
         "security": [],
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "Sucesso"
           }
         }
       }
@@ -802,7 +2842,7 @@
               2,
               3
             ],
-            "description": "The type of the message"
+            "description": "Tipo da mensagem"
           },
           "created_at": {
             "type": "integer",
@@ -958,6 +2998,9 @@
             ]
           },
           "message_signature": {
+            "description": "Desabilitada no AptusChat — a assinatura pessoal de mensagens está oculta no MVP.",
+            "x-aptus-status": "disabled",
+            "x-aptus-disabled-reason": "A assinatura pessoal de mensagens está oculta no MVP do AptusChat.",
             "type": [
               "string",
               "null"
@@ -1513,7 +3556,7 @@
           "secret": {
             "type": "string",
             "nullable": true,
-            "description": "Secret used to sign webhook requests. Signed webhook deliveries include `X-Chatwoot-Timestamp` and `X-Chatwoot-Signature`; the signature is `sha256=` followed by the HMAC-SHA256 of `{timestamp}.{raw_request_body}` using this secret. Deliveries also include `X-Chatwoot-Delivery` when a delivery id is available."
+            "description": "Segredo usado para assinar as requisições de webhook. As entregas assinadas incluem os cabeçalhos técnicos `X-Chatwoot-Timestamp` e `X-Chatwoot-Signature`; a assinatura contém `sha256=` seguido pelo HMAC-SHA256 de `{timestamp}.{raw_request_body}` usando este segredo. Quando disponível, o identificador da entrega é enviado em `X-Chatwoot-Delivery`."
           },
           "account_id": {
             "type": "number",
@@ -1679,7 +3722,7 @@
                   "string",
                   "null"
                 ],
-                "description": "Latest version of Chatwoot available",
+                "description": "Latest version of AptusChat available",
                 "example": "3.0.0"
               },
               "subscribed_features": {
@@ -1967,7 +4010,7 @@
           },
           "pubsub_token": {
             "type": "string",
-            "description": "The token to be used to connect to chatwoot websocket"
+            "description": "The token to be used to connect to AptusChat websocket"
           }
         }
       },
@@ -3027,7 +5070,7 @@
             "properties": {
               "content": {
                 "type": "string",
-                "description": "The content of the message",
+                "description": "Conteúdo da mensagem",
                 "example": "Hello, how can I help you?"
               },
               "template_params": {
@@ -3053,7 +5096,7 @@
                     "type": "object",
                     "description": "The processed param values for template variables in template",
                     "example": {
-                      "1": "Chatwoot"
+                      "1": "AptusChat"
                     }
                   }
                 }
@@ -3070,7 +5113,7 @@
         "properties": {
           "content": {
             "type": "string",
-            "description": "The content of the message",
+            "description": "Conteúdo da mensagem",
             "example": "Hello, how can I help you?"
           },
           "message_type": {
@@ -3079,7 +5122,7 @@
               "outgoing",
               "incoming"
             ],
-            "description": "The type of the message",
+            "description": "Tipo da mensagem",
             "example": "outgoing"
           },
           "private": {
@@ -3112,7 +5155,7 @@
           },
           "template_params": {
             "type": "object",
-            "description": "WhatsApp template parameters for sending structured messages",
+            "description": "Parâmetros para envio de templates estruturados do WhatsApp.",
             "required": [
               "name",
               "category",
@@ -3144,7 +5187,7 @@
               },
               "processed_params": {
                 "type": "object",
-                "description": "Processed template parameters organized by component type",
+                "description": "Parâmetros organizados pelo tipo de componente do template.",
                 "properties": {
                   "body": {
                     "type": "object",
@@ -3201,6 +5244,86 @@
                         }
                       }
                     }
+                  },
+                  "cards": {
+                    "type": "array",
+                    "description": "Parâmetros dos cards de um template de carrossel, na mesma ordem aprovada pela Meta.",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "header"
+                      ],
+                      "properties": {
+                        "header": {
+                          "type": "object",
+                          "required": [
+                            "media_url",
+                            "media_type"
+                          ],
+                          "properties": {
+                            "media_url": {
+                              "type": "string",
+                              "format": "uri",
+                              "pattern": "^https://",
+                              "description": "URL HTTPS pública, sem autenticação, que retorna diretamente a imagem ou o vídeo.",
+                              "example": "https://cdn.exemplo.com/produtos/card-1.jpg"
+                            },
+                            "media_type": {
+                              "type": "string",
+                              "enum": [
+                                "image",
+                                "video"
+                              ]
+                            }
+                          }
+                        },
+                        "buttons": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "url",
+                                  "quick_reply",
+                                  "copy_code"
+                                ]
+                              },
+                              "parameter": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "example": [
+                      {
+                        "header": {
+                          "media_url": "https://cdn.exemplo.com/produtos/card-1.jpg",
+                          "media_type": "image"
+                        },
+                        "buttons": [
+                          {
+                            "type": "url",
+                            "parameter": "produto-1"
+                          }
+                        ]
+                      },
+                      {
+                        "header": {
+                          "media_url": "https://cdn.exemplo.com/produtos/card-2.jpg",
+                          "media_type": "image"
+                        },
+                        "buttons": [
+                          {
+                            "type": "url",
+                            "parameter": "produto-2"
+                          }
+                        ]
+                      }
+                    ]
                   }
                 }
               }
@@ -4528,7 +6651,7 @@
           "custom_domain": {
             "type": "string",
             "description": "Custom domain to display help center.",
-            "example": "chatwoot.help"
+            "example": "AptusChat.help"
           },
           "header_text": {
             "type": "string",
@@ -4538,7 +6661,7 @@
           "homepage_link": {
             "type": "string",
             "description": "link to main dashboard",
-            "example": "https://www.chatwoot.com/"
+            "example": "https://www.AptusChat.com/"
           },
           "name": {
             "type": "string",
@@ -5784,7 +7907,7 @@
               2,
               3
             ],
-            "description": "The type of the message (0: incoming, 1: outgoing, 2: activity, 3: template)"
+            "description": "Tipo da mensagem (0: incoming, 1: outgoing, 2: activity, 3: template)"
           },
           "content_type": {
             "type": "string",
@@ -5803,7 +7926,7 @@
               "sticker",
               "voice_call"
             ],
-            "description": "The type of the message content"
+            "description": "Tipo da mensagem content"
           },
           "status": {
             "type": "string",
@@ -6557,6 +8680,212 @@
             "description": "List of reporting events"
           }
         }
+      },
+      "crm_stage": {
+        "type": "object",
+        "description": "Estágio de um pipeline do CRM.",
+        "required": [
+          "id",
+          "name",
+          "color",
+          "position",
+          "is_win",
+          "is_loss",
+          "crm_pipeline_id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "description": "Nome do estágio"
+          },
+          "color": {
+            "type": "string",
+            "description": "Cor usada na interface"
+          },
+          "position": {
+            "type": "integer",
+            "description": "Ordem do estágio no pipeline"
+          },
+          "is_win": {
+            "type": "boolean",
+            "description": "Indica um estágio de ganho"
+          },
+          "is_loss": {
+            "type": "boolean",
+            "description": "Indica um estágio de perda"
+          },
+          "crm_pipeline_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "created_at": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Data de criação em Unix timestamp"
+          },
+          "updated_at": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Data da atualização em Unix timestamp"
+          }
+        }
+      },
+      "crm_pipeline": {
+        "type": "object",
+        "description": "Pipeline do CRM AptusChat.",
+        "required": [
+          "id",
+          "name",
+          "active",
+          "position",
+          "stages"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "description": "Nome do pipeline"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "Descrição do pipeline"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Indica se o pipeline está ativo"
+          },
+          "position": {
+            "type": "integer",
+            "description": "Ordem de exibição"
+          },
+          "stages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/crm_stage"
+            }
+          },
+          "created_at": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "updated_at": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "crm_deal": {
+        "type": "object",
+        "description": "Negócio registrado no CRM AptusChat.",
+        "required": [
+          "id",
+          "name",
+          "crm_pipeline_id",
+          "crm_stage_id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "description": "Nome do negócio"
+          },
+          "amount": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true,
+            "description": "Valor do negócio"
+          },
+          "currency": {
+            "type": "string",
+            "nullable": true,
+            "description": "Código da moeda"
+          },
+          "close_date": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "probability": {
+            "type": "number",
+            "nullable": true,
+            "description": "Probabilidade de fechamento"
+          },
+          "position": {
+            "type": "integer",
+            "description": "Posição no estágio"
+          },
+          "custom_attributes": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "crm_pipeline_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "crm_stage_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "contact_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "assignee_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "assignee": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "contact": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string",
+                "nullable": true
+              },
+              "phone_number": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          },
+          "created_at": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "updated_at": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
       }
     },
     "parameters": {
@@ -6612,7 +8941,7 @@
         "schema": {
           "type": "string"
         },
-        "description": "Id of the session for which the conversation is created.\n\n\n\n Source Ids can be obtained through contactable inboxes API or via generated.<br/><br/>Website: Chatwoot generated string which can be obtained from webhook events. <br/> Phone Channels(Twilio): Phone number in e164 format <br/> Email Channels: Contact Email address <br/> API Channel: Any Random String"
+        "description": "Id of the session for which the conversation is created.\n\n\n\n Source Ids can be obtained through contactable inboxes API or via generated.<br/><br/>Website: AptusChat generated string which can be obtained from webhook events. <br/> Phone Channels(Twilio): Phone number in e164 format <br/> Email Channels: Contact Email address <br/> API Channel: Any Random String"
       },
       "contact_sort_param": {
         "in": "query",
@@ -6763,23 +9092,31 @@
         "type": "apiKey",
         "in": "header",
         "name": "api_access_token",
-        "description": "This token can be obtained by visiting the profile page or via rails console. Provides access to  endpoints based on the user permissions levels. This token can be saved by an external system when user is created via API, to perform activities on behalf of the user."
+        "description": "Token obtido na página de perfil ou pelo console Rails. O acesso respeita as permissões do usuário."
       },
       "agentBotApiKey": {
         "type": "apiKey",
         "in": "header",
         "name": "api_access_token",
-        "description": "This token should be provided by system admin or obtained via rails console. This token can be used to build bot integrations and can only access limited apis."
+        "description": "Token fornecido pelo administrador para integrações com bots, com acesso limitado às APIs permitidas."
       },
       "platformAppApiKey": {
         "type": "apiKey",
         "in": "header",
         "name": "api_access_token",
-        "description": "This token can be obtained by the system admin after creating a platformApp. This token should be used to provision agent bots, accounts, users and their roles."
+        "description": "Token criado pelo administrador para provisionar contas, usuários, funções e bots da plataforma."
       }
     }
   },
   "tags": [
+    {
+      "name": "Autenticação",
+      "description": "Sessões, tokens, confirmação e recuperação de acesso."
+    },
+    {
+      "name": "Webhooks e callbacks",
+      "description": "Recebimento de eventos e retornos de serviços externos."
+    },
     {
       "name": "CSAT Survey Page",
       "description": "Customer satisfaction survey"
@@ -6789,6 +9126,7 @@
     {
       "name": "Platform",
       "tags": [
+        "API da Plataforma",
         "Accounts",
         "Account Users",
         "AgentBots",
@@ -6798,6 +9136,12 @@
     {
       "name": "Application",
       "tags": [
+        "API da Aplicação",
+        "CRM",
+        "Captain e Copilot",
+        "Empresas",
+        "Campanhas",
+        "Portais e Help Center",
         "Account AgentBots",
         "Account",
         "Agents",
@@ -6825,6 +9169,8 @@
     {
       "name": "Client",
       "tags": [
+        "API Pública",
+        "Widget",
         "Contacts API",
         "Conversations API",
         "Messages API"
@@ -6833,6 +9179,8 @@
     {
       "name": "Others",
       "tags": [
+        "Autenticação",
+        "Webhooks e callbacks",
         "CSAT Survey Page"
       ]
     }

@@ -30,7 +30,7 @@ properties:
     example: 1
   template_params:
     type: object
-    description: WhatsApp template parameters for sending structured messages
+    description: Parâmetros para envio de templates estruturados do WhatsApp.
     required:
       - name
       - category
@@ -52,7 +52,7 @@ properties:
         example: 'en_US'
       processed_params:
         type: object
-        description: Processed template parameters organized by component type
+        description: Parâmetros organizados pelo tipo de componente do template.
         properties:
           body:
             type: object
@@ -91,3 +91,46 @@ properties:
                   type: string
                   description: Dynamic parameter value for the button
                   example: 'SSFSDFSD'
+          cards:
+            type: array
+            description: Parâmetros dos cards de um template de carrossel, na mesma ordem aprovada pela Meta.
+            items:
+              type: object
+              required: [header]
+              properties:
+                header:
+                  type: object
+                  required: [media_url, media_type]
+                  properties:
+                    media_url:
+                      type: string
+                      format: uri
+                      pattern: '^https://'
+                      description: URL HTTPS pública, sem autenticação, que retorna diretamente a imagem ou o vídeo.
+                      example: 'https://cdn.exemplo.com/produtos/card-1.jpg'
+                    media_type:
+                      type: string
+                      enum: [image, video]
+                buttons:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        enum: [url, quick_reply, copy_code]
+                      parameter:
+                        type: string
+            example:
+              - header:
+                  media_url: 'https://cdn.exemplo.com/produtos/card-1.jpg'
+                  media_type: image
+                buttons:
+                  - type: url
+                    parameter: produto-1
+              - header:
+                  media_url: 'https://cdn.exemplo.com/produtos/card-2.jpg'
+                  media_type: image
+                buttons:
+                  - type: url
+                    parameter: produto-2

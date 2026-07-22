@@ -1,13 +1,9 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Chatwoot",
-    "description": "This is the API documentation for Chatwoot server.",
-    "version": "1.1.0",
-    "termsOfService": "https://www.chatwoot.com/terms-of-service/",
-    "contact": {
-      "email": "hello@chatwoot.com"
-    },
+    "title": "AptusChat API",
+    "description": "Documentação completa das APIs HTTP do servidor AptusChat.",
+    "version": "2.0.0",
     "license": {
       "name": "MIT License",
       "url": "https://opensource.org/licenses/MIT"
@@ -15,10 +11,2684 @@
   },
   "servers": [
     {
-      "url": "https://app.chatwoot.com/"
+      "url": "/",
+      "description": "Servidor AptusChat atual"
     }
   ],
   "paths": {
+    "/api/v1/widget/direct_uploads": {
+      "post": {
+        "tags": [
+          "Widget"
+        ],
+        "operationId": "post-api-v1-widget-direct_uploads-create-api-v1-widget-direct_uploads",
+        "summary": "Criar direct uploads",
+        "description": "Executa `POST /api/v1/widget/direct_uploads`. Operação implementada por `api/v1/widget/direct_uploads#create`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/widget/direct_uploads#create",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/widget/config": {
+      "post": {
+        "tags": [
+          "Widget"
+        ],
+        "operationId": "post-api-v1-widget-configs-create-api-v1-widget-config",
+        "summary": "Criar configs",
+        "description": "Executa `POST /api/v1/widget/config`. Operação implementada por `api/v1/widget/configs#create`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/widget/configs#create",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/widget/campaigns": {
+      "get": {
+        "tags": [
+          "Widget"
+        ],
+        "operationId": "get-api-v1-widget-campaigns-index-api-v1-widget-campaigns",
+        "summary": "Desabilitada no AptusChat — Listar campaigns",
+        "description": "**DESABILITADA NO APTUSCHAT:** As campanhas estão ocultas no MVP do AptusChat.\n\nExecuta `GET /api/v1/widget/campaigns`. Operação implementada por `api/v1/widget/campaigns#index`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/widget/campaigns#index",
+        "x-aptus-status": "disabled",
+        "x-aptus-disabled-reason": "As campanhas estão ocultas no MVP do AptusChat.",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/v1/widget/events": {
+      "post": {
+        "tags": [
+          "Widget"
+        ],
+        "operationId": "post-api-v1-widget-events-create-api-v1-widget-events",
+        "summary": "Criar events",
+        "description": "Executa `POST /api/v1/widget/events`. Operação implementada por `api/v1/widget/events#create`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/widget/events#create",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/widget/messages": {
+      "get": {
+        "tags": [
+          "Widget"
+        ],
+        "operationId": "get-api-v1-widget-messages-index-api-v1-widget-messages",
+        "summary": "Listar messages",
+        "description": "Executa `GET /api/v1/widget/messages`. Operação implementada por `api/v1/widget/messages#index`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/widget/messages#index",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Widget"
+        ],
+        "operationId": "post-api-v1-widget-messages-create-api-v1-widget-messages",
+        "summary": "Criar messages",
+        "description": "Executa `POST /api/v1/widget/messages`. Operação implementada por `api/v1/widget/messages#create`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/widget/messages#create",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/widget/messages/{id}": {
+      "patch": {
+        "tags": [
+          "Widget"
+        ],
+        "operationId": "patch-api-v1-widget-messages-update-api-v1-widget-messages-id",
+        "summary": "Atualizar messages",
+        "description": "Executa `PATCH /api/v1/widget/messages/{id}`. Operação implementada por `api/v1/widget/messages#update`.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/widget/messages#update",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Widget"
+        ],
+        "operationId": "put-api-v1-widget-messages-update-api-v1-widget-messages-id",
+        "summary": "Atualizar messages",
+        "description": "Executa `PUT /api/v1/widget/messages/{id}`. Operação implementada por `api/v1/widget/messages#update`.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/widget/messages#update",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/widget/conversations/destroy_custom_attributes": {
+      "post": {
+        "tags": [
+          "Widget"
+        ],
+        "operationId": "post-api-v1-widget-conversations-destroy_custom_attributes-api-v1-widget-conversations-destroy_custom_attributes",
+        "summary": "Executar operação de conversations",
+        "description": "Executa `POST /api/v1/widget/conversations/destroy_custom_attributes`. Operação implementada por `api/v1/widget/conversations#destroy_custom_attributes`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/widget/conversations#destroy_custom_attributes",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/widget/conversations/set_custom_attributes": {
+      "post": {
+        "tags": [
+          "Widget"
+        ],
+        "operationId": "post-api-v1-widget-conversations-set_custom_attributes-api-v1-widget-conversations-set_custom_attributes",
+        "summary": "Executar operação de conversations",
+        "description": "Executa `POST /api/v1/widget/conversations/set_custom_attributes`. Operação implementada por `api/v1/widget/conversations#set_custom_attributes`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/widget/conversations#set_custom_attributes",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/widget/conversations/update_last_seen": {
+      "post": {
+        "tags": [
+          "Widget"
+        ],
+        "operationId": "post-api-v1-widget-conversations-update_last_seen-api-v1-widget-conversations-update_last_seen",
+        "summary": "Executar operação de conversations",
+        "description": "Executa `POST /api/v1/widget/conversations/update_last_seen`. Operação implementada por `api/v1/widget/conversations#update_last_seen`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/widget/conversations#update_last_seen",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/widget/conversations/toggle_typing": {
+      "post": {
+        "tags": [
+          "Widget"
+        ],
+        "operationId": "post-api-v1-widget-conversations-toggle_typing-api-v1-widget-conversations-toggle_typing",
+        "summary": "Executar operação de conversations",
+        "description": "Executa `POST /api/v1/widget/conversations/toggle_typing`. Operação implementada por `api/v1/widget/conversations#toggle_typing`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/widget/conversations#toggle_typing",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/widget/conversations/transcript": {
+      "post": {
+        "tags": [
+          "Widget"
+        ],
+        "operationId": "post-api-v1-widget-conversations-transcript-api-v1-widget-conversations-transcript",
+        "summary": "Executar operação de conversations",
+        "description": "Executa `POST /api/v1/widget/conversations/transcript`. Operação implementada por `api/v1/widget/conversations#transcript`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/widget/conversations#transcript",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/widget/conversations/toggle_status": {
+      "get": {
+        "tags": [
+          "Widget"
+        ],
+        "operationId": "get-api-v1-widget-conversations-toggle_status-api-v1-widget-conversations-toggle_status",
+        "summary": "Alternar status conversations",
+        "description": "Executa `GET /api/v1/widget/conversations/toggle_status`. Operação implementada por `api/v1/widget/conversations#toggle_status`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/widget/conversations#toggle_status",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/v1/widget/conversations": {
+      "get": {
+        "tags": [
+          "Widget"
+        ],
+        "operationId": "get-api-v1-widget-conversations-index-api-v1-widget-conversations",
+        "summary": "Listar conversations",
+        "description": "Executa `GET /api/v1/widget/conversations`. Operação implementada por `api/v1/widget/conversations#index`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/widget/conversations#index",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Widget"
+        ],
+        "operationId": "post-api-v1-widget-conversations-create-api-v1-widget-conversations",
+        "summary": "Criar conversations",
+        "description": "Executa `POST /api/v1/widget/conversations`. Operação implementada por `api/v1/widget/conversations#create`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/widget/conversations#create",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/widget/contact/destroy_custom_attributes": {
+      "post": {
+        "tags": [
+          "Widget"
+        ],
+        "operationId": "post-api-v1-widget-contacts-destroy_custom_attributes-api-v1-widget-contact-destroy_custom_attributes",
+        "summary": "Executar operação de contacts",
+        "description": "Executa `POST /api/v1/widget/contact/destroy_custom_attributes`. Operação implementada por `api/v1/widget/contacts#destroy_custom_attributes`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/widget/contacts#destroy_custom_attributes",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/widget/contact/set_user": {
+      "patch": {
+        "tags": [
+          "Widget"
+        ],
+        "operationId": "patch-api-v1-widget-contacts-set_user-api-v1-widget-contact-set_user",
+        "summary": "Executar operação de contacts",
+        "description": "Executa `PATCH /api/v1/widget/contact/set_user`. Operação implementada por `api/v1/widget/contacts#set_user`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/widget/contacts#set_user",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/widget/contact": {
+      "get": {
+        "tags": [
+          "Widget"
+        ],
+        "operationId": "get-api-v1-widget-contacts-show-api-v1-widget-contact",
+        "summary": "Consultar contacts",
+        "description": "Executa `GET /api/v1/widget/contact`. Operação implementada por `api/v1/widget/contacts#show`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/widget/contacts#show",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Widget"
+        ],
+        "operationId": "patch-api-v1-widget-contacts-update-api-v1-widget-contact",
+        "summary": "Atualizar contacts",
+        "description": "Executa `PATCH /api/v1/widget/contact`. Operação implementada por `api/v1/widget/contacts#update`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/widget/contacts#update",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Widget"
+        ],
+        "operationId": "put-api-v1-widget-contacts-update-api-v1-widget-contact",
+        "summary": "Atualizar contacts",
+        "description": "Executa `PUT /api/v1/widget/contact`. Operação implementada por `api/v1/widget/contacts#update`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/widget/contacts#update",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/widget/inbox_members": {
+      "get": {
+        "tags": [
+          "Widget"
+        ],
+        "operationId": "get-api-v1-widget-inbox_members-index-api-v1-widget-inbox_members",
+        "summary": "Listar inbox members",
+        "description": "Executa `GET /api/v1/widget/inbox_members`. Operação implementada por `api/v1/widget/inbox_members#index`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/widget/inbox_members#index",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/v1/widget/labels": {
+      "post": {
+        "tags": [
+          "Widget"
+        ],
+        "operationId": "post-api-v1-widget-labels-create-api-v1-widget-labels",
+        "summary": "Criar labels",
+        "description": "Executa `POST /api/v1/widget/labels`. Operação implementada por `api/v1/widget/labels#create`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/widget/labels#create",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/widget/labels/{id}": {
+      "delete": {
+        "tags": [
+          "Widget"
+        ],
+        "operationId": "delete-api-v1-widget-labels-destroy-api-v1-widget-labels-id",
+        "summary": "Excluir labels",
+        "description": "Executa `DELETE /api/v1/widget/labels/{id}`. Operação implementada por `api/v1/widget/labels#destroy`.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/widget/labels#destroy",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/v1/widget/integrations/dyte/add_participant_to_meeting": {
+      "post": {
+        "tags": [
+          "Widget"
+        ],
+        "operationId": "post-api-v1-widget-integrations-dyte-add_participant_to_meeting-api-v1-widget-integrations-dyte-add_participant_to_meeting",
+        "summary": "Executar operação de dyte",
+        "description": "Executa `POST /api/v1/widget/integrations/dyte/add_participant_to_meeting`. Operação implementada por `api/v1/widget/integrations/dyte#add_participant_to_meeting`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          },
+          "401": {
+            "description": "Token ausente ou inválido."
+          },
+          "403": {
+            "description": "Usuário sem permissão para executar a operação."
+          }
+        },
+        "x-aptus-controller": "api/v1/widget/integrations/dyte#add_participant_to_meeting",
+        "x-aptus-status": "enabled",
+        "security": [
+          {
+            "userApiKey": []
+          },
+          {
+            "agentBotApiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/api/v1/inboxes/{inbox_id}/contacts/{contact_id}/conversations/{id}/toggle_status": {
+      "post": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "post-public-api-v1-inboxes-conversations-toggle_status-public-api-v1-inboxes-inbox_id-contacts-contact_id-conversations-id-toggle_status",
+        "summary": "Alternar status conversations",
+        "description": "Executa `POST /public/api/v1/inboxes/{inbox_id}/contacts/{contact_id}/conversations/{id}/toggle_status`. Operação implementada por `public/api/v1/inboxes/conversations#toggle_status`.",
+        "parameters": [
+          {
+            "name": "inbox_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `inbox_id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "contact_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `contact_id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/inboxes/conversations#toggle_status",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/api/v1/inboxes/{inbox_id}/contacts/{contact_id}/conversations/{id}/toggle_typing": {
+      "post": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "post-public-api-v1-inboxes-conversations-toggle_typing-public-api-v1-inboxes-inbox_id-contacts-contact_id-conversations-id-toggle_typing",
+        "summary": "Executar operação de conversations",
+        "description": "Executa `POST /public/api/v1/inboxes/{inbox_id}/contacts/{contact_id}/conversations/{id}/toggle_typing`. Operação implementada por `public/api/v1/inboxes/conversations#toggle_typing`.",
+        "parameters": [
+          {
+            "name": "inbox_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `inbox_id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "contact_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `contact_id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/inboxes/conversations#toggle_typing",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/api/v1/inboxes/{inbox_id}/contacts/{contact_id}/conversations/{id}/update_last_seen": {
+      "post": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "post-public-api-v1-inboxes-conversations-update_last_seen-public-api-v1-inboxes-inbox_id-contacts-contact_id-conversations-id-update_last_seen",
+        "summary": "Executar operação de conversations",
+        "description": "Executa `POST /public/api/v1/inboxes/{inbox_id}/contacts/{contact_id}/conversations/{id}/update_last_seen`. Operação implementada por `public/api/v1/inboxes/conversations#update_last_seen`.",
+        "parameters": [
+          {
+            "name": "inbox_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `inbox_id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "contact_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `contact_id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/inboxes/conversations#update_last_seen",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/api/v1/inboxes/{inbox_id}/contacts/{contact_id}/conversations/{conversation_id}/messages": {
+      "get": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "get-public-api-v1-inboxes-messages-index-public-api-v1-inboxes-inbox_id-contacts-contact_id-conversations-conversation_id-messages",
+        "summary": "Listar messages",
+        "description": "Executa `GET /public/api/v1/inboxes/{inbox_id}/contacts/{contact_id}/conversations/{conversation_id}/messages`. Operação implementada por `public/api/v1/inboxes/messages#index`.",
+        "parameters": [
+          {
+            "name": "inbox_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `inbox_id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "contact_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `contact_id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "conversation_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `conversation_id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/inboxes/messages#index",
+        "x-aptus-status": "enabled"
+      },
+      "post": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "post-public-api-v1-inboxes-messages-create-public-api-v1-inboxes-inbox_id-contacts-contact_id-conversations-conversation_id-messages",
+        "summary": "Criar messages",
+        "description": "Executa `POST /public/api/v1/inboxes/{inbox_id}/contacts/{contact_id}/conversations/{conversation_id}/messages`. Operação implementada por `public/api/v1/inboxes/messages#create`.",
+        "parameters": [
+          {
+            "name": "inbox_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `inbox_id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "contact_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `contact_id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "conversation_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `conversation_id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/inboxes/messages#create",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/api/v1/inboxes/{inbox_id}/contacts/{contact_id}/conversations/{conversation_id}/messages/{id}": {
+      "patch": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "patch-public-api-v1-inboxes-messages-update-public-api-v1-inboxes-inbox_id-contacts-contact_id-conversations-conversation_id-messages-id",
+        "summary": "Atualizar messages",
+        "description": "Executa `PATCH /public/api/v1/inboxes/{inbox_id}/contacts/{contact_id}/conversations/{conversation_id}/messages/{id}`. Operação implementada por `public/api/v1/inboxes/messages#update`.",
+        "parameters": [
+          {
+            "name": "inbox_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `inbox_id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "contact_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `contact_id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "conversation_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `conversation_id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/inboxes/messages#update",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "put-public-api-v1-inboxes-messages-update-public-api-v1-inboxes-inbox_id-contacts-contact_id-conversations-conversation_id-messages-id",
+        "summary": "Atualizar messages",
+        "description": "Executa `PUT /public/api/v1/inboxes/{inbox_id}/contacts/{contact_id}/conversations/{conversation_id}/messages/{id}`. Operação implementada por `public/api/v1/inboxes/messages#update`.",
+        "parameters": [
+          {
+            "name": "inbox_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `inbox_id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "contact_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `contact_id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "conversation_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `conversation_id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/inboxes/messages#update",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/api/v1/inboxes/{inbox_id}/contacts/{contact_id}/conversations": {
+      "get": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "get-public-api-v1-inboxes-conversations-index-public-api-v1-inboxes-inbox_id-contacts-contact_id-conversations",
+        "summary": "Listar conversations",
+        "description": "Executa `GET /public/api/v1/inboxes/{inbox_id}/contacts/{contact_id}/conversations`. Operação implementada por `public/api/v1/inboxes/conversations#index`.",
+        "parameters": [
+          {
+            "name": "inbox_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `inbox_id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "contact_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `contact_id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/inboxes/conversations#index",
+        "x-aptus-status": "enabled"
+      },
+      "post": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "post-public-api-v1-inboxes-conversations-create-public-api-v1-inboxes-inbox_id-contacts-contact_id-conversations",
+        "summary": "Criar conversations",
+        "description": "Executa `POST /public/api/v1/inboxes/{inbox_id}/contacts/{contact_id}/conversations`. Operação implementada por `public/api/v1/inboxes/conversations#create`.",
+        "parameters": [
+          {
+            "name": "inbox_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `inbox_id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "contact_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `contact_id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/inboxes/conversations#create",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/api/v1/inboxes/{inbox_id}/contacts/{contact_id}/conversations/{id}": {
+      "get": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "get-public-api-v1-inboxes-conversations-show-public-api-v1-inboxes-inbox_id-contacts-contact_id-conversations-id",
+        "summary": "Consultar conversations",
+        "description": "Executa `GET /public/api/v1/inboxes/{inbox_id}/contacts/{contact_id}/conversations/{id}`. Operação implementada por `public/api/v1/inboxes/conversations#show`.",
+        "parameters": [
+          {
+            "name": "inbox_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `inbox_id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "contact_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `contact_id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/inboxes/conversations#show",
+        "x-aptus-status": "enabled"
+      }
+    },
+    "/public/api/v1/inboxes/{inbox_id}/contacts": {
+      "post": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "post-public-api-v1-inboxes-contacts-create-public-api-v1-inboxes-inbox_id-contacts",
+        "summary": "Criar contacts",
+        "description": "Executa `POST /public/api/v1/inboxes/{inbox_id}/contacts`. Operação implementada por `public/api/v1/inboxes/contacts#create`.",
+        "parameters": [
+          {
+            "name": "inbox_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `inbox_id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/inboxes/contacts#create",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/api/v1/inboxes/{inbox_id}/contacts/{id}": {
+      "get": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "get-public-api-v1-inboxes-contacts-show-public-api-v1-inboxes-inbox_id-contacts-id",
+        "summary": "Consultar contacts",
+        "description": "Executa `GET /public/api/v1/inboxes/{inbox_id}/contacts/{id}`. Operação implementada por `public/api/v1/inboxes/contacts#show`.",
+        "parameters": [
+          {
+            "name": "inbox_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `inbox_id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/inboxes/contacts#show",
+        "x-aptus-status": "enabled"
+      },
+      "patch": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "patch-public-api-v1-inboxes-contacts-update-public-api-v1-inboxes-inbox_id-contacts-id",
+        "summary": "Atualizar contacts",
+        "description": "Executa `PATCH /public/api/v1/inboxes/{inbox_id}/contacts/{id}`. Operação implementada por `public/api/v1/inboxes/contacts#update`.",
+        "parameters": [
+          {
+            "name": "inbox_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `inbox_id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/inboxes/contacts#update",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "put-public-api-v1-inboxes-contacts-update-public-api-v1-inboxes-inbox_id-contacts-id",
+        "summary": "Atualizar contacts",
+        "description": "Executa `PUT /public/api/v1/inboxes/{inbox_id}/contacts/{id}`. Operação implementada por `public/api/v1/inboxes/contacts#update`.",
+        "parameters": [
+          {
+            "name": "inbox_id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `inbox_id`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/inboxes/contacts#update",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/api/v1/inboxes": {
+      "get": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "get-public-api-v1-inboxes-index-public-api-v1-inboxes",
+        "summary": "Listar inboxes",
+        "description": "Executa `GET /public/api/v1/inboxes`. Operação implementada por `public/api/v1/inboxes#index`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/inboxes#index",
+        "x-aptus-status": "enabled"
+      },
+      "post": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "post-public-api-v1-inboxes-create-public-api-v1-inboxes",
+        "summary": "Criar inboxes",
+        "description": "Executa `POST /public/api/v1/inboxes`. Operação implementada por `public/api/v1/inboxes#create`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/inboxes#create",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/api/v1/inboxes/new": {
+      "get": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "get-public-api-v1-inboxes-new-public-api-v1-inboxes-new",
+        "summary": "Executar operação de inboxes",
+        "description": "Executa `GET /public/api/v1/inboxes/new`. Operação implementada por `public/api/v1/inboxes#new`.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/inboxes#new",
+        "x-aptus-status": "enabled"
+      }
+    },
+    "/public/api/v1/inboxes/{id}/edit": {
+      "get": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "get-public-api-v1-inboxes-edit-public-api-v1-inboxes-id-edit",
+        "summary": "Executar operação de inboxes",
+        "description": "Executa `GET /public/api/v1/inboxes/{id}/edit`. Operação implementada por `public/api/v1/inboxes#edit`.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/inboxes#edit",
+        "x-aptus-status": "enabled"
+      }
+    },
+    "/public/api/v1/inboxes/{id}": {
+      "get": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "get-public-api-v1-inboxes-show-public-api-v1-inboxes-id",
+        "summary": "Consultar inboxes",
+        "description": "Executa `GET /public/api/v1/inboxes/{id}`. Operação implementada por `public/api/v1/inboxes#show`.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/inboxes#show",
+        "x-aptus-status": "enabled"
+      },
+      "patch": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "patch-public-api-v1-inboxes-update-public-api-v1-inboxes-id",
+        "summary": "Atualizar inboxes",
+        "description": "Executa `PATCH /public/api/v1/inboxes/{id}`. Operação implementada por `public/api/v1/inboxes#update`.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/inboxes#update",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "put-public-api-v1-inboxes-update-public-api-v1-inboxes-id",
+        "summary": "Atualizar inboxes",
+        "description": "Executa `PUT /public/api/v1/inboxes/{id}`. Operação implementada por `public/api/v1/inboxes#update`.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/inboxes#update",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "delete-public-api-v1-inboxes-destroy-public-api-v1-inboxes-id",
+        "summary": "Excluir inboxes",
+        "description": "Executa `DELETE /public/api/v1/inboxes/{id}`. Operação implementada por `public/api/v1/inboxes#destroy`.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/inboxes#destroy",
+        "x-aptus-status": "enabled"
+      }
+    },
+    "/public/api/v1/csat_survey/{id}": {
+      "get": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "get-public-api-v1-csat_survey-show-public-api-v1-csat_survey-id",
+        "summary": "Consultar csat survey",
+        "description": "Executa `GET /public/api/v1/csat_survey/{id}`. Operação implementada por `public/api/v1/csat_survey#show`.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/csat_survey#show",
+        "x-aptus-status": "enabled"
+      },
+      "patch": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "patch-public-api-v1-csat_survey-update-public-api-v1-csat_survey-id",
+        "summary": "Atualizar csat survey",
+        "description": "Executa `PATCH /public/api/v1/csat_survey/{id}`. Operação implementada por `public/api/v1/csat_survey#update`.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/csat_survey#update",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "put-public-api-v1-csat_survey-update-public-api-v1-csat_survey-id",
+        "summary": "Atualizar csat survey",
+        "description": "Executa `PUT /public/api/v1/csat_survey/{id}`. Operação implementada por `public/api/v1/csat_survey#update`.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `id`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/csat_survey#update",
+        "x-aptus-status": "enabled",
+        "requestBody": {
+          "required": false,
+          "description": "Corpo JSON aceito pela operação. Consulte os campos específicos do recurso quando houver schema detalhado.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hc/{slug}": {
+      "get": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "get-public-api-v1-portals-show-hc-slug",
+        "summary": "Desabilitada no AptusChat — Consultar portals",
+        "description": "**DESABILITADA NO APTUSCHAT:** O Help Center e os portais estão ocultos no MVP do AptusChat.\n\nExecuta `GET /hc/{slug}`. Operação implementada por `public/api/v1/portals#show`.",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `slug`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/portals#show",
+        "x-aptus-status": "disabled",
+        "x-aptus-disabled-reason": "O Help Center e os portais estão ocultos no MVP do AptusChat."
+      }
+    },
+    "/hc/{slug}/sitemap.xml": {
+      "get": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "get-public-api-v1-portals-sitemap-hc-slug-sitemap-xml",
+        "summary": "Desabilitada no AptusChat — Executar operação de portals",
+        "description": "**DESABILITADA NO APTUSCHAT:** O Help Center e os portais estão ocultos no MVP do AptusChat.\n\nExecuta `GET /hc/{slug}/sitemap.xml`. Operação implementada por `public/api/v1/portals#sitemap`.",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `slug`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/portals#sitemap",
+        "x-aptus-status": "disabled",
+        "x-aptus-disabled-reason": "O Help Center e os portais estão ocultos no MVP do AptusChat."
+      }
+    },
+    "/hc/{slug}/{locale}": {
+      "get": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "get-public-api-v1-portals-show-hc-slug-locale",
+        "summary": "Desabilitada no AptusChat — Consultar portals",
+        "description": "**DESABILITADA NO APTUSCHAT:** O Help Center e os portais estão ocultos no MVP do AptusChat.\n\nExecuta `GET /hc/{slug}/{locale}`. Operação implementada por `public/api/v1/portals#show`.",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `slug`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "locale",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `locale`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/portals#show",
+        "x-aptus-status": "disabled",
+        "x-aptus-disabled-reason": "O Help Center e os portais estão ocultos no MVP do AptusChat."
+      }
+    },
+    "/hc/{slug}/{locale}/search": {
+      "get": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "get-public-api-v1-portals-search-index-hc-slug-locale-search",
+        "summary": "Desabilitada no AptusChat — Listar search",
+        "description": "**DESABILITADA NO APTUSCHAT:** O Help Center e os portais estão ocultos no MVP do AptusChat.\n\nExecuta `GET /hc/{slug}/{locale}/search`. Operação implementada por `public/api/v1/portals/search#index`.",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `slug`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "locale",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `locale`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/portals/search#index",
+        "x-aptus-status": "disabled",
+        "x-aptus-disabled-reason": "O Help Center e os portais estão ocultos no MVP do AptusChat."
+      }
+    },
+    "/hc/{slug}/{locale}/articles": {
+      "get": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "get-public-api-v1-portals-articles-index-hc-slug-locale-articles",
+        "summary": "Desabilitada no AptusChat — Listar articles",
+        "description": "**DESABILITADA NO APTUSCHAT:** O Help Center e os portais estão ocultos no MVP do AptusChat.\n\nExecuta `GET /hc/{slug}/{locale}/articles`. Operação implementada por `public/api/v1/portals/articles#index`.",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `slug`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "locale",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `locale`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/portals/articles#index",
+        "x-aptus-status": "disabled",
+        "x-aptus-disabled-reason": "O Help Center e os portais estão ocultos no MVP do AptusChat."
+      }
+    },
+    "/hc/{slug}/{locale}/categories": {
+      "get": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "get-public-api-v1-portals-categories-index-hc-slug-locale-categories",
+        "summary": "Desabilitada no AptusChat — Listar categories",
+        "description": "**DESABILITADA NO APTUSCHAT:** O Help Center e os portais estão ocultos no MVP do AptusChat.\n\nExecuta `GET /hc/{slug}/{locale}/categories`. Operação implementada por `public/api/v1/portals/categories#index`.",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `slug`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "locale",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `locale`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/portals/categories#index",
+        "x-aptus-status": "disabled",
+        "x-aptus-disabled-reason": "O Help Center e os portais estão ocultos no MVP do AptusChat."
+      }
+    },
+    "/hc/{slug}/{locale}/categories/{category_slug}": {
+      "get": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "get-public-api-v1-portals-categories-show-hc-slug-locale-categories-category_slug",
+        "summary": "Desabilitada no AptusChat — Consultar categories",
+        "description": "**DESABILITADA NO APTUSCHAT:** O Help Center e os portais estão ocultos no MVP do AptusChat.\n\nExecuta `GET /hc/{slug}/{locale}/categories/{category_slug}`. Operação implementada por `public/api/v1/portals/categories#show`.",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `slug`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "locale",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `locale`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "category_slug",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `category_slug`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/portals/categories#show",
+        "x-aptus-status": "disabled",
+        "x-aptus-disabled-reason": "O Help Center e os portais estão ocultos no MVP do AptusChat."
+      }
+    },
+    "/hc/{slug}/{locale}/categories/{category_slug}/articles": {
+      "get": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "get-public-api-v1-portals-articles-index-hc-slug-locale-categories-category_slug-articles",
+        "summary": "Desabilitada no AptusChat — Listar articles",
+        "description": "**DESABILITADA NO APTUSCHAT:** O Help Center e os portais estão ocultos no MVP do AptusChat.\n\nExecuta `GET /hc/{slug}/{locale}/categories/{category_slug}/articles`. Operação implementada por `public/api/v1/portals/articles#index`.",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `slug`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "locale",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `locale`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "category_slug",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `category_slug`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/portals/articles#index",
+        "x-aptus-status": "disabled",
+        "x-aptus-disabled-reason": "O Help Center e os portais estão ocultos no MVP do AptusChat."
+      }
+    },
+    "/hc/{slug}/articles/{article_slug}.png": {
+      "get": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "get-public-api-v1-portals-articles-tracking_pixel-hc-slug-articles-article_slug-png",
+        "summary": "Desabilitada no AptusChat — Executar operação de articles",
+        "description": "**DESABILITADA NO APTUSCHAT:** O Help Center e os portais estão ocultos no MVP do AptusChat.\n\nExecuta `GET /hc/{slug}/articles/{article_slug}.png`. Operação implementada por `public/api/v1/portals/articles#tracking_pixel`.",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `slug`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "article_slug",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `article_slug`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/portals/articles#tracking_pixel",
+        "x-aptus-status": "disabled",
+        "x-aptus-disabled-reason": "O Help Center e os portais estão ocultos no MVP do AptusChat."
+      }
+    },
+    "/hc/{slug}/articles/{article_slug}.md": {
+      "get": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "get-public-api-v1-portals-articles-show_markdown-hc-slug-articles-article_slug-md",
+        "summary": "Desabilitada no AptusChat — Executar operação de articles",
+        "description": "**DESABILITADA NO APTUSCHAT:** O Help Center e os portais estão ocultos no MVP do AptusChat.\n\nExecuta `GET /hc/{slug}/articles/{article_slug}.md`. Operação implementada por `public/api/v1/portals/articles#show_markdown`.",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `slug`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "article_slug",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `article_slug`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/portals/articles#show_markdown",
+        "x-aptus-status": "disabled",
+        "x-aptus-disabled-reason": "O Help Center e os portais estão ocultos no MVP do AptusChat."
+      }
+    },
+    "/hc/{slug}/articles/{article_slug}": {
+      "get": {
+        "tags": [
+          "API Pública"
+        ],
+        "operationId": "get-public-api-v1-portals-articles-show-hc-slug-articles-article_slug",
+        "summary": "Desabilitada no AptusChat — Consultar articles",
+        "description": "**DESABILITADA NO APTUSCHAT:** O Help Center e os portais estão ocultos no MVP do AptusChat.\n\nExecuta `GET /hc/{slug}/articles/{article_slug}`. Operação implementada por `public/api/v1/portals/articles#show`.",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `slug`.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "article_slug",
+            "in": "path",
+            "required": true,
+            "description": "Identificador `article_slug`.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação realizada com sucesso."
+          },
+          "422": {
+            "description": "Parâmetros inválidos ou regra de negócio não atendida."
+          }
+        },
+        "x-aptus-controller": "public/api/v1/portals/articles#show",
+        "x-aptus-status": "disabled",
+        "x-aptus-disabled-reason": "O Help Center e os portais estão ocultos no MVP do AptusChat."
+      }
+    },
     "/public/api/v1/inboxes/{inbox_identifier}/contacts": {
       "parameters": [
         {
@@ -45,7 +2715,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Sucesso",
             "content": {
               "application/json": {
                 "schema": {
@@ -86,7 +2756,7 @@
         "security": [],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Sucesso",
             "content": {
               "application/json": {
                 "schema": {
@@ -137,7 +2807,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Sucesso",
             "content": {
               "application/json": {
                 "schema": {
@@ -188,7 +2858,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Sucesso",
             "content": {
               "application/json": {
                 "schema": {
@@ -219,7 +2889,7 @@
         "security": [],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Sucesso",
             "content": {
               "application/json": {
                 "schema": {
@@ -267,7 +2937,7 @@
         "security": [],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Sucesso",
             "content": {
               "application/json": {
                 "schema": {
@@ -287,7 +2957,7 @@
             }
           },
           "404": {
-            "description": "Conversation not found",
+            "description": "Conversation não encontrado",
             "content": {
               "application/json": {
                 "schema": {
@@ -341,7 +3011,7 @@
             }
           },
           "404": {
-            "description": "Conversation not found",
+            "description": "Conversation não encontrado",
             "content": {
               "application/json": {
                 "schema": {
@@ -420,7 +3090,7 @@
             }
           },
           "404": {
-            "description": "Conversation not found",
+            "description": "Conversation não encontrado",
             "content": {
               "application/json": {
                 "schema": {
@@ -467,7 +3137,7 @@
             }
           },
           "404": {
-            "description": "Conversation not found",
+            "description": "Conversation não encontrado",
             "content": {
               "application/json": {
                 "schema": {
@@ -511,7 +3181,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Sucesso",
             "content": {
               "application/json": {
                 "schema": {
@@ -542,7 +3212,7 @@
         "security": [],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Sucesso",
             "content": {
               "application/json": {
                 "schema": {
@@ -603,7 +3273,7 @@
         },
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Sucesso",
             "content": {
               "application/json": {
                 "schema": {
@@ -1387,7 +4057,7 @@
               2,
               3
             ],
-            "description": "The type of the message"
+            "description": "Tipo da mensagem"
           },
           "created_at": {
             "type": "integer",
@@ -1543,6 +4213,9 @@
             ]
           },
           "message_signature": {
+            "description": "Desabilitada no AptusChat — a assinatura pessoal de mensagens está oculta no MVP.",
+            "x-aptus-status": "disabled",
+            "x-aptus-disabled-reason": "A assinatura pessoal de mensagens está oculta no MVP do AptusChat.",
             "type": [
               "string",
               "null"
@@ -2098,7 +4771,7 @@
           "secret": {
             "type": "string",
             "nullable": true,
-            "description": "Secret used to sign webhook requests. Signed webhook deliveries include `X-Chatwoot-Timestamp` and `X-Chatwoot-Signature`; the signature is `sha256=` followed by the HMAC-SHA256 of `{timestamp}.{raw_request_body}` using this secret. Deliveries also include `X-Chatwoot-Delivery` when a delivery id is available."
+            "description": "Segredo usado para assinar as requisições de webhook. As entregas assinadas incluem os cabeçalhos técnicos `X-Chatwoot-Timestamp` e `X-Chatwoot-Signature`; a assinatura contém `sha256=` seguido pelo HMAC-SHA256 de `{timestamp}.{raw_request_body}` usando este segredo. Quando disponível, o identificador da entrega é enviado em `X-Chatwoot-Delivery`."
           },
           "account_id": {
             "type": "number",
@@ -2264,7 +4937,7 @@
                   "string",
                   "null"
                 ],
-                "description": "Latest version of Chatwoot available",
+                "description": "Latest version of AptusChat available",
                 "example": "3.0.0"
               },
               "subscribed_features": {
@@ -2552,7 +5225,7 @@
           },
           "pubsub_token": {
             "type": "string",
-            "description": "The token to be used to connect to chatwoot websocket"
+            "description": "The token to be used to connect to AptusChat websocket"
           }
         }
       },
@@ -3612,7 +6285,7 @@
             "properties": {
               "content": {
                 "type": "string",
-                "description": "The content of the message",
+                "description": "Conteúdo da mensagem",
                 "example": "Hello, how can I help you?"
               },
               "template_params": {
@@ -3638,7 +6311,7 @@
                     "type": "object",
                     "description": "The processed param values for template variables in template",
                     "example": {
-                      "1": "Chatwoot"
+                      "1": "AptusChat"
                     }
                   }
                 }
@@ -3655,7 +6328,7 @@
         "properties": {
           "content": {
             "type": "string",
-            "description": "The content of the message",
+            "description": "Conteúdo da mensagem",
             "example": "Hello, how can I help you?"
           },
           "message_type": {
@@ -3664,7 +6337,7 @@
               "outgoing",
               "incoming"
             ],
-            "description": "The type of the message",
+            "description": "Tipo da mensagem",
             "example": "outgoing"
           },
           "private": {
@@ -3697,7 +6370,7 @@
           },
           "template_params": {
             "type": "object",
-            "description": "WhatsApp template parameters for sending structured messages",
+            "description": "Parâmetros para envio de templates estruturados do WhatsApp.",
             "required": [
               "name",
               "category",
@@ -3729,7 +6402,7 @@
               },
               "processed_params": {
                 "type": "object",
-                "description": "Processed template parameters organized by component type",
+                "description": "Parâmetros organizados pelo tipo de componente do template.",
                 "properties": {
                   "body": {
                     "type": "object",
@@ -3786,6 +6459,86 @@
                         }
                       }
                     }
+                  },
+                  "cards": {
+                    "type": "array",
+                    "description": "Parâmetros dos cards de um template de carrossel, na mesma ordem aprovada pela Meta.",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "header"
+                      ],
+                      "properties": {
+                        "header": {
+                          "type": "object",
+                          "required": [
+                            "media_url",
+                            "media_type"
+                          ],
+                          "properties": {
+                            "media_url": {
+                              "type": "string",
+                              "format": "uri",
+                              "pattern": "^https://",
+                              "description": "URL HTTPS pública, sem autenticação, que retorna diretamente a imagem ou o vídeo.",
+                              "example": "https://cdn.exemplo.com/produtos/card-1.jpg"
+                            },
+                            "media_type": {
+                              "type": "string",
+                              "enum": [
+                                "image",
+                                "video"
+                              ]
+                            }
+                          }
+                        },
+                        "buttons": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "url",
+                                  "quick_reply",
+                                  "copy_code"
+                                ]
+                              },
+                              "parameter": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "example": [
+                      {
+                        "header": {
+                          "media_url": "https://cdn.exemplo.com/produtos/card-1.jpg",
+                          "media_type": "image"
+                        },
+                        "buttons": [
+                          {
+                            "type": "url",
+                            "parameter": "produto-1"
+                          }
+                        ]
+                      },
+                      {
+                        "header": {
+                          "media_url": "https://cdn.exemplo.com/produtos/card-2.jpg",
+                          "media_type": "image"
+                        },
+                        "buttons": [
+                          {
+                            "type": "url",
+                            "parameter": "produto-2"
+                          }
+                        ]
+                      }
+                    ]
                   }
                 }
               }
@@ -5113,7 +7866,7 @@
           "custom_domain": {
             "type": "string",
             "description": "Custom domain to display help center.",
-            "example": "chatwoot.help"
+            "example": "AptusChat.help"
           },
           "header_text": {
             "type": "string",
@@ -5123,7 +7876,7 @@
           "homepage_link": {
             "type": "string",
             "description": "link to main dashboard",
-            "example": "https://www.chatwoot.com/"
+            "example": "https://www.AptusChat.com/"
           },
           "name": {
             "type": "string",
@@ -6369,7 +9122,7 @@
               2,
               3
             ],
-            "description": "The type of the message (0: incoming, 1: outgoing, 2: activity, 3: template)"
+            "description": "Tipo da mensagem (0: incoming, 1: outgoing, 2: activity, 3: template)"
           },
           "content_type": {
             "type": "string",
@@ -6388,7 +9141,7 @@
               "sticker",
               "voice_call"
             ],
-            "description": "The type of the message content"
+            "description": "Tipo da mensagem content"
           },
           "status": {
             "type": "string",
@@ -7142,6 +9895,212 @@
             "description": "List of reporting events"
           }
         }
+      },
+      "crm_stage": {
+        "type": "object",
+        "description": "Estágio de um pipeline do CRM.",
+        "required": [
+          "id",
+          "name",
+          "color",
+          "position",
+          "is_win",
+          "is_loss",
+          "crm_pipeline_id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "description": "Nome do estágio"
+          },
+          "color": {
+            "type": "string",
+            "description": "Cor usada na interface"
+          },
+          "position": {
+            "type": "integer",
+            "description": "Ordem do estágio no pipeline"
+          },
+          "is_win": {
+            "type": "boolean",
+            "description": "Indica um estágio de ganho"
+          },
+          "is_loss": {
+            "type": "boolean",
+            "description": "Indica um estágio de perda"
+          },
+          "crm_pipeline_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "created_at": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Data de criação em Unix timestamp"
+          },
+          "updated_at": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Data da atualização em Unix timestamp"
+          }
+        }
+      },
+      "crm_pipeline": {
+        "type": "object",
+        "description": "Pipeline do CRM AptusChat.",
+        "required": [
+          "id",
+          "name",
+          "active",
+          "position",
+          "stages"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "description": "Nome do pipeline"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "Descrição do pipeline"
+          },
+          "active": {
+            "type": "boolean",
+            "description": "Indica se o pipeline está ativo"
+          },
+          "position": {
+            "type": "integer",
+            "description": "Ordem de exibição"
+          },
+          "stages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/crm_stage"
+            }
+          },
+          "created_at": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "updated_at": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "crm_deal": {
+        "type": "object",
+        "description": "Negócio registrado no CRM AptusChat.",
+        "required": [
+          "id",
+          "name",
+          "crm_pipeline_id",
+          "crm_stage_id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "description": "Nome do negócio"
+          },
+          "amount": {
+            "type": "number",
+            "format": "decimal",
+            "nullable": true,
+            "description": "Valor do negócio"
+          },
+          "currency": {
+            "type": "string",
+            "nullable": true,
+            "description": "Código da moeda"
+          },
+          "close_date": {
+            "type": "string",
+            "format": "date",
+            "nullable": true
+          },
+          "probability": {
+            "type": "number",
+            "nullable": true,
+            "description": "Probabilidade de fechamento"
+          },
+          "position": {
+            "type": "integer",
+            "description": "Posição no estágio"
+          },
+          "custom_attributes": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "crm_pipeline_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "crm_stage_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "contact_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "assignee_id": {
+            "type": "integer",
+            "nullable": true
+          },
+          "assignee": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "contact": {
+            "type": "object",
+            "nullable": true,
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string",
+                "nullable": true
+              },
+              "phone_number": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          },
+          "created_at": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "updated_at": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
       }
     },
     "parameters": {
@@ -7197,7 +10156,7 @@
         "schema": {
           "type": "string"
         },
-        "description": "Id of the session for which the conversation is created.\n\n\n\n Source Ids can be obtained through contactable inboxes API or via generated.<br/><br/>Website: Chatwoot generated string which can be obtained from webhook events. <br/> Phone Channels(Twilio): Phone number in e164 format <br/> Email Channels: Contact Email address <br/> API Channel: Any Random String"
+        "description": "Id of the session for which the conversation is created.\n\n\n\n Source Ids can be obtained through contactable inboxes API or via generated.<br/><br/>Website: AptusChat generated string which can be obtained from webhook events. <br/> Phone Channels(Twilio): Phone number in e164 format <br/> Email Channels: Contact Email address <br/> API Channel: Any Random String"
       },
       "contact_sort_param": {
         "in": "query",
@@ -7348,23 +10307,31 @@
         "type": "apiKey",
         "in": "header",
         "name": "api_access_token",
-        "description": "This token can be obtained by visiting the profile page or via rails console. Provides access to  endpoints based on the user permissions levels. This token can be saved by an external system when user is created via API, to perform activities on behalf of the user."
+        "description": "Token obtido na página de perfil ou pelo console Rails. O acesso respeita as permissões do usuário."
       },
       "agentBotApiKey": {
         "type": "apiKey",
         "in": "header",
         "name": "api_access_token",
-        "description": "This token should be provided by system admin or obtained via rails console. This token can be used to build bot integrations and can only access limited apis."
+        "description": "Token fornecido pelo administrador para integrações com bots, com acesso limitado às APIs permitidas."
       },
       "platformAppApiKey": {
         "type": "apiKey",
         "in": "header",
         "name": "api_access_token",
-        "description": "This token can be obtained by the system admin after creating a platformApp. This token should be used to provision agent bots, accounts, users and their roles."
+        "description": "Token criado pelo administrador para provisionar contas, usuários, funções e bots da plataforma."
       }
     }
   },
   "tags": [
+    {
+      "name": "API Pública",
+      "description": "Endpoints públicos destinados a contatos e ao Help Center."
+    },
+    {
+      "name": "Widget",
+      "description": "Operações utilizadas pelo widget de atendimento."
+    },
     {
       "name": "Contacts API",
       "description": "Public contact APIs"
@@ -7382,6 +10349,7 @@
     {
       "name": "Platform",
       "tags": [
+        "API da Plataforma",
         "Accounts",
         "Account Users",
         "AgentBots",
@@ -7391,6 +10359,12 @@
     {
       "name": "Application",
       "tags": [
+        "API da Aplicação",
+        "CRM",
+        "Captain e Copilot",
+        "Empresas",
+        "Campanhas",
+        "Portais e Help Center",
         "Account AgentBots",
         "Account",
         "Agents",
@@ -7418,6 +10392,8 @@
     {
       "name": "Client",
       "tags": [
+        "API Pública",
+        "Widget",
         "Contacts API",
         "Conversations API",
         "Messages API"
@@ -7426,6 +10402,8 @@
     {
       "name": "Others",
       "tags": [
+        "Autenticação",
+        "Webhooks e callbacks",
         "CSAT Survey Page"
       ]
     }

@@ -14,6 +14,7 @@ import {
   fromUnixTime,
 } from 'date-fns';
 import { DATE_RANGE_TYPES } from '../helpers/searchHelper';
+import { formatLocalized } from 'shared/helpers/timeHelper';
 
 import Button from 'dashboard/components-next/button/Button.vue';
 import DropdownMenu from 'dashboard/components-next/dropdown-menu/DropdownMenu.vue';
@@ -143,7 +144,8 @@ const clearCustomRange = () => {
   customTo.value = '';
 };
 
-const formatDate = timestamp => format(fromUnixTime(timestamp), 'MMM d, yyyy'); // (e.g., "Jan 15, 2024")
+const formatDate = timestamp =>
+  formatLocalized(fromUnixTime(timestamp), 'MMM d, yyyy');
 
 const selectedLabel = computed(() => {
   const prefix = t('SEARCH.DATE_RANGE.TIME_RANGE');

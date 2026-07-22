@@ -1,6 +1,5 @@
 import {
   getUnixTime,
-  format,
   add,
   startOfWeek,
   addWeeks,
@@ -12,6 +11,7 @@ import {
   setMinutes,
   setSeconds,
 } from 'date-fns';
+import { formatLocalized } from 'shared/helpers/timeHelper';
 import wootConstants from 'dashboard/constants/globals';
 import {
   generateDateSuggestions,
@@ -60,15 +60,16 @@ export const findSnoozeTime = (snoozeType, currentDate = new Date()) => {
 export const snoozedReopenTime = snoozedUntil => {
   if (!snoozedUntil) return null;
   const date = new Date(snoozedUntil);
-  if (isToday(date)) return format(date, 'h.mmaaa');
-  if (!isSameYear(date, new Date())) return format(date, 'd MMM yyyy, h.mmaaa');
-  return format(date, 'd MMM, h.mmaaa');
+  if (isToday(date)) return formatLocalized(date, 'h:mm a');
+  if (!isSameYear(date, new Date()))
+    return formatLocalized(date, 'd MMM yyyy, h:mm a');
+  return formatLocalized(date, 'd MMM, h:mm a');
 };
 
 export const snoozedReopenTimeToTimestamp = snoozedUntil =>
   snoozedUntil ? getUnixTime(new Date(snoozedUntil)) : null;
 
-const formatSnoozeDate = (snoozeDate, currentDate, locale = 'en') => {
+const formatSnoozeDate = (snoozeDate, currentDate, locale = 'pt_BR') => {
   const sameYear = isSameYear(snoozeDate, currentDate);
   try {
     const opts = {
@@ -77,14 +78,14 @@ const formatSnoozeDate = (snoozeDate, currentDate, locale = 'en') => {
       month: 'short',
       hour: 'numeric',
       minute: '2-digit',
-      hour12: true,
+      hour12: locale.toLowerCase().startsWith('en'),
       ...(sameYear ? {} : { year: 'numeric' }),
     };
     return new Intl.DateTimeFormat(locale, opts).format(snoozeDate);
   } catch {
     return sameYear
-      ? format(snoozeDate, 'EEE, d MMM, h:mm a')
-      : format(snoozeDate, 'EEE, d MMM yyyy, h:mm a');
+      ? formatLocalized(snoozeDate, 'EEE, d MMM, h:mm a')
+      : formatLocalized(snoozeDate, 'EEE, d MMM yyyy, h:mm a');
   }
 };
 

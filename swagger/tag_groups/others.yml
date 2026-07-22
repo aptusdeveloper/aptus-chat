@@ -1,16 +1,16 @@
 openapi: '3.1.0'
 info:
-  title: Chatwoot - Other APIs
-  description: Other API endpoints for Chatwoot
+  title: AptusChat - Other APIs
+  description: Other API endpoints for AptusChat
   version: 1.1.0
-  termsOfService: https://www.chatwoot.com/terms-of-service/
+  termsOfService: https://www.AptusChat.com/terms-of-service/
   contact:
-    email: hello@chatwoot.com
+    email: hello@AptusChat.com
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
 servers:
-  - url: https://app.chatwoot.com/
+  - url: https://aptusdevelop.com/
 tags:
   - name: CSAT Survey Page
     description: APIs for CSAT survey functionality
@@ -26,4 +26,4 @@ components:
       type: apiKey
       in: header
       name: api_access_token
-      description: This token can be obtained by visiting the profile page or via rails console. Provides access to endpoints based on the user permissions levels. 
+      description: This token can be obtained by visiting the profile page or via rails console. Provides access to endpoints based on the user permissions levels.

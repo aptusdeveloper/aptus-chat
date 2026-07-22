@@ -29,7 +29,7 @@ properties:
   secret:
     type: string
     nullable: true
-    description: Secret used to sign webhook requests. Signed webhook deliveries include `X-Chatwoot-Timestamp` and `X-Chatwoot-Signature`; the signature is `sha256=` followed by the HMAC-SHA256 of `{timestamp}.{raw_request_body}` using this secret. Deliveries also include `X-Chatwoot-Delivery` when a delivery id is available.
+    description: Segredo usado para assinar as requisições de webhook. As entregas assinadas incluem os cabeçalhos técnicos `X-Chatwoot-Timestamp` e `X-Chatwoot-Signature`; a assinatura contém `sha256=` seguido pelo HMAC-SHA256 de `{timestamp}.{raw_request_body}` usando este segredo. Quando disponível, o identificador da entrega é enviado em `X-Chatwoot-Delivery`.
   account_id:
     type: number
     description: The id of the account which the webhook object belongs to

@@ -62,7 +62,8 @@
       "CUSTOM_ATTRIBUTE_LINK": "Link",
       "CUSTOM_ATTRIBUTE_CHECKBOX": "Checkbox",
       "CREATED_AT": "Criado em",
-      "LAST_ACTIVITY": "Última atividade"
+      "LAST_ACTIVITY": "Última atividade",
+      "CONTACT": "Contato"
     },
     "ERRORS": {
       "VALUE_REQUIRED": "Valor obrigatório",
@@ -114,6 +115,8 @@
           "ERROR_MESSAGE": "Erro ao excluir segmento."
         }
       }
-    }
+    },
+    "CONTACT_SEARCH_PLACEHOLDER": "Pesquisar contatos",
+    "CONTACT_FALLBACK": "Contato #{id}"
   }
 }

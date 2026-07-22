@@ -19,6 +19,8 @@
       "REFRESH_BUTTON": "Refresh templates",
       "REFRESH_SUCCESS": "Templates refresh initiated. It may take a couple of minutes to update.",
       "REFRESH_ERROR": "Failed to refresh templates. Please try again.",
+      "CAROUSEL_BADGE": "Carousel",
+      "CAROUSEL_CARD_COUNT": "{count} cards",
       "LABELS": {
         "LANGUAGE": "Language",
         "TEMPLATE_BODY": "Template Body",
@@ -41,7 +43,22 @@
       "COUPON_CODE": "Enter coupon code (max 15 chars)",
       "MEDIA_URL_LABEL": "Enter {type} URL",
       "DOCUMENT_NAME_PLACEHOLDER": "Enter document filename (e.g., Invoice_2025.pdf)",
-      "BUTTON_PARAMETER": "Enter button parameter"
+      "BUTTON_PARAMETER": "Enter button parameter",
+      "CAROUSEL": {
+        "CARDS_LABEL": "Carousel Cards",
+        "CARD_LABEL": "Card {index}",
+        "CARD_PROGRESS": "Card {current} of {total}",
+        "MEDIA_LABEL": "{type} for this card",
+        "UPLOAD_MEDIA": "Upload media",
+        "CHANGE_MEDIA": "Change media",
+        "MEDIA_UPLOAD_ERROR": "Failed to upload media, please try again",
+        "UPLOAD_MODE": "Upload file",
+        "URL_MODE": "Use URL",
+        "URL_PLACEHOLDER": "https://example.com/image.jpg",
+        "PUBLIC_URL_HINT": "The URL must be public HTTPS, require no login, and return the media file directly.",
+        "INVALID_URL": "Enter a public HTTPS URL. Localhost and private network addresses cannot be accessed by WhatsApp.",
+        "NON_PUBLIC_UPLOAD": "The uploaded file generated a non-public URL. Use a public URL or configure Active Storage with a public HTTPS host."
+      }
     }
   }
 }

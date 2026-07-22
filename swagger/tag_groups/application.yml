@@ -1,16 +1,16 @@
 openapi: '3.1.0'
 info:
-  title: Chatwoot - Application API
-  description: Application API endpoints for Chatwoot
+  title: AptusChat - Application API
+  description: Application API endpoints for AptusChat
   version: 1.1.0
-  termsOfService: https://www.chatwoot.com/terms-of-service/
+  termsOfService: https://www.AptusChat.com/terms-of-service/
   contact:
-    email: hello@chatwoot.com
+    email: hello@AptusChat.com
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
 servers:
-  - url: https://app.chatwoot.com/
+  - url: https://aptusdevelop.com/
 tags:
   - name: Account AgentBots
     description: Manage agent bots within accounts

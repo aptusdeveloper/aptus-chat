@@ -92,7 +92,7 @@
 
   {% assign brand_name = global_config['BRAND_NAME'] %}
   {% if brand_name == nil %}
-    {% assign brand_name = 'Chatwoot' %}
+    {% assign brand_name = 'AptusChat' %}
   {% endif %}
   {% assign brand_url = global_config['BRAND_URL'] %}
 
@@ -120,7 +120,7 @@
             {% if brand_name != '' %}
               <tr style="margin: 0;">
                 <td class="footer" style="padding: 20px 8px 0; text-align: center; color: #64748B; font-size: 13px; line-height: 21px;">
-                  This email was sent by
+                  {{ footer_text }}
                   {% if brand_url != nil and brand_url != '' %}
                     <a href="{{ brand_url }}" style="color: #2781F6; font-weight: 600; text-decoration: none;">{{ brand_name }}</a>.
                   {% else %}

@@ -1,9 +1,9 @@
 tags:
   - Messages
 operationId: create-a-new-message-in-a-conversation
-summary: Create New Message
+summary: Criar mensagem em uma conversa
 description: |
-  Create a new message in the conversation.
+  Cria uma mensagem na conversa.
 
   Use `application/json` for text messages and `multipart/form-data` when the
   message includes file attachments.
@@ -14,7 +14,7 @@ description: |
   `multipart/form-data` content type and boundary automatically.
 
   ```bash
-  curl -X POST "https://app.chatwoot.com/api/v1/accounts/{account_id}/conversations/{conversation_id}/messages" \
+  curl -X POST "https://aptusdevelop.com/api/v1/accounts/{account_id}/conversations/{conversation_id}/messages" \
     -H "api_access_token: <your-api-token>" \
     -F "content=Here is the screenshot" \
     -F "message_type=outgoing" \
@@ -22,7 +22,7 @@ description: |
     -F "attachments[]=@/path/to/screenshot.png"
   ```
   
-  ## WhatsApp Template Messages
+  ## Templates do WhatsApp
   
   For WhatsApp channels, you can send structured template messages using the `template_params` field. 
   Templates must be pre-approved in WhatsApp Business Manager.
@@ -66,6 +66,34 @@ description: |
           "type": "copy_code",
           "parameter": "SAVE20"
         }]
+      }
+    }
+  }
+  ```
+
+  **Template de carrossel com imagens por URL:**
+  ```json
+  {
+    "content": "Confira nossos produtos",
+    "template_params": {
+      "name": "products_carousel",
+      "category": "MARKETING",
+      "language": "pt_BR",
+      "processed_params": {
+        "cards": [
+          {
+            "header": {
+              "media_url": "https://cdn.exemplo.com/produtos/card-1.jpg",
+              "media_type": "image"
+            }
+          },
+          {
+            "header": {
+              "media_url": "https://cdn.exemplo.com/produtos/card-2.jpg",
+              "media_type": "image"
+            }
+          }
+        ]
       }
     }
   }

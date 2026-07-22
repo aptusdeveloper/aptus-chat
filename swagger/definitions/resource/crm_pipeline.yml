@@ -1,0 +1,14 @@
+type: object
+description: Pipeline do CRM AptusChat.
+required: [id, name, active, position, stages]
+properties:
+  id: { type: string, format: uuid }
+  name: { type: string, description: Nome do pipeline }
+  description: { type: string, nullable: true, description: Descrição do pipeline }
+  active: { type: boolean, description: Indica se o pipeline está ativo }
+  position: { type: integer, description: Ordem de exibição }
+  stages:
+    type: array
+    items: { $ref: '#/components/schemas/crm_stage' }
+  created_at: { type: integer, format: int64 }
+  updated_at: { type: integer, format: int64 }

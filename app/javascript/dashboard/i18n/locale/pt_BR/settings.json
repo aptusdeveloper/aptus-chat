@@ -225,6 +225,17 @@
         "LABEL": "Confirme a nova senha",
         "ERROR": "A confirmação da senha é diferente. Favor digitar novamente",
         "PLACEHOLDER": "Por favor, digite sua nova senha "
+      },
+      "SESSIONS_SECTION": {
+        "TITLE": "Sessões ativas",
+        "NOTE": "Estes são os dispositivos atualmente conectados à sua conta.",
+        "CURRENT": "Sessão atual",
+        "REVOKE": "Revogar",
+        "REVOKE_SUCCESS": "Sessão revogada com sucesso",
+        "REVOKE_ERROR": "Não foi possível revogar a sessão. Por favor, tente novamente.",
+        "FETCH_ERROR": "Não foi possível buscar sessões. Por favor, tente novamente.",
+        "LAST_ACTIVE": "Último ativo",
+        "UNKNOWN_DEVICE": "Dispositivo desconhecido"
       }
     }
   },
@@ -383,7 +394,22 @@
     "DOCS": "Ler documentos",
     "SECURITY": "Segurança",
     "CAPTAIN_AI": "Capitão",
-    "CONVERSATION_WORKFLOW": "Fluxo de Conversa"
+    "CONVERSATION_WORKFLOW": "Fluxo de Conversa",
+    "SORT_TOOLTIP": "Organizar",
+    "SORT_BY": "Ordenar por",
+    "SORT_GROUPS": {
+      "CREATED": "Classificar por data de criação",
+      "ALPHABETICAL": "Classifique em ordem alfabética",
+      "UNREAD_COUNT": "Classificar por contagem de não lidos"
+    },
+    "SORT_OPTIONS": {
+      "CREATED_DESC": "O mais novo primeiro",
+      "CREATED_ASC": "Mais antigo primeiro",
+      "ALPHABETICAL_ASC": "Ascendente (A - Z)",
+      "ALPHABETICAL_DESC": "Descendente (Z - A)",
+      "UNREAD_COUNT_DESC": "Mais alto primeiro",
+      "UNREAD_COUNT_ASC": "Mais baixo primeiro"
+    }
   },
   "CAPTAIN_SETTINGS": {
     "TITLE": "Configurações do Capitão",
@@ -415,7 +441,9 @@
       "DESCRIPTION": "Ative ou desative recursos com tecnologia de IA.",
       "AUDIO_TRANSCRIPTION": {
         "TITLE": "Transcrição de Áudio",
-        "DESCRIPTION": "Converte automaticamente mensagens de voz e gravações de chamadas em transcrições de texto pesquisáveis."
+        "DESCRIPTION": "Converte automaticamente mensagens de voz e gravações de chamadas em transcrições de texto pesquisáveis.",
+        "MODEL_TITLE": "Modelo de transcrição de áudio",
+        "MODEL_DESCRIPTION": "Selecione o modelo de IA a ser usado para converter mensagens de áudio em transcrições de texto"
       },
       "HELP_CENTER_SEARCH": {
         "TITLE": "Indexação de Pesquisa da Central de Ajuda",
@@ -790,6 +818,10 @@
             "SUCCESS_MESSAGE": "Caixa de entrada adicionada à política com sucesso",
             "ERROR_MESSAGE": "Falha ao adicionar a caixa de entrada à política"
           }
+        },
+        "EXCLUDE_OLDER_THAN": {
+          "LABEL": "Ignore conversas obsoletas",
+          "DESCRIPTION": "Ignore conversas não atribuídas anteriores a esta. O padrão é 7 dias; desmarque para desativar."
         }
       },
       "DELETE_POLICY": {

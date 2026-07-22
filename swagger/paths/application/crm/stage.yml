@@ -1,0 +1,27 @@
+parameters:
+  - $ref: '#/components/parameters/account_id'
+  - name: crm_pipeline_id
+    in: path
+    required: true
+    schema: { type: string, format: uuid }
+  - name: id
+    in: path
+    required: true
+    schema: { type: string, format: uuid }
+patch:
+  tags: [CRM]
+  summary: Atualizar estágio do pipeline
+  security: [{ userApiKey: [] }]
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: { type: object, additionalProperties: true }
+  responses:
+    '200': { description: Estágio atualizado com sucesso. }
+delete:
+  tags: [CRM]
+  summary: Excluir estágio do pipeline
+  security: [{ userApiKey: [] }]
+  responses:
+    '200': { description: Estágio excluído com sucesso. }

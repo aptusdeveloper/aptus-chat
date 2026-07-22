@@ -104,8 +104,11 @@ const setQuotedReplyFlagForInbox = (channelType, value, updateUISettings) => {
 const fetchSignatureFlagFromUISettings = (channelType, uiSettings) => {
   if (!channelType) return false;
 
-  const slugifiedChannel = slugifyChannel(channelType);
-  return uiSettings.value[`${slugifiedChannel}_signature_enabled`];
+  // APTUS-HIDDEN: assinatura de mensagens desativada no MVP — nunca aparece
+  // no rodapé da mensagem, mesmo que a conta tenha um valor salvo como true.
+  // const slugifiedChannel = slugifyChannel(channelType);
+  // return uiSettings.value[`${slugifiedChannel}_signature_enabled`];
+  return false;
 };
 
 const fetchQuotedReplyFlagFromUISettings = (channelType, uiSettings) => {

@@ -151,7 +151,12 @@ class Whatsapp::Providers::WhatsappCloudService < Whatsapp::Providers::BaseServi
 
   def error_message(response)
     # https://developers.facebook.com/docs/whatsapp/cloud-api/support/error-codes/#sample-response
-    response.parsed_response&.dig('error', 'message')
+    error = response.parsed_response&.dig('error')
+    return if error.blank?
+
+    return error['message'] unless error['code'] == 131_053
+
+    '131053: Media upload error. Check that the URL is public HTTPS, needs no login, and uses a supported type and size.'
   end
 
   def voice_message?(type, attachment)

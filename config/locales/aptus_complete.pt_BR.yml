@@ -1,0 +1,115 @@
+pt_BR:
+  activerecord:
+    attributes:
+      user:
+        password: "Senha"
+        password_confirmation: "Confirmação de senha"
+  profile_settings:
+    sessions:
+      cannot_revoke_current: "Você não pode revogar a sessão atual."
+  errors:
+    conversations:
+      unread_counts:
+        feature_not_enabled: "O recurso de contagem de conversas não lidas não está habilitado para esta conta"
+    dyte:
+      realtimekit_credentials_required: "As credenciais do Cloudflare RealtimeKit são obrigatórias. Exclua a integração Dyte existente e crie-a novamente com as credenciais do Cloudflare RealtimeKit."
+    cloudflare:
+      realtimekit:
+        invalid_credentials: "As credenciais do Cloudflare RealtimeKit são inválidas. Verifique o ID da conta, o ID do aplicativo RealtimeKit e as permissões do token da API."
+        missing_credentials: "O ID da conta Cloudflare, o ID do aplicativo RealtimeKit e o token da API são obrigatórios."
+        invalid_api_token: "O token da API Cloudflare é inválido ou está inativo. Crie um novo token com permissões de administrador do Realtime."
+        invalid_account_or_permissions: "O ID da conta Cloudflare é inválido ou o token da API não possui acesso de administrador do Realtime a esta conta."
+        app_not_found: "O ID do aplicativo RealtimeKit não foi encontrado nesta conta Cloudflare. Verifique o aplicativo selecionado."
+        verification_failed: "Não foi possível verificar agora as credenciais do Cloudflare RealtimeKit. Tente novamente."
+  super_admin:
+    captain_model_overrides:
+      form:
+        helper_text: "Deixe o modelo em branco para usar o padrão definido no YAML para esse recurso de IA."
+        use_default: "Usar padrão: %{model} (%{model_id})"
+      show:
+        summary: "Visualizar roteamento de modelos"
+        provider: "Provedor"
+        model: "Modelo"
+      sources:
+        account_override: "Substituição da conta"
+        default: "Padrão"
+      features:
+        editor: "Editor"
+        assistant: "Assistente"
+        copilot: "Copilot"
+        label_suggestion: "Sugestão de etiquetas"
+        document_faq_generation: "Geração de perguntas frequentes a partir de documentos"
+        help_center_article_generation: "Geração de artigos da Central de Ajuda"
+        onboarding_content_generation: "Geração de conteúdo de integração"
+        help_center_query_translation: "Tradução de consultas da Central de Ajuda"
+        audio_transcription: "Transcrição de áudio"
+        help_center_search: "Pesquisa na Central de Ajuda"
+  secure_password:
+    character:
+      one: "caractere"
+      other: "caracteres"
+    types:
+      uppercase: "maiúsculo"
+      downcase: "minúsculo"
+      lowercase: "minúsculo"
+      number: "numérico"
+      special: "especial"
+    password_has_required_content:
+      errors:
+        messages:
+          unknown_characters: "contém %{count} %{subject} inválido(s)"
+          minimum_characters: "deve conter pelo menos %{count} %{subject} do tipo %{type}"
+          maximum_characters: "deve conter menos de %{count} %{subject} do tipo %{type}"
+          minimum_length: "deve conter pelo menos %{count} %{subject}"
+          maximum_length: "deve conter menos de %{count} %{subject}"
+    password_disallows_frequent_reuse:
+      errors:
+        messages:
+          password_is_recent: "As últimas %{count} senhas não podem ser reutilizadas"
+    password_disallows_frequent_changes:
+      errors:
+        messages:
+          password_is_recent: "A senha não pode ser alterada mais de uma vez a cada %{timeframe}"
+    password_requires_regular_updates:
+      alerts:
+        messages:
+          password_updated: "Sua senha foi atualizada."
+      errors:
+        messages:
+          password_expired: "Sua senha expirou. As senhas devem ser alteradas a cada %{timeframe}"
+    datetime:
+      precise_distance_in_words:
+        half_a_minute: "meio minuto"
+        less_than_x_seconds:
+          one: "1 segundo"
+          other: "%{count} segundos"
+        x_seconds:
+          one: "1 segundo"
+          other: "%{count} segundos"
+        less_than_x_minutes:
+          one: "um minuto"
+          other: "%{count} minutos"
+        x_minutes:
+          one: "1 minuto"
+          other: "%{count} minutos"
+        about_x_hours:
+          one: "1 hora"
+          other: "%{count} horas"
+        x_days:
+          one: "1 dia"
+          other: "%{count} dias"
+        about_x_months:
+          one: "1 mês"
+          other: "%{count} meses"
+        x_months:
+          one: "1 mês"
+          other: "%{count} meses"
+        about_x_years:
+          one: "1 ano"
+          other: "%{count} anos"
+        over_x_years:
+          one: "1 ano"
+          other: "%{count} anos"
+        almost_x_years:
+          one: "1 ano"
+          other: "%{count} anos"

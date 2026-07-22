@@ -25,7 +25,7 @@ export default {
     emitter.off(BUS_EVENTS.SHOW_TOAST, this.onNewToastMessage);
   },
   methods: {
-    onNewToastMessage({ message, action }) {
+    onNewToastMessage({ message, action, duration }) {
       this.snackbarAlertMessages.push({
         key: new Date().getTime(),
         message,
@@ -33,7 +33,7 @@ export default {
       });
       window.setTimeout(() => {
         this.snackbarAlertMessages.splice(0, 1);
-      }, this.duration);
+      }, duration ?? this.duration);
     },
   },
 };
@@ -43,7 +43,7 @@ export default {
   <transition-group
     name="toast-fade"
     tag="div"
-    class="fixed left-0 right-0 mx-auto overflow-hidden text-center top-10 z-50 max-w-[40rem]"
+    class="fixed left-0 right-0 mx-auto overflow-hidden text-center top-10 z-50 max-w-[48rem] px-4"
   >
     <SnackbarItem
       v-for="snackbarAlertMessage in snackbarAlertMessages"

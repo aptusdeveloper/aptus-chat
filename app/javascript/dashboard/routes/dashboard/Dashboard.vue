@@ -20,8 +20,9 @@ const FloatingCallWidget = defineAsyncComponent(
   () => import('dashboard/components-next/call/FloatingCallWidget.vue')
 );
 
-import CopilotLauncher from 'dashboard/components-next/copilot/CopilotLauncher.vue';
-import CopilotContainer from 'dashboard/components/copilot/CopilotContainer.vue';
+// APTUS-HIDDEN: botão flutuante e painel lateral do Copilot removidos do MVP.
+// import CopilotLauncher from 'dashboard/components-next/copilot/CopilotLauncher.vue';
+// import CopilotContainer from 'dashboard/components/copilot/CopilotContainer.vue';
 
 import MobileSidebarLauncher from 'dashboard/components-next/sidebar/MobileSidebarLauncher.vue';
 import { useCallsStore } from 'dashboard/stores/calls';
@@ -33,8 +34,7 @@ export default {
     WootKeyShortcutModal,
     AddAccountModal,
     UpgradePage,
-    CopilotLauncher,
-    CopilotContainer,
+    // APTUS-HIDDEN: CopilotLauncher, CopilotContainer — não fazem parte do MVP
     FloatingCallWidget,
     MobileSidebarLauncher,
   },
@@ -156,12 +156,16 @@ export default {
       <template v-if="!showUpgradePage">
         <router-view />
         <CommandBar />
+        <!-- APTUS-HIDDEN: CopilotLauncher — não faz parte do MVP
         <CopilotLauncher />
+        -->
         <MobileSidebarLauncher
           :is-mobile-sidebar-open="isMobileSidebarOpen"
           @toggle="toggleMobileSidebar"
         />
+        <!-- APTUS-HIDDEN: CopilotContainer — não faz parte do MVP
         <CopilotContainer />
+        -->
         <FloatingCallWidget v-if="hasActiveCall || hasIncomingCall" />
       </template>
       <AddAccountModal

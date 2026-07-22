@@ -14,7 +14,7 @@ RSpec.describe AdministratorNotifications::AccountComplianceMailer do
   describe 'account_deleted' do
     it 'has the right subject format' do
       subject = described_class.new.send(:subject_for, account)
-      expect(subject).to eq("Account Deletion Notice for #{account.id} - #{account.name}")
+      expect(subject).to eq("Aviso de exclusão da conta #{account.id} - #{account.name}")
     end
 
     it 'includes soft deleted users in meta when provided' do

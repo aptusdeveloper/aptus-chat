@@ -382,6 +382,23 @@ describe Whatsapp::Providers::WhatsappCloudService do
         expect(message.reload.external_error).to be_nil
       end
     end
+
+    context 'when WhatsApp cannot download media' do
+      let(:error_response) do
+        {
+          'error' => {
+            'message' => 'Media upload error',
+            'code' => 131_053
+          }
+        }
+      end
+
+      it 'stores actionable troubleshooting information' do
+        service.send(:handle_error, error_response_object, message)
+
+        expect(message.reload.external_error).to include('public HTTPS', 'no login', 'supported type and size')
+      end
+    end
   end
 
   describe 'CSAT template methods' do

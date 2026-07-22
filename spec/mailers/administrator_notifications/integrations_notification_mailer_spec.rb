@@ -12,7 +12,7 @@ RSpec.describe AdministratorNotifications::IntegrationsNotificationMailer do
     let(:mail) { described_class.with(account: account).slack_disconnect.deliver_now }
 
     it 'renders the subject' do
-      expect(mail.subject).to eq('Your Slack integration has expired')
+      expect(mail.subject).to eq('Sua integração com Slack expirou')
     end
 
     it 'renders the receiver email' do
@@ -20,7 +20,9 @@ RSpec.describe AdministratorNotifications::IntegrationsNotificationMailer do
     end
 
     it 'includes reconnect instructions in the body' do
-      expect(mail.body.encoded).to include('To continue receiving messages on Slack, please delete the integration and connect your workspace again')
+      expected_text = 'Para continuar recebendo mensagens no Slack, exclua a integração ' \
+                      'e conecte seu workspace novamente'
+      expect(mail.body.encoded).to include(expected_text)
     end
   end
 
@@ -28,11 +30,11 @@ RSpec.describe AdministratorNotifications::IntegrationsNotificationMailer do
     let(:mail) { described_class.with(account: account).dialogflow_disconnect.deliver_now }
 
     it 'renders the subject' do
-      expect(mail.subject).to eq('Your Dialogflow integration was disconnected')
+      expect(mail.subject).to eq('Sua integração com Dialogflow foi desconectada')
     end
 
     it 'renders the content' do
-      expect(mail.body.encoded).to include('Your Dialogflow integration was disconnected because of permission issues')
+      expect(mail.body.encoded).to include('Sua integração do Dialogflow foi desconectada devido a problemas de permissão')
     end
 
     it 'renders the receiver email' do
@@ -44,11 +46,11 @@ RSpec.describe AdministratorNotifications::IntegrationsNotificationMailer do
     let(:mail) { described_class.with(account: account).openai_disconnect.deliver_now }
 
     it 'renders the subject' do
-      expect(mail.subject).to eq('Your OpenAI integration was disconnected')
+      expect(mail.subject).to eq('Sua integração com OpenAI foi desconectada')
     end
 
     it 'renders the content' do
-      expect(mail.body.encoded).to include('the configured API key is invalid or revoked')
+      expect(mail.body.encoded).to include('a chave de API configurada é inválida ou revogada')
     end
 
     it 'renders the receiver email' do

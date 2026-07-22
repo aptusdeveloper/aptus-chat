@@ -1,6 +1,6 @@
 class AdministratorNotifications::AccountNotificationMailer < AdministratorNotifications::BaseMailer
   def account_deletion_user_initiated(account, reason)
-    subject = 'Your Chatwoot account deletion has been scheduled'
+    subject = I18n.t('email_subjects.account_deletion_scheduled')
     action_url = settings_url('general')
     meta = {
       'account_name' => account.name,
@@ -12,7 +12,7 @@ class AdministratorNotifications::AccountNotificationMailer < AdministratorNotif
   end
 
   def account_deletion_for_inactivity(account, reason)
-    subject = 'Your Chatwoot account is scheduled for deletion due to inactivity'
+    subject = I18n.t('email_subjects.account_deletion_inactivity')
     action_url = settings_url('general')
     meta = {
       'account_name' => account.name,
@@ -24,7 +24,7 @@ class AdministratorNotifications::AccountNotificationMailer < AdministratorNotif
   end
 
   def contact_import_complete(resource)
-    subject = 'Contact Import Completed'
+    subject = I18n.t('email_subjects.contact_import_complete')
 
     action_url = if resource.failed_records.attached?
                    Rails.application.routes.url_helpers.rails_blob_url(resource.failed_records)
@@ -41,17 +41,17 @@ class AdministratorNotifications::AccountNotificationMailer < AdministratorNotif
   end
 
   def contact_import_failed
-    subject = 'Contact Import Failed'
+    subject = I18n.t('email_subjects.contact_import_failed')
     send_notification(subject)
   end
 
   def contact_export_complete(file_url, email_to)
-    subject = "Your contact's export file is available to download."
+    subject = I18n.t('email_subjects.contact_export_complete')
     send_notification(subject, to: email_to, action_url: file_url)
   end
 
   def automation_rule_disabled(rule)
-    subject = 'Automation rule disabled due to validation errors.'
+    subject = I18n.t('email_subjects.automation_rule_disabled')
     action_url = settings_url('automation/list')
     meta = { 'rule_name' => rule.name }
 
@@ -61,10 +61,10 @@ class AdministratorNotifications::AccountNotificationMailer < AdministratorNotif
   private
 
   def format_deletion_date(deletion_date_str)
-    return 'Unknown' if deletion_date_str.blank?
+    return I18n.t('email_subjects.unknown') if deletion_date_str.blank?
 
-    Time.zone.parse(deletion_date_str).strftime('%B %d, %Y')
+    I18n.l(Time.zone.parse(deletion_date_str).to_date, format: :long)
   rescue StandardError
-    'Unknown'
+    I18n.t('email_subjects.unknown')
   end
 end

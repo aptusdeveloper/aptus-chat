@@ -1,8 +1,8 @@
 {
   "CONVERSATION": {
+    "404": "Desculpe, não conseguimos encontrar a conversa. Por favor, tente novamente",
     "SELECT_A_CONVERSATION": "Por favor, selecione uma conversa no painel da esquerda",
     "CSAT_REPLY_MESSAGE": "Por favor, classifique a conversa",
-    "404": "Desculpe, não conseguimos encontrar a conversa. Por favor, tente novamente",
     "SWITCH_VIEW_LAYOUT": "Alternar o layout",
     "DASHBOARD_APP_TAB_MESSAGES": "Mensagens",
     "UNVERIFIED_SESSION": "A identidade deste usuário não foi verificada",
@@ -264,7 +264,8 @@
         "REMOVE_PREVIEW": "Remover o encadeamento de e-mails citado",
         "COLLAPSE": "Recolher a prévia",
         "EXPAND": "Expandir a prévia"
-      }
+      },
+      "IMAGE_UPLOAD_SUCCESS": "Imagem enviada com sucesso"
     },
     "VISIBLE_TO_AGENTS": "Mensagem Privada: Apenas visível para você e seu time",
     "CHANGE_STATUS": "Estado da conversa mudou",
@@ -303,6 +304,25 @@
         "MESSAGE": "Você não pode desfazer essa ação",
         "DELETE": "Excluir",
         "CANCEL": "Cancelar"
+      },
+      "REPORT_MESSAGE": {
+        "LABEL": "Denunciar mensagem",
+        "TITLE": "Denunciar mensagem do Captain",
+        "DESCRIPTION": "Encontrou um problema nesta resposta da IA? Conte o que aconteceu e nossa equipe analisar? para ajudar a melhorar a precis?o do Captain.",
+        "PROBLEM_TYPE": "Tipo de problema",
+        "PROBLEM_TYPE_PLACEHOLDER": "Selecione um tipo de problema",
+        "DESCRIPTION_LABEL": "Descri??o",
+        "DESCRIPTION_PLACEHOLDER": "Descreva o problema em detalhes",
+        "SUBMIT": "Denunciar",
+        "SUCCESS": "Obrigado pela den?ncia. Nossa equipe ir? analis?-la.",
+        "ERROR": "N?o foi poss?vel denunciar esta mensagem. Tente novamente.",
+        "REASONS": {
+          "incorrect_information": "Informa??o incorreta",
+          "inappropriate_response": "Resposta inadequada",
+          "incomplete_response": "Resposta incompleta",
+          "outdated_information": "Informa??o desatualizada",
+          "other": "Outro"
+        }
       }
     },
     "SIDEBAR": {
@@ -400,7 +420,8 @@
       "VIEW_ALL": "Visualizar tudo",
       "SHOW_LESS": "Mostrar menos",
       "MORE_COUNT": "+{count}",
-      "UNTITLED_FILE": "Arquivo sem nome"
+      "UNTITLED_FILE": "Arquivo sem nome",
+      "JUMP_TO_MESSAGE": "Ir para a mensagem"
     },
     "SHOPIFY": {
       "ORDER_ID": "Pedido #{id}",

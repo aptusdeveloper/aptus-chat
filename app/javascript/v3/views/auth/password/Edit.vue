@@ -59,10 +59,19 @@ export default {
     },
   },
   methods: {
+    formatPasswordError(message) {
+      return message
+        .replace(/, (?=Password(?: confirmation)? )/g, '\n')
+        .replaceAll(
+          'Password confirmation',
+          this.$t('SET_NEW_PASSWORD.CONFIRM_PASSWORD.LABEL')
+        )
+        .replaceAll('Password', this.$t('SET_NEW_PASSWORD.PASSWORD.LABEL'));
+    },
     showAlertMessage(message) {
       // Reset loading, current selected agent
       this.newPasswordAPI.showLoading = false;
-      useAlert(message);
+      useAlert(this.formatPasswordError(message), null, { duration: 12000 });
     },
     submitForm() {
       this.newPasswordAPI.showLoading = true;

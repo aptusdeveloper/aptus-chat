@@ -3,13 +3,21 @@ require 'fileutils'
 require 'pathname'
 require 'yaml'
 require 'json'
+require Rails.root.join('lib/swagger/route_inventory')
 
-module SwaggerTaskActions
+module SwaggerTaskActions # rubocop:disable Metrics/ModuleLength
+  INVENTORY_METADATA_KEYS = %w[
+    tags operationId summary description x-aptus-controller x-aptus-status x-aptus-disabled-reason
+  ].freeze
+
+  # rubocop:disable Metrics/MethodLength
   def self.execute_build
     swagger_dir = Rails.root.join('swagger')
     # Paths relative to swagger_dir for use within Dir.chdir
     index_yml_relative_path = 'index.yml'
     swagger_json_relative_path = 'swagger.json'
+
+    Swagger::RouteInventory.write!
 
     Dir.chdir(swagger_dir) do
       # Operations within this block are relative to swagger_dir
@@ -22,6 +30,13 @@ module SwaggerTaskActions
         resolve_file_ref: true, # Uses CWD (swagger_dir) for resolving file refs
         logging: true
       )
+      # YAML aceita códigos de resposta sem aspas como inteiros. Ao mesclar `200`
+      # com `"200"`, o JSON teria duas chaves textualmente idênticas e o ReDoc
+      # rejeitaria o documento como "duplicated mapping key".
+      final_build = final_build.deep_stringify_keys
+      generated_paths = YAML.safe_load(File.read('generated_paths.yml')).deep_stringify_keys
+      final_build['paths'] = _merge_route_inventory(generated_paths, final_build['paths'] || {})
+      final_build = _localize_and_brand(final_build)
       File.write(swagger_json_relative_path, JSON.pretty_generate(final_build))
 
       # For user messages, provide the absolute path
@@ -34,6 +49,7 @@ module SwaggerTaskActions
       Rake::Task['swagger:build_tag_groups'].invoke
     end
   end
+  # rubocop:enable Metrics/MethodLength
 
   def self.execute_build_tag_groups
     base_swagger_path = Rails.root.join('swagger')
@@ -76,6 +92,43 @@ module SwaggerTaskActions
   # Private helper methods
   class << self
     private
+
+    def _merge_route_inventory(generated_paths, authored_paths)
+      generated_paths.each_with_object({}) do |(path, generated_item), result|
+        authored_item = authored_paths[path] || {}
+        result[path] = generated_item.deep_merge(authored_item)
+
+        generated_item.each do |method, generated_operation|
+          next unless generated_operation.is_a?(Hash)
+
+          INVENTORY_METADATA_KEYS.each do |key|
+            result[path][method][key] = generated_operation[key] if generated_operation.key?(key)
+          end
+        end
+      end.merge(authored_paths.except(*generated_paths.keys))
+    end
+
+    def _localize_and_brand(value)
+      case value
+      when Hash
+        value.transform_values { |child| _localize_and_brand(child) }
+      when Array
+        value.map { |child| _localize_and_brand(child) }
+      when String
+        value
+          .gsub('Success', 'Sucesso')
+          .gsub('Access denied', 'Acesso negado')
+          .gsub('not found', 'não encontrado')
+          .gsub('The content of the message', 'Conteúdo da mensagem')
+          .gsub('The type of the message', 'Tipo da mensagem')
+          .gsub('User management APIs', 'APIs de gerenciamento de usuários')
+          .gsub('Account management APIs', 'APIs de gerenciamento de contas')
+          .gsub('Conversation management APIs', 'APIs de gerenciamento de conversas')
+          .gsub('Contact management APIs', 'APIs de gerenciamento de contatos')
+      else
+        value
+      end
+    end
 
     def _process_tag_group(tag_group, full_spec, output_dir)
       group_name = tag_group['name']

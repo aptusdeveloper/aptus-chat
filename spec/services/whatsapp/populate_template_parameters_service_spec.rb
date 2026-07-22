@@ -28,6 +28,25 @@ describe Whatsapp::PopulateTemplateParametersService do
   end
 
   describe '#build_media_parameter' do
+    context 'when URL is not publicly accessible over HTTPS' do
+      it 'rejects HTTP, localhost, loopback and private addresses' do
+        invalid_urls = [
+          'http://example.com/image.jpg',
+          'https://localhost:3000/image.jpg',
+          'https://127.0.0.1/image.jpg',
+          'https://10.0.0.1/image.jpg',
+          'https://172.16.0.1/image.jpg',
+          'https://192.168.1.1/image.jpg'
+        ]
+
+        invalid_urls.each do |url|
+          expect do
+            service.build_media_parameter(url, 'IMAGE', nil, require_public_url: true)
+          end.to raise_error(ArgumentError)
+        end
+      end
+    end
+
     context 'when URL contains spaces' do
       it 'normalizes the URL before building media parameter' do
         url_with_spaces = 'https://example.com/image with spaces.jpg'

@@ -25,7 +25,7 @@ class AdministratorNotifications::AccountComplianceMailer < AdministratorNotific
       'account_id' => account.id,
       'account_name' => account.name,
       'deleted_at' => format_time(Time.current.iso8601),
-      'deletion_reason' => account.custom_attributes['marked_for_deletion_reason'] || 'not specified',
+      'deletion_reason' => account.custom_attributes['marked_for_deletion_reason'] || I18n.t('email_subjects.not_specified'),
       'marked_for_deletion_at' => format_time(account.custom_attributes['marked_for_deletion_at']),
       'soft_deleted_users' => user_info_list,
       'deleted_user_count' => user_info_list.size
@@ -33,13 +33,13 @@ class AdministratorNotifications::AccountComplianceMailer < AdministratorNotific
   end
 
   def format_time(time_string)
-    return 'not specified' if time_string.blank?
+    return I18n.t('email_subjects.not_specified') if time_string.blank?
 
-    Time.zone.parse(time_string).strftime('%B %d, %Y %H:%M:%S %Z')
+    I18n.l(Time.zone.parse(time_string), format: :long)
   end
 
   def subject_for(account)
-    "Account Deletion Notice for #{account.id} - #{account.name}"
+    I18n.t('email_subjects.account_deletion_notice', id: account.id, name: account.name, locale: :pt_BR)
   end
 
   def instance_admin_email

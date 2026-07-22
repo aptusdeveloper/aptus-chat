@@ -5,6 +5,27 @@ import {
   formatDistanceToNow,
   differenceInDays,
 } from 'date-fns';
+import { enUS, ptBR } from 'date-fns/locale';
+
+const currentLocale = () => document.documentElement.lang || 'pt_BR';
+const dateLocale = () =>
+  currentLocale().toLowerCase().startsWith('en') ? enUS : ptBR;
+const localizedPattern = pattern => {
+  if (currentLocale().toLowerCase().startsWith('en')) return pattern;
+
+  return pattern
+    .replace("'at'", "'às'")
+    .replace(/LLL d/g, 'd MMM')
+    .replace(/MMM d/g, 'd MMM')
+    .replace(/hh?:mm a/g, 'HH:mm');
+};
+
+export const setDateLocale = locale => {
+  document.documentElement.lang = locale || 'pt_BR';
+};
+
+export const formatLocalized = (date, pattern) =>
+  format(date, localizedPattern(pattern), { locale: dateLocale() });
 
 /**
  * Formats a Unix timestamp into a human-readable time format.
@@ -14,7 +35,9 @@ import {
  */
 export const messageStamp = (time, dateFormat = 'h:mm a') => {
   const unixTime = fromUnixTime(time);
-  return format(unixTime, dateFormat);
+  return format(unixTime, localizedPattern(dateFormat), {
+    locale: dateLocale(),
+  });
 };
 
 /**
@@ -26,9 +49,13 @@ export const messageStamp = (time, dateFormat = 'h:mm a') => {
 export const messageTimestamp = (time, dateFormat = 'MMM d, yyyy') => {
   const messageTime = fromUnixTime(time);
   const now = new Date();
-  const messageDate = format(messageTime, dateFormat);
+  const messageDate = format(messageTime, localizedPattern(dateFormat), {
+    locale: dateLocale(),
+  });
   if (!isSameYear(messageTime, now)) {
-    return format(messageTime, 'LLL d y, h:mm a');
+    return format(messageTime, localizedPattern('LLL d y, h:mm a'), {
+      locale: dateLocale(),
+    });
   }
   return messageDate;
 };
@@ -40,7 +67,10 @@ export const messageTimestamp = (time, dateFormat = 'MMM d, yyyy') => {
  */
 export const dynamicTime = time => {
   const unixTime = fromUnixTime(time);
-  return formatDistanceToNow(unixTime, { addSuffix: true });
+  return formatDistanceToNow(unixTime, {
+    addSuffix: true,
+    locale: dateLocale(),
+  });
 };
 
 /**
@@ -51,7 +81,7 @@ export const dynamicTime = time => {
  */
 export const dateFormat = (time, df = 'MMM d, yyyy') => {
   const unixTime = fromUnixTime(time);
-  return format(unixTime, df);
+  return format(unixTime, localizedPattern(df), { locale: dateLocale() });
 };
 
 /**

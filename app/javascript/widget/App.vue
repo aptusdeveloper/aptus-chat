@@ -1,4 +1,5 @@
 <script>
+import { setDateLocale } from 'shared/helpers/timeHelper';
 import { mapGetters, mapActions } from 'vuex';
 import { setHeader } from 'widget/helpers/axios';
 import addHours from 'date-fns/addHours';
@@ -156,8 +157,10 @@ export default {
 
       if (hasLocaleWithVariation) {
         this.$root.$i18n.locale = localeWithVariation;
+        setDateLocale(localeWithVariation);
       } else if (hasLocaleWithoutVariation) {
         this.$root.$i18n.locale = localeWithoutVariation;
+        setDateLocale(localeWithoutVariation);
       }
     },
     registerUnreadEvents() {

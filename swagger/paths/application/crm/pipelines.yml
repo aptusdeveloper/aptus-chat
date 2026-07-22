@@ -1,0 +1,37 @@
+parameters:
+  - $ref: '#/components/parameters/account_id'
+get:
+  tags: [CRM]
+  summary: Listar pipelines do CRM
+  security: [{ userApiKey: [] }]
+  responses:
+    '200':
+      description: Pipelines retornados com sucesso.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              payload: { type: array, items: { $ref: '#/components/schemas/crm_pipeline' } }
+post:
+  tags: [CRM]
+  summary: Criar pipeline do CRM
+  security: [{ userApiKey: [] }]
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [crm_pipeline]
+          properties:
+            crm_pipeline:
+              type: object
+              required: [name]
+              properties:
+                name: { type: string }
+                description: { type: string }
+                active: { type: boolean }
+                position: { type: integer }
+  responses:
+    '200': { description: Pipeline criado com sucesso. }

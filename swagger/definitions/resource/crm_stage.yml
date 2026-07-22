@@ -1,0 +1,13 @@
+type: object
+description: Estágio de um pipeline do CRM.
+required: [id, name, color, position, is_win, is_loss, crm_pipeline_id]
+properties:
+  id: { type: string, format: uuid }
+  name: { type: string, description: Nome do estágio }
+  color: { type: string, description: Cor usada na interface }
+  position: { type: integer, description: Ordem do estágio no pipeline }
+  is_win: { type: boolean, description: Indica um estágio de ganho }
+  is_loss: { type: boolean, description: Indica um estágio de perda }
+  crm_pipeline_id: { type: string, format: uuid }
+  created_at: { type: integer, format: int64, description: Data de criação em Unix timestamp }
+  updated_at: { type: integer, format: int64, description: Data da atualização em Unix timestamp }

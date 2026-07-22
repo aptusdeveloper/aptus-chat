@@ -1,3 +1,5 @@
+require 'ipaddr'
+
 class Whatsapp::PopulateTemplateParametersService
   def build_parameter(value)
     case value
@@ -23,6 +25,8 @@ class Whatsapp::PopulateTemplateParametersService
         type: 'coupon_code',
         coupon_code: coupon_code
       }
+    when 'quick_reply'
+      { type: 'payload', payload: button['parameter'].to_s.strip }
     else
       # For URL buttons and other button types, treat parameter as text
       # If parameter is blank, use empty string (required for URL buttons)
@@ -30,12 +34,12 @@ class Whatsapp::PopulateTemplateParametersService
     end
   end
 
-  def build_media_parameter(url, media_type, media_name = nil)
+  def build_media_parameter(url, media_type, media_name = nil, require_public_url: false)
     return nil if url.blank?
 
     sanitized_url = sanitize_parameter(url)
     normalized_url = normalize_url(sanitized_url)
-    validate_url(normalized_url)
+    validate_url(normalized_url, require_public_url: require_public_url)
     build_media_type_parameter(normalized_url, media_type.downcase, media_name)
   end
 
@@ -148,16 +152,32 @@ class Whatsapp::PopulateTemplateParametersService
     url.gsub(' ', '%20')
   end
 
-  def validate_url(url)
+  def validate_url(url, require_public_url: false)
     return if url.blank?
 
     # url is already normalized by the caller
 
     uri = URI.parse(url)
     raise ArgumentError, "Invalid URL scheme: #{uri.scheme}. Only http and https are allowed" unless %w[http https].include?(uri.scheme)
+
+    validate_public_url!(uri) if require_public_url
     raise ArgumentError, 'URL too long (max 2000 characters)' if url.length > 2000
 
   rescue URI::InvalidURIError => e
     raise ArgumentError, "Invalid URL format: #{e.message}. Please enter a valid URL like https://example.com/document.pdf"
+  end
+
+  def validate_public_url!(uri)
+    raise ArgumentError, 'WhatsApp carousel media URL must use HTTPS' unless uri.scheme == 'https'
+    raise ArgumentError, 'WhatsApp carousel media URL must use a public host' unless public_host?(uri.host)
+  end
+
+  def public_host?(host)
+    return false if host.blank? || host.casecmp('localhost').zero? || host.downcase.end_with?('.localhost', '.local')
+
+    address = IPAddr.new(host)
+    !(address.private? || address.loopback? || address.link_local?)
+  rescue IPAddr::InvalidAddressError
+    host.include?('.')
   end
 end

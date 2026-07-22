@@ -10,7 +10,8 @@ import { parseAPIErrorResponse } from 'dashboard/store/utils/api';
 import { parseBoolean } from '@chatwoot/utils';
 import UserProfilePicture from './UserProfilePicture.vue';
 import UserBasicDetails from './UserBasicDetails.vue';
-import MessageSignature from './MessageSignature.vue';
+// APTUS-HIDDEN: assinatura de mensagens pessoais removida do MVP.
+// import MessageSignature from './MessageSignature.vue';
 import FontSize from './FontSize.vue';
 import UserLanguageSelect from './UserLanguageSelect.vue';
 import ChangePassword from './ChangePassword.vue';
@@ -30,7 +31,7 @@ import {
 
 export default {
   components: {
-    MessageSignature,
+    // APTUS-HIDDEN: MessageSignature — não faz parte do MVP
     SectionLayout,
     FontSize,
     UserLanguageSelect,
@@ -66,7 +67,8 @@ export default {
       name: '',
       displayName: '',
       email: '',
-      messageSignature: '',
+      // APTUS-HIDDEN: assinatura de mensagens pessoais removida do MVP.
+      // messageSignature: '',
       hotKeys: [
         {
           key: 'enter',
@@ -117,7 +119,8 @@ export default {
       this.email = this.currentUser.email;
       this.avatarUrl = this.currentUser.avatar_url;
       this.displayName = this.currentUser.display_name;
-      this.messageSignature = this.currentUser.message_signature;
+      // APTUS-HIDDEN: assinatura de mensagens pessoais removida do MVP.
+      // this.messageSignature = this.currentUser.message_signature;
     },
     async dispatchUpdate(payload, successMessage, errorMessage) {
       let alertMessage = '';
@@ -158,17 +161,18 @@ export default {
 
       if (hasEmailChanged && success) clearCookiesOnLogout();
     },
-    async updateSignature(signature) {
-      const payload = { message_signature: signature };
-      let successMessage = this.$t(
-        'PROFILE_SETTINGS.FORM.MESSAGE_SIGNATURE_SECTION.API_SUCCESS'
-      );
-      let errorMessage = this.$t(
-        'PROFILE_SETTINGS.FORM.MESSAGE_SIGNATURE_SECTION.API_ERROR'
-      );
+    // APTUS-HIDDEN: assinatura de mensagens pessoais removida do MVP.
+    // async updateSignature(signature) {
+    //   const payload = { message_signature: signature };
+    //   let successMessage = this.$t(
+    //     'PROFILE_SETTINGS.FORM.MESSAGE_SIGNATURE_SECTION.API_SUCCESS'
+    //   );
+    //   let errorMessage = this.$t(
+    //     'PROFILE_SETTINGS.FORM.MESSAGE_SIGNATURE_SECTION.API_ERROR'
+    //   );
 
-      await this.dispatchUpdate(payload, successMessage, errorMessage);
-    },
+    //   await this.dispatchUpdate(payload, successMessage, errorMessage);
+    // },
     updateProfilePicture({ file, url }) {
       this.avatarFile = file;
       this.avatarUrl = url;
@@ -252,6 +256,7 @@ export default {
         />
       </div>
     </SectionLayout>
+    <!-- APTUS-HIDDEN: assinatura de mensagens pessoais removida do MVP.
     <SectionLayout
       with-border
       :title="$t('PROFILE_SETTINGS.FORM.MESSAGE_SIGNATURE_SECTION.TITLE')"
@@ -262,6 +267,7 @@ export default {
         @update-signature="updateSignature"
       />
     </SectionLayout>
+    -->
     <SectionLayout
       with-border
       :title="$t('PROFILE_SETTINGS.FORM.SEND_MESSAGE.TITLE')"

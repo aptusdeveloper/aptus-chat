@@ -33,7 +33,11 @@ export function useCaptain() {
   });
 
   const captainTasksEnabled = computed(() => {
-    return isCloudFeatureEnabled(FEATURE_FLAGS.CAPTAIN_TASKS);
+    // APTUS-HIDDEN: recursos de IA do Copilot (sugerir resposta, resumir
+    // conversa, perguntar ao copiloto, ajustar tom/gramática, sugestão de
+    // etiquetas e atalhos de IA no command bar) removidos do MVP.
+    // return isCloudFeatureEnabled(FEATURE_FLAGS.CAPTAIN_TASKS);
+    return false;
   });
 
   // === Limits (Enterprise) ===

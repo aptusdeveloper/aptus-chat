@@ -45,25 +45,31 @@ class Whatsapp::TemplateProcessorService
     components.concat(process_body_components(processed_params, template))
     components.concat(process_footer_components(processed_params))
     components.concat(process_button_components(processed_params))
+    components.concat(process_carousel_components(processed_params, template))
 
     @template_params = components
   end
 
-  def process_header_components(processed_params)
+  def process_header_components(processed_params, require_public_media: false)
     return [] if processed_params['header'].blank?
 
-    header_params = build_header_params(processed_params['header'])
+    header_params = build_header_params(processed_params['header'], require_public_media: require_public_media)
     header_params.present? ? [{ type: 'header', parameters: header_params }] : []
   end
 
-  def build_header_params(header_data)
+  def build_header_params(header_data, require_public_media: false)
     header_params = []
     header_data.each do |key, value|
       next if value.blank?
 
       if media_url_with_type?(key, header_data)
         media_name = header_data['media_name']
-        media_param = parameter_builder.build_media_parameter(value, header_data['media_type'], media_name)
+        media_param = parameter_builder.build_media_parameter(
+          value,
+          header_data['media_type'],
+          media_name,
+          require_public_url: require_public_media
+        )
         header_params << media_param if media_param
       elsif key != 'media_type' && key != 'media_name'
         header_params << parameter_builder.build_parameter(value)
@@ -122,6 +128,39 @@ class Whatsapp::TemplateProcessorService
     end
 
     button_params.compact
+  end
+
+  def process_carousel_components(processed_params, template)
+    return [] if processed_params['cards'].blank?
+
+    cards = processed_params['cards'].each_with_index.filter_map do |card_data, index|
+      build_card(card_data, index)
+    end
+
+    validate_carousel_card_count!(cards, template)
+
+    cards.present? ? [{ type: 'carousel', cards: cards }] : []
+  end
+
+  def build_card(card_data, index)
+    return nil if card_data.blank?
+
+    card_components = process_header_components(card_data, require_public_media: true) + process_button_components(card_data)
+    return nil if card_components.blank?
+
+    { card_index: index, components: card_components }
+  end
+
+  def validate_carousel_card_count!(cards, template)
+    expected_count = expected_carousel_card_count(template)
+    return if expected_count.blank? || cards.size == expected_count
+
+    raise ArgumentError, "Carousel card count mismatch: template expects #{expected_count}, got #{cards.size}"
+  end
+
+  def expected_carousel_card_count(template)
+    carousel_definition = template['components']&.find { |c| c['type']&.upcase == 'CAROUSEL' }
+    carousel_definition&.dig('cards')&.size
   end
 
   def parameter_builder

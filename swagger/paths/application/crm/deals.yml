@@ -1,0 +1,47 @@
+parameters:
+  - $ref: '#/components/parameters/account_id'
+get:
+  tags: [CRM]
+  summary: Listar negócios do CRM
+  security: [{ userApiKey: [] }]
+  parameters:
+    - { name: pipeline_id, in: query, schema: { type: string, format: uuid }, description: Filtra pelo pipeline }
+    - { name: stage_id, in: query, schema: { type: string, format: uuid }, description: Filtra pelo estágio }
+  responses:
+    '200':
+      description: Negócios retornados com sucesso.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              payload: { type: array, items: { $ref: '#/components/schemas/crm_deal' } }
+post:
+  tags: [CRM]
+  summary: Criar negócio no CRM
+  security: [{ userApiKey: [] }]
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [crm_deal]
+          properties:
+            crm_deal:
+              type: object
+              required: [name, crm_pipeline_id, crm_stage_id]
+              properties:
+                name: { type: string }
+                amount: { type: number }
+                currency: { type: string }
+                close_date: { type: string, format: date }
+                probability: { type: number }
+                position: { type: integer }
+                crm_pipeline_id: { type: string, format: uuid }
+                crm_stage_id: { type: string, format: uuid }
+                contact_id: { type: integer }
+                assignee_id: { type: integer }
+                custom_attributes: { type: object, additionalProperties: true }
+  responses:
+    '200': { description: Negócio criado com sucesso. }

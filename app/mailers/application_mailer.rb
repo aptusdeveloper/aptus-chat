@@ -55,7 +55,8 @@ class ApplicationMailer < ActionMailer::Base
     # expose variables you want to be exposed in liquid
     locals = {
       global_config: GlobalConfig.get('BRAND_NAME', 'BRAND_URL'),
-      action_url: @action_url
+      action_url: @action_url,
+      footer_text: I18n.t('mailers.footer.sent_by')
     }
 
     locals.merge({ attachment_url: @attachment_url }) if @attachment_url
@@ -75,8 +76,7 @@ class ApplicationMailer < ActionMailer::Base
   end
 
   def switch_locale(&)
-    locale ||= locale_from_account(Current.account)
-    locale ||= I18n.default_locale
+    locale = :pt_BR
     # ensure locale won't bleed into other requests
     # https://guides.rubyonrails.org/i18n.html#managing-the-locale-across-requests
     I18n.with_locale(locale, &)

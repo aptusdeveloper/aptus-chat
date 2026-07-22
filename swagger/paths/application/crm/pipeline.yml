@@ -1,0 +1,29 @@
+parameters:
+  - $ref: '#/components/parameters/account_id'
+  - name: id
+    in: path
+    required: true
+    schema: { type: string, format: uuid }
+get:
+  tags: [CRM]
+  summary: Consultar pipeline do CRM
+  security: [{ userApiKey: [] }]
+  responses:
+    '200': { description: Pipeline retornado com sucesso. }
+patch:
+  tags: [CRM]
+  summary: Atualizar pipeline do CRM
+  security: [{ userApiKey: [] }]
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: { type: object, additionalProperties: true }
+  responses:
+    '200': { description: Pipeline atualizado com sucesso. }
+delete:
+  tags: [CRM]
+  summary: Excluir pipeline do CRM
+  security: [{ userApiKey: [] }]
+  responses:
+    '200': { description: Pipeline excluído com sucesso. }

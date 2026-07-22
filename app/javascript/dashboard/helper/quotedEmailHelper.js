@@ -1,4 +1,5 @@
-import { format, parseISO, isValid as isValidDate } from 'date-fns';
+import { parseISO, isValid as isValidDate } from 'date-fns';
+import { formatLocalized } from 'shared/helpers/timeHelper';
 import DOMPurify from 'dompurify';
 
 /**
@@ -100,11 +101,11 @@ export const getEmailDate = lastEmail => {
  */
 export const formatQuotedEmailDate = date => {
   try {
-    return format(date, "EEE, MMM d, yyyy 'at' p");
+    return formatLocalized(date, "EEE, MMM d, yyyy 'at' p");
   } catch (error) {
     const fallbackDate = new Date(date);
     if (!Number.isNaN(fallbackDate.getTime())) {
-      return format(fallbackDate, "EEE, MMM d, yyyy 'at' p");
+      return formatLocalized(fallbackDate, "EEE, MMM d, yyyy 'at' p");
     }
   }
 

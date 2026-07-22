@@ -6,6 +6,7 @@ import {
   shortTimestamp,
   getDayDifferenceFromNow,
   hasOneDayPassed,
+  setDateLocale,
 } from 'shared/helpers/timeHelper';
 
 beforeEach(() => {
@@ -13,6 +14,7 @@ beforeEach(() => {
   vi.useFakeTimers('modern');
   const mockDate = new Date(Date.UTC(2023, 4, 5));
   vi.setSystemTime(mockDate);
+  setDateLocale('en');
 });
 
 afterEach(() => {
@@ -25,6 +27,11 @@ describe('#messageStamp', () => {
     expect(messageStamp(1612971343, 'LLL d, h:mm a')).toEqual(
       'Feb 10, 3:35 PM'
     );
+  });
+
+  it('usa mês em português e relógio de 24 horas em pt_BR', () => {
+    setDateLocale('pt_BR');
+    expect(messageStamp(1612971343, 'LLL d, h:mm a')).toEqual('10 fev., 15:35');
   });
 });
 

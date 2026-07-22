@@ -3,11 +3,31 @@ import {
   buildTemplateParameters,
   processVariable,
   allKeysRequired,
+  isPublicHttpsMediaUrl,
 } from '../templateHelper';
 import { templates } from '../../store/modules/specs/inboxes/templateFixtures';
 
 describe('templateHelper', () => {
   const technicianTemplate = templates.find(t => t.name === 'technician_visit');
+
+  describe('isPublicHttpsMediaUrl', () => {
+    it.each([
+      'http://example.com/image.jpg',
+      'https://localhost:3000/image.jpg',
+      'https://127.0.0.1/image.jpg',
+      'https://10.0.0.1/image.jpg',
+      'https://172.16.0.1/image.jpg',
+      'https://192.168.1.1/image.jpg',
+    ])('rejects non-public media URL %s', url => {
+      expect(isPublicHttpsMediaUrl(url)).toBe(false);
+    });
+
+    it('accepts a public HTTPS media URL', () => {
+      expect(isPublicHttpsMediaUrl('https://cdn.example.com/image.jpg')).toBe(
+        true
+      );
+    });
+  });
 
   describe('processVariable', () => {
     it('should remove curly braces from variables', () => {
@@ -77,6 +97,27 @@ describe('templateHelper', () => {
   });
 
   describe('buildTemplateParameters', () => {
+    it('builds independent media slots for carousel cards', () => {
+      const carouselTemplate = {
+        components: [
+          {
+            type: 'CAROUSEL',
+            cards: [
+              { components: [{ type: 'HEADER', format: 'IMAGE' }] },
+              { components: [{ type: 'HEADER', format: 'IMAGE' }] },
+            ],
+          },
+        ],
+      };
+
+      const result = buildTemplateParameters(carouselTemplate, false);
+
+      expect(result.cards).toEqual([
+        { header: { media_url: '', media_type: 'image' } },
+        { header: { media_url: '', media_type: 'image' } },
+      ]);
+      expect(result.cards[0].header).not.toBe(result.cards[1].header);
+    });
     it('should build parameters for template with body variables', () => {
       const result = buildTemplateParameters(technicianTemplate, false);
 

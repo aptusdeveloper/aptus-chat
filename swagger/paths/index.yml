@@ -166,6 +166,22 @@
 
 # ------------  Application API routes  ------------#
 
+# CRM AptusChat
+/api/v1/accounts/{account_id}/crm_pipelines:
+  $ref: ./application/crm/pipelines.yml
+/api/v1/accounts/{account_id}/crm_pipelines/{id}:
+  $ref: ./application/crm/pipeline.yml
+/api/v1/accounts/{account_id}/crm_pipelines/{crm_pipeline_id}/stages:
+  $ref: ./application/crm/stages.yml
+/api/v1/accounts/{account_id}/crm_pipelines/{crm_pipeline_id}/stages/{id}:
+  $ref: ./application/crm/stage.yml
+/api/v1/accounts/{account_id}/crm_deals:
+  $ref: ./application/crm/deals.yml
+/api/v1/accounts/{account_id}/crm_deals/{id}:
+  $ref: ./application/crm/deal.yml
+/api/v1/accounts/{account_id}/crm_deals/{id}/move:
+  $ref: ./application/crm/move_deal.yml
+
 # Accounts
 /api/v1/accounts/{account_id}:
   parameters:

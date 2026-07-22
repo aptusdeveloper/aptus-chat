@@ -19,6 +19,8 @@
       "REFRESH_BUTTON": "Atualizar modelos",
       "REFRESH_SUCCESS": "Atualização de modelos iniciada. Pode levar alguns minutos para atualizar.",
       "REFRESH_ERROR": "Falha ao atualizar os modelos. Por favor, tente novamente.",
+      "CAROUSEL_BADGE": "Carrossel",
+      "CAROUSEL_CARD_COUNT": "{count} cards",
       "LABELS": {
         "LANGUAGE": "Idioma",
         "TEMPLATE_BODY": "Conteúdo do Template",
@@ -41,7 +43,22 @@
       "COUPON_CODE": "Digite o código do cupom (máx. 15 caracteres)",
       "MEDIA_URL_LABEL": "Digite a URL {type}",
       "DOCUMENT_NAME_PLACEHOLDER": "Informe o nome do arquivo do documento (ex.: Comprovante_2025.pdf)",
-      "BUTTON_PARAMETER": "Insira o parâmetro do botão"
+      "BUTTON_PARAMETER": "Insira o parâmetro do botão",
+      "CAROUSEL": {
+        "CARDS_LABEL": "Cards do Carrossel",
+        "CARD_LABEL": "Card {index}",
+        "CARD_PROGRESS": "Card {current} de {total}",
+        "MEDIA_LABEL": "{type} deste card",
+        "UPLOAD_MEDIA": "Enviar mídia",
+        "CHANGE_MEDIA": "Trocar mídia",
+        "MEDIA_UPLOAD_ERROR": "Falha ao enviar a mídia, tente novamente",
+        "UPLOAD_MODE": "Enviar arquivo",
+        "URL_MODE": "Usar URL",
+        "URL_PLACEHOLDER": "https://exemplo.com/imagem.jpg",
+        "PUBLIC_URL_HINT": "A URL deve usar HTTPS, ser pública, não exigir login e retornar diretamente o arquivo de mídia.",
+        "INVALID_URL": "Informe uma URL HTTPS pública. O WhatsApp não consegue acessar localhost nem endereços de rede privada.",
+        "NON_PUBLIC_UPLOAD": "O arquivo enviado gerou uma URL não pública. Use uma URL pública ou configure o Active Storage com um host HTTPS público."
+      }
     }
   }
 }

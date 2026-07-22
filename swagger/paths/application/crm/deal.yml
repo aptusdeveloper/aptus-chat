@@ -1,0 +1,29 @@
+parameters:
+  - $ref: '#/components/parameters/account_id'
+  - name: id
+    in: path
+    required: true
+    schema: { type: string, format: uuid }
+get:
+  tags: [CRM]
+  summary: Consultar negócio do CRM
+  security: [{ userApiKey: [] }]
+  responses:
+    '200': { description: Negócio retornado com sucesso. }
+patch:
+  tags: [CRM]
+  summary: Atualizar negócio do CRM
+  security: [{ userApiKey: [] }]
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema: { type: object, additionalProperties: true }
+  responses:
+    '200': { description: Negócio atualizado com sucesso. }
+delete:
+  tags: [CRM]
+  summary: Excluir negócio do CRM
+  security: [{ userApiKey: [] }]
+  responses:
+    '200': { description: Negócio excluído com sucesso. }

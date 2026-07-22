@@ -1,0 +1,30 @@
+type: object
+description: Negócio registrado no CRM AptusChat.
+required: [id, name, crm_pipeline_id, crm_stage_id]
+properties:
+  id: { type: string, format: uuid }
+  name: { type: string, description: Nome do negócio }
+  amount: { type: number, format: decimal, nullable: true, description: Valor do negócio }
+  currency: { type: string, nullable: true, description: Código da moeda }
+  close_date: { type: string, format: date, nullable: true }
+  probability: { type: number, nullable: true, description: Probabilidade de fechamento }
+  position: { type: integer, description: Posição no estágio }
+  custom_attributes: { type: object, additionalProperties: true }
+  crm_pipeline_id: { type: string, format: uuid }
+  crm_stage_id: { type: string, format: uuid }
+  contact_id: { type: integer, nullable: true }
+  assignee_id: { type: integer, nullable: true }
+  assignee:
+    type: object
+    nullable: true
+    properties: { id: { type: integer }, name: { type: string } }
+  contact:
+    type: object
+    nullable: true
+    properties:
+      id: { type: integer }
+      name: { type: string }
+      email: { type: string, nullable: true }
+      phone_number: { type: string, nullable: true }
+  created_at: { type: integer, format: int64 }
+  updated_at: { type: integer, format: int64 }

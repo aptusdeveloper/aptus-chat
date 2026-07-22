@@ -17,6 +17,9 @@ properties:
       - string
       - 'null'
   message_signature:
+    description: Desabilitada no AptusChat — a assinatura pessoal de mensagens está oculta no MVP.
+    x-aptus-status: disabled
+    x-aptus-disabled-reason: A assinatura pessoal de mensagens está oculta no MVP do AptusChat.
     type:
       - string
       - 'null'

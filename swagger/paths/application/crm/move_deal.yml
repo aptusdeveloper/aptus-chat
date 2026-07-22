@@ -1,0 +1,22 @@
+parameters:
+  - $ref: '#/components/parameters/account_id'
+  - name: id
+    in: path
+    required: true
+    schema: { type: string, format: uuid }
+patch:
+  tags: [CRM]
+  summary: Mover negócio para outro estágio
+  security: [{ userApiKey: [] }]
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required: [stage_id]
+          properties:
+            stage_id: { type: string, format: uuid }
+            position: { type: integer }
+  responses:
+    '200': { description: Negócio movimentado com sucesso. }

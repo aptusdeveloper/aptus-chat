@@ -3,28 +3,27 @@ import Button from 'dashboard/components-next/button/Button.vue';
 import ButtonGroup from 'dashboard/components-next/buttonGroup/ButtonGroup.vue';
 import { useUISettings } from 'dashboard/composables/useUISettings';
 import { computed } from 'vue';
-import { FEATURE_FLAGS } from 'dashboard/featureFlags';
-import { useMapGetter } from 'dashboard/composables/store';
 import { useKeyboardEvents } from 'dashboard/composables/useKeyboardEvents';
 
 const { updateUISettings } = useUISettings();
 
-const currentAccountId = useMapGetter('getCurrentAccountId');
-const isFeatureEnabledonAccount = useMapGetter(
-  'accounts/isFeatureEnabledonAccount'
-);
-
-const showCopilotTab = computed(() =>
-  isFeatureEnabledonAccount.value(currentAccountId.value, FEATURE_FLAGS.CAPTAIN)
-);
+// APTUS-HIDDEN: aba "Copilot" do painel lateral da conversa removida do MVP.
+// const currentAccountId = useMapGetter('getCurrentAccountId');
+// const isFeatureEnabledonAccount = useMapGetter(
+//   'accounts/isFeatureEnabledonAccount'
+// );
+// const showCopilotTab = computed(() =>
+//   isFeatureEnabledonAccount.value(currentAccountId.value, FEATURE_FLAGS.CAPTAIN)
+// );
 
 const { uiSettings } = useUISettings();
 const isContactSidebarOpen = computed(
   () => uiSettings.value.is_contact_sidebar_open
 );
-const isCopilotPanelOpen = computed(
-  () => uiSettings.value.is_copilot_panel_open
-);
+// APTUS-HIDDEN: painel do Copilot removido do MVP.
+// const isCopilotPanelOpen = computed(
+//   () => uiSettings.value.is_copilot_panel_open
+// );
 
 const toggleConversationSidebarToggle = () => {
   updateUISettings({
@@ -40,12 +39,13 @@ const handleConversationSidebarToggle = () => {
   });
 };
 
-const handleCopilotSidebarToggle = () => {
-  updateUISettings({
-    is_contact_sidebar_open: false,
-    is_copilot_panel_open: true,
-  });
-};
+// APTUS-HIDDEN: acionava o painel do Copilot — removido do MVP.
+// const handleCopilotSidebarToggle = () => {
+//   updateUISettings({
+//     is_contact_sidebar_open: false,
+//     is_copilot_panel_open: true,
+//   });
+// };
 
 const keyboardEvents = {
   'Alt+KeyO': {
@@ -71,6 +71,7 @@ useKeyboardEvents(keyboardEvents);
       icon="i-ph-user-bold"
       @click="handleConversationSidebarToggle"
     />
+    <!-- APTUS-HIDDEN: aba "Copilot" do painel lateral da conversa removida do MVP.
     <Button
       v-if="showCopilotTab"
       v-tooltip.bottom="$t('CONVERSATION.SIDEBAR.COPILOT')"
@@ -85,5 +86,6 @@ useKeyboardEvents(keyboardEvents);
       icon="i-woot-captain"
       @click="handleCopilotSidebarToggle"
     />
+    -->
   </ButtonGroup>
 </template>

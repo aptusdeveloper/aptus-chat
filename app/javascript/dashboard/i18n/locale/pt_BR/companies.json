@@ -139,6 +139,10 @@
     },
     "EMPTY_STATE": {
       "TITLE": "Nenhuma empresa encontrada"
+    },
+    "SELECTOR": {
+      "PLACEHOLDER": "Selecionar empresa",
+      "CREATE_OPTION": "Adicionar \"{name}\""
     }
   },
   "COMPANIES_LAYOUT": {

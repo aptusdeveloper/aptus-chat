@@ -331,8 +331,8 @@
       }
     },
     "TABLE": {
-      "LOADING_MESSAGE": "Carregando artigos...",
       "404": "Nenhum artigo corresponde à sua pesquisa 🔍",
+      "LOADING_MESSAGE": "Carregando artigos...",
       "NO_ARTICLES": "Não há artigos disponíveis",
       "HEADERS": {
         "TITLE": "Título",
@@ -552,7 +552,8 @@
         "LOCALE": {
           "ALL": "Todos os Idioma"
         },
-        "NEW_ARTICLE": "Novo artigo"
+        "NEW_ARTICLE": "Novo artigo",
+        "SEARCH_PLACEHOLDER": "Pesquisar artigos..."
       },
       "EMPTY_STATE": {
         "ALL": {
@@ -579,6 +580,10 @@
         "CATEGORY": {
           "TITLE": "Não há artigos nesta categoria",
           "SUBTITLE": "Os artigos nesta categoria aparecerão aqui"
+        },
+        "SEARCH": {
+          "TITLE": "Nenhum artigo correspondente",
+          "SUBTITLE": "Não encontramos nenhum artigo que corresponda à sua pesquisa. Experimente um termo diferente."
         }
       },
       "BULK_TRANSLATE": {
@@ -628,7 +633,8 @@
         "BREADCRUMB": {
           "CATEGORY_LOCALE": "Categorias ({localeCode})",
           "ACTIVE_CATEGORY": "{categoryName} ({categoryCount} artigos) | {categoryName} ({categoryCount} artigo)"
-        }
+        },
+        "SEARCH_PLACEHOLDER": "Pesquisar categorias..."
       },
       "CATEGORY_EMPTY_STATE": {
         "TITLE": "Nenhuma categoria encontrada",
@@ -686,6 +692,10 @@
           "EDIT": "Atualizar",
           "CANCEL": "Cancelar"
         }
+      },
+      "SEARCH_EMPTY_STATE": {
+        "TITLE": "Nenhuma categoria correspondente",
+        "SUBTITLE": "Não encontramos nenhuma categoria correspondente à sua pesquisa. Experimente um termo diferente."
       }
     },
     "LOCALES_PAGE": {
@@ -700,7 +710,8 @@
           "MAKE_DEFAULT": "Tornar padrão",
           "MOVE_TO_DRAFT": "Mover para rascunho",
           "PUBLISH_LOCALE": "Publicar localidade",
-          "DELETE": "Excluir"
+          "DELETE": "Excluir",
+          "CUSTOMIZE_CONTENT": "Localize conteúdo"
         }
       },
       "ADD_LOCALE_DIALOG": {
@@ -719,6 +730,28 @@
         "API": {
           "SUCCESS_MESSAGE": "Localidade adicionada com sucesso",
           "ERROR_MESSAGE": "Não foi possível adicionar a localidade. Tente novamente."
+        }
+      },
+      "SEARCH_PLACEHOLDER": "Pesquisar localidades...",
+      "SEARCH_EMPTY_STATE": {
+        "TITLE": "Nenhuma localidade correspondente",
+        "SUBTITLE": "Não encontramos nenhum local que corresponda à sua pesquisa. Experimente um termo diferente."
+      },
+      "CONTENT_DIALOG": {
+        "TITLE": "Localize conteúdo",
+        "DESCRIPTION": "Defina valores específicos para esta localidade. Qualquer coisa deixada em branco retorna ao código do idioma padrão.",
+        "NAME": {
+          "LABEL": "Nome"
+        },
+        "PAGE_TITLE": {
+          "LABEL": "Título da página"
+        },
+        "HEADER_TEXT": {
+          "LABEL": "Texto do cabeçalho"
+        },
+        "API": {
+          "SUCCESS_MESSAGE": "Conteúdo local atualizado com sucesso",
+          "ERROR_MESSAGE": "Não foi possível atualizar o conteúdo de localidade. Tente novamente."
         }
       }
     },
