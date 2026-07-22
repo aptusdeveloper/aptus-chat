@@ -20,8 +20,11 @@ done
 
 echo "Database ready to accept connections."
 
-#install missing gems for local dev as we are using base image compiled for production
-bundle install
+#install missing gems for local dev as we are using base image compiled for production,
+#but skip it when the Gemfile.lock is already satisfied to avoid reinstalling on every boot
+if ! bundle check > /dev/null 2>&1; then
+  bundle install
+fi
 
 BUNDLE="bundle check"
 
