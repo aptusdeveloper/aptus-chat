@@ -61,6 +61,24 @@ class Channel::Whatsapp < ApplicationRecord
     provider == 'whatsapp_cloud'
   end
 
+  # Only whatsapp_cloud inboxes can reach Meta's typing-indicator Graph API call;
+  # 360dialog (default provider) doesn't implement it.
+  def typing_indicator_supported?
+    provider == 'whatsapp_cloud'
+  end
+
+  # Best-effort, fire-and-forget: shows "typing..." to the customer and marks
+  # message_id as read. Silently no-ops for unsupported providers so callers
+  # don't need a provider check of their own, and never raises -- a failed
+  # typing indicator isn't user-visible enough to warrant surfacing an error.
+  def send_typing_indicator(message_id)
+    return unless typing_indicator_supported?
+
+    provider_service.send_typing_indicator(message_id)
+  rescue StandardError => e
+    Rails.logger.warn "[WHATSAPP TYPING] send_typing_indicator failed: #{e.message}"
+  end
+
   def provider_service
     if provider == 'whatsapp_cloud'
       Whatsapp::Providers::WhatsappCloudService.new(whatsapp_channel: self)

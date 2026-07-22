@@ -79,6 +79,21 @@ class Whatsapp::Providers::WhatsappCloudService < Whatsapp::Providers::BaseServi
     "#{api_base_path}/v13.0/#{media_id}"
   end
 
+  def send_typing_indicator(message_id)
+    response = HTTParty.post(
+      "#{phone_id_path}/messages",
+      headers: api_headers,
+      body: {
+        messaging_product: 'whatsapp',
+        status: 'read',
+        message_id: message_id,
+        typing_indicator: { type: 'text' }
+      }.to_json
+    )
+    Rails.logger.warn "[WHATSAPP TYPING] indicator failed: #{response.body}" unless response.success?
+    response
+  end
+
   private
 
   def csat_template_service

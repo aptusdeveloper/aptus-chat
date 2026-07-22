@@ -266,4 +266,57 @@ RSpec.describe Channel::Whatsapp do
       expect(channel.inbound_calls_enabled?).to be false
     end
   end
+
+  describe '#typing_indicator_supported?' do
+    let(:account) { create(:account) }
+
+    it 'returns true for whatsapp_cloud channels' do
+      channel = create(:channel_whatsapp, account: account, provider: 'whatsapp_cloud',
+                                          validate_provider_config: false, sync_templates: false)
+      expect(channel.typing_indicator_supported?).to be true
+    end
+
+    it 'returns false for default-provider channels (360dialog)' do
+      channel = create(:channel_whatsapp, account: account, provider: 'default',
+                                          validate_provider_config: false, sync_templates: false)
+      expect(channel.typing_indicator_supported?).to be false
+    end
+  end
+
+  describe '#send_typing_indicator' do
+    let(:account) { create(:account) }
+
+    it 'delegates to the provider service when supported' do
+      channel = create(:channel_whatsapp, account: account, provider: 'whatsapp_cloud',
+                                          validate_provider_config: false, sync_templates: false)
+      provider_service = instance_double(Whatsapp::Providers::WhatsappCloudService)
+      allow(channel).to receive(:provider_service).and_return(provider_service)
+      allow(provider_service).to receive(:send_typing_indicator)
+
+      channel.send_typing_indicator('wamid.123')
+
+      expect(provider_service).to have_received(:send_typing_indicator).with('wamid.123')
+    end
+
+    it 'does nothing for unsupported providers' do
+      channel = create(:channel_whatsapp, account: account, provider: 'default',
+                                          validate_provider_config: false, sync_templates: false)
+      allow(channel).to receive(:provider_service)
+
+      channel.send_typing_indicator('wamid.123')
+
+      expect(channel).not_to have_received(:provider_service)
+    end
+
+    it 'rescues and logs errors instead of raising' do
+      channel = create(:channel_whatsapp, account: account, provider: 'whatsapp_cloud',
+                                          validate_provider_config: false, sync_templates: false)
+      provider_service = instance_double(Whatsapp::Providers::WhatsappCloudService)
+      allow(channel).to receive(:provider_service).and_return(provider_service)
+      allow(provider_service).to receive(:send_typing_indicator).and_raise(StandardError, 'boom')
+
+      expect(Rails.logger).to receive(:warn).with(/send_typing_indicator failed: boom/)
+      expect { channel.send_typing_indicator('wamid.123') }.not_to raise_error
+    end
+  end
 end

@@ -227,6 +227,42 @@ describe Whatsapp::Providers::WhatsappCloudService do
     end
   end
 
+  describe '#send_typing_indicator' do
+    context 'when called' do
+      it 'posts the typing indicator payload to the messages endpoint' do
+        stub_request(:post, 'https://graph.facebook.com/v13.0/123456789/messages')
+          .with(
+            body: {
+              messaging_product: 'whatsapp',
+              status: 'read',
+              message_id: 'external_id',
+              typing_indicator: { type: 'text' }
+            }.to_json
+          )
+          .to_return(status: 200, body: { success: true }.to_json, headers: response_headers)
+
+        response = service.send_typing_indicator('external_id')
+        expect(response.success?).to be(true)
+      end
+
+      it 'logs a warning when the request fails' do
+        stub_request(:post, 'https://graph.facebook.com/v13.0/123456789/messages')
+          .with(
+            body: {
+              messaging_product: 'whatsapp',
+              status: 'read',
+              message_id: 'external_id',
+              typing_indicator: { type: 'text' }
+            }.to_json
+          )
+          .to_return(status: 401, body: { error: { message: 'Invalid token' } }.to_json, headers: response_headers)
+
+        expect(Rails.logger).to receive(:warn).with(/indicator failed/)
+        service.send_typing_indicator('external_id')
+      end
+    end
+  end
+
   describe '#sync_templates' do
     context 'when called' do
       it 'updated the message templates' do
