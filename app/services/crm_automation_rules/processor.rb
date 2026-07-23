@@ -1,6 +1,16 @@
 class CrmAutomationRules::Processor
+  IDEMPOTENCY_WINDOW = 5.minutes
+
   def self.run(trigger_type:, deal:)
     new(trigger_type: trigger_type, deal: deal).run
+  end
+
+  def self.recently_executed?(rule, deal, since: IDEMPOTENCY_WINDOW.ago)
+    CrmAutomationExecution.where(
+      crm_automation_rule: rule,
+      crm_deal: deal,
+      executed_at: since..Time.current
+    ).exists?
   end
 
   def initialize(trigger_type:, deal:)
@@ -25,6 +35,7 @@ class CrmAutomationRules::Processor
   end
 
   def process_rule(rule)
+    return if self.class.recently_executed?(rule, @deal)
     return unless CrmAutomationRules::ConditionsFilterService.match?(rule, @deal)
 
     CrmAutomationRules::ActionService.new(rule, @deal).perform

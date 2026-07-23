@@ -1002,6 +1002,125 @@
       "ACTIVE": "Ativo",
       "INACTIVE": "Inativo",
       "SELECT_PIPELINE": "Selecione um funil para gerenciar suas etapas."
+    },
+    "NAV": {
+      "PIPELINE": "Funil",
+      "AUTOMATIONS": "Automações"
+    },
+    "AUTOMATIONS": {
+      "TITLE": "Automações",
+      "SUBTITLE": "Regras com gatilho, condições e ações para o CRM.",
+      "ALL_PIPELINES": "Todos os funis",
+      "STATUS": {
+        "ACTIVE": "Ativo",
+        "INACTIVE": "Inativo"
+      },
+      "LIST": {
+        "NEW": "Nova automação",
+        "EMPTY_TITLE": "Nenhuma automação criada",
+        "EMPTY_SUBTITLE": "Crie a primeira regra para agir quando um lead mudar no CRM.",
+        "CLONE_SUCCESS": "Automação duplicada com sucesso",
+        "DELETE_SUCCESS": "Automação excluída com sucesso",
+        "COLUMNS": {
+          "NAME": "Nome",
+          "STATUS": "Status",
+          "PIPELINE": "Funil",
+          "TRIGGER": "Gatilho",
+          "ACTIONS": "Ações",
+          "UPDATED": "Atualizada",
+          "MANAGE": "Gerenciar"
+        }
+      },
+      "TRIGGERS": {
+        "DEAL_CREATED": "Negócio criado",
+        "DEAL_ENTERED_STAGE": "Negócio entrou em uma etapa",
+        "DEAL_STAGE_CHANGED": "Negócio mudou de etapa",
+        "DEAL_WON": "Negócio ganho",
+        "DEAL_LOST": "Negócio perdido",
+        "DEAL_STAGNANT": "Parado na etapa por X dias",
+        "CLOSE_DATE_APPROACHING": "Data de fechamento em X dias"
+      },
+      "FORM": {
+        "NEW_TITLE": "Nova automação",
+        "EDIT_TITLE": "Editar automação",
+        "SUBTITLE": "Configure a regra em cartões sequenciais.",
+        "NAME": "Nome da automação",
+        "NAME_REQUIRED": "Informe um nome para a automação.",
+        "ACTION_REQUIRED": "Adicione pelo menos uma ação.",
+        "PIPELINE": "Funil",
+        "TRIGGER": "Gatilho",
+        "STAGE": "Etapa",
+        "SELECT_STAGE": "Selecione uma etapa",
+        "DAYS": "Dias",
+        "ADD_CONDITION": "Adicionar condição",
+        "ADD_ACTION": "Adicionar ação",
+        "NO_CONDITIONS": "Sem condições extras.",
+        "SAVE_SUCCESS": "Automação salva com sucesso",
+        "SAVE_ERROR": "Não foi possível salvar a automação.",
+        "SECTIONS": {
+          "IDENTITY": "Identificação",
+          "TRIGGER": "Gatilho",
+          "CONDITIONS": "Condições",
+          "ACTIONS": "Ações"
+        }
+      },
+      "CONDITIONS": {
+        "AND": "E",
+        "OR": "OU",
+        "ATTRIBUTES": {
+          "STAGE": "Etapa atual",
+          "ASSIGNEE": "Responsável",
+          "AMOUNT": "Valor",
+          "PROBABILITY": "Probabilidade",
+          "CLOSE_DATE": "Data de fechamento",
+          "DAYS_IN_STAGE": "Dias na etapa"
+        },
+        "OPERATORS": {
+          "EQUAL_TO": "É igual a",
+          "NOT_EQUAL_TO": "Não é igual a",
+          "GREATER_THAN": "Maior que",
+          "LESS_THAN": "Menor que",
+          "GTE": "Maior ou igual a",
+          "LTE": "Menor ou igual a",
+          "CONTAINS": "Contém",
+          "IS_PRESENT": "Existe",
+          "IS_NOT_PRESENT": "Não existe",
+          "DAYS_BEFORE": "Dias antes",
+          "IS_TODAY": "É hoje",
+          "IS_PAST": "Está no passado",
+          "IS_FUTURE": "Está no futuro"
+        }
+      },
+      "ACTIONS": {
+        "UNASSIGNED": "Sem responsável",
+        "TYPES": {
+          "SEND_LEAD_MESSAGE": "Enviar mensagem ao lead",
+          "CHANGE_STAGE": "Mover para outra etapa",
+          "CHANGE_PIPELINE": "Mover para outro funil",
+          "ASSIGN_AGENT": "Atribuir responsável",
+          "UPDATE_FIELD": "Atualizar campo do negócio",
+          "SEND_WEBHOOK": "Enviar webhook"
+        }
+      },
+      "MESSAGE": {
+        "KINDS": {
+          "TEXT": "Texto",
+          "MEDIA": "Mídia",
+          "BUTTONS": "Botões/lista",
+          "TEMPLATE": "Template"
+        },
+        "UPLOAD": "Anexar mídia",
+        "ADD_BUTTON": "Adicionar opção",
+        "BUTTON_DEFAULT": "Opção",
+        "EMPTY_PREVIEW": "Prévia da mensagem",
+        "INVALID_TEMPLATE_JSON": "O template precisa ser um JSON válido."
+      },
+      "FIELDS": {
+        "NAME": "Nome",
+        "AMOUNT": "Valor",
+        "CLOSE_DATE": "Data de fechamento",
+        "PROBABILITY": "Probabilidade"
+      }
     }
   }
 }

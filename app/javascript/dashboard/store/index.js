@@ -61,6 +61,7 @@ import captainScenarios from './captain/scenarios';
 import captainTools from './captain/tools';
 import captainCustomTools from './captain/customTools';
 import crmDeals from './modules/crmDeals';
+import crmAutomations from './modules/crmAutomations';
 
 const plugins = [];
 
@@ -127,6 +128,7 @@ export default createStore({
     captainTools,
     captainCustomTools,
     crmDeals,
+    crmAutomations,
   },
   plugins,
 });

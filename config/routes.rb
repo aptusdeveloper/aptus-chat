@@ -205,6 +205,9 @@ Rails.application.routes.draw do
           resources :crm_deals, only: [:index, :show, :create, :update, :destroy] do
             member { patch :move }
           end
+          resources :crm_automation_rules, only: [:index, :create, :show, :update, :destroy] do
+            post :clone, on: :member
+          end
           resources :contacts, only: [:index, :show, :update, :create, :destroy] do
             collection do
               get :active

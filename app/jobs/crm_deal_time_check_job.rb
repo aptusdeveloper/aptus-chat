@@ -28,6 +28,7 @@ class CrmDealTimeCheckJob < ApplicationJob
   end
 
   def process_rule_for_deal(rule, deal)
+    return if rule.crm_pipeline_id.present? && rule.crm_pipeline_id != deal.crm_pipeline_id
     return if already_executed_today?(rule, deal)
     return unless CrmAutomationRules::ConditionsFilterService.match?(rule, deal)
 

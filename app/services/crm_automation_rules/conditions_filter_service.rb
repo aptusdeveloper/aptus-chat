@@ -47,21 +47,59 @@ class CrmAutomationRules::ConditionsFilterService
     op_fn = OPERATORS[operator]
     return false if op_fn.nil?
 
+    value, target = normalize_comparable_values(value, target)
     op_fn.call(value, target)
   end
 
   def resolve_attribute(key)
     return days_in_stage if key == 'days_in_stage'
+    return if key.blank?
+    return resolve_custom_attribute(key.delete_prefix('custom_attributes.')) if key.start_with?('custom_attributes.')
+    return @deal.public_send(key) if @deal.respond_to?(key)
 
-    @deal.public_send(key)
-  rescue NoMethodError
-    nil
+    resolve_custom_attribute(key)
   end
 
   def days_in_stage
     return 0 if @deal.stage_entered_at.blank?
 
     ((Time.current - @deal.stage_entered_at) / 86_400).to_i
+  end
+
+  def resolve_custom_attribute(key)
+    @deal.custom_attributes&.dig(key.to_s)
+  end
+
+  def normalize_comparable_values(value, target)
+    return [value, target] if value.blank?
+
+    if numeric_value?(value)
+      return [BigDecimal(value.to_s), BigDecimal(target.to_s)]
+    end
+
+    if date_value?(value)
+      return [value.to_date, target.to_date]
+    end
+
+    if boolean_value?(value)
+      return [ActiveModel::Type::Boolean.new.cast(value), ActiveModel::Type::Boolean.new.cast(target)]
+    end
+
+    [value, target]
+  rescue ArgumentError, NoMethodError
+    [value, target]
+  end
+
+  def numeric_value?(value)
+    value.is_a?(Numeric) || value.is_a?(BigDecimal)
+  end
+
+  def date_value?(value)
+    value.respond_to?(:to_date) && !value.is_a?(String)
+  end
+
+  def boolean_value?(value)
+    value == true || value == false
   end
 
   def combine_results(results)

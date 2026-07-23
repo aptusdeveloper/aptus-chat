@@ -66,6 +66,7 @@ class Account < ApplicationRecord
   has_many :automation_rules, dependent: :destroy_async
   has_many :crm_pipelines, dependent: :destroy_async
   has_many :crm_deals, dependent: :destroy_async
+  has_many :crm_automation_rules, dependent: :destroy_async
   has_many :macros, dependent: :destroy_async
   has_many :campaigns, dependent: :destroy_async
   has_many :canned_responses, dependent: :destroy_async

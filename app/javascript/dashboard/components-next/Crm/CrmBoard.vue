@@ -58,18 +58,12 @@ onMounted(async () => {
 <template>
   <div class="flex flex-col h-full overflow-hidden">
     <div
-      class="flex items-center gap-3 px-4 py-3 border-b border-n-weak bg-white dark:bg-n-solid-2 shrink-0"
+      class="flex items-center gap-3 px-4 py-2 border-b border-n-weak bg-white dark:bg-n-solid-2 shrink-0 min-h-12"
     >
-      <i class="i-lucide-kanban w-5 h-5 text-n-slate-9" />
-      <h1 class="text-base font-semibold text-n-slate-12">
-        {{ t('SIDEBAR.CRM') }}
-      </h1>
-
       <CrmPipelineSelector
         v-if="pipelines.length"
         v-model="activePipelineId"
         :pipelines="pipelines"
-        class="ml-2"
       />
 
       <div class="ml-auto flex items-center gap-2">

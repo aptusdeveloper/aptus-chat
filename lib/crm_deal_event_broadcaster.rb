@@ -19,6 +19,7 @@ module CrmDealEventBroadcaster
     triggers << 'deal_updated'
 
     if previous_changes.key?('crm_stage_id')
+      triggers << 'deal_entered_stage'
       triggers << 'deal_stage_changed'
       triggers << 'deal_won' if deal.crm_stage.is_win
       triggers << 'deal_lost' if deal.crm_stage.is_loss

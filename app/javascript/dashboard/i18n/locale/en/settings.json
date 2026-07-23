@@ -1002,6 +1002,125 @@
       "ACTIVE": "Active",
       "INACTIVE": "Inactive",
       "SELECT_PIPELINE": "Select a pipeline to manage its stages."
+    },
+    "NAV": {
+      "PIPELINE": "Pipeline",
+      "AUTOMATIONS": "Automations"
+    },
+    "AUTOMATIONS": {
+      "TITLE": "Automations",
+      "SUBTITLE": "Rules with trigger, conditions, and actions for CRM.",
+      "ALL_PIPELINES": "All pipelines",
+      "STATUS": {
+        "ACTIVE": "Active",
+        "INACTIVE": "Inactive"
+      },
+      "LIST": {
+        "NEW": "New automation",
+        "EMPTY_TITLE": "No automations yet",
+        "EMPTY_SUBTITLE": "Create the first rule to act when a lead changes in CRM.",
+        "CLONE_SUCCESS": "Automation duplicated successfully",
+        "DELETE_SUCCESS": "Automation deleted successfully",
+        "COLUMNS": {
+          "NAME": "Name",
+          "STATUS": "Status",
+          "PIPELINE": "Pipeline",
+          "TRIGGER": "Trigger",
+          "ACTIONS": "Actions",
+          "UPDATED": "Updated",
+          "MANAGE": "Manage"
+        }
+      },
+      "TRIGGERS": {
+        "DEAL_CREATED": "Deal created",
+        "DEAL_ENTERED_STAGE": "Deal entered a stage",
+        "DEAL_STAGE_CHANGED": "Deal stage changed",
+        "DEAL_WON": "Deal won",
+        "DEAL_LOST": "Deal lost",
+        "DEAL_STAGNANT": "Stagnant in stage for X days",
+        "CLOSE_DATE_APPROACHING": "Close date in X days"
+      },
+      "FORM": {
+        "NEW_TITLE": "New automation",
+        "EDIT_TITLE": "Edit automation",
+        "SUBTITLE": "Configure the rule in sequential cards.",
+        "NAME": "Automation name",
+        "NAME_REQUIRED": "Enter a name for the automation.",
+        "ACTION_REQUIRED": "Add at least one action.",
+        "PIPELINE": "Pipeline",
+        "TRIGGER": "Trigger",
+        "STAGE": "Stage",
+        "SELECT_STAGE": "Select a stage",
+        "DAYS": "Days",
+        "ADD_CONDITION": "Add condition",
+        "ADD_ACTION": "Add action",
+        "NO_CONDITIONS": "No extra conditions.",
+        "SAVE_SUCCESS": "Automation saved successfully",
+        "SAVE_ERROR": "Could not save automation.",
+        "SECTIONS": {
+          "IDENTITY": "Identity",
+          "TRIGGER": "Trigger",
+          "CONDITIONS": "Conditions",
+          "ACTIONS": "Actions"
+        }
+      },
+      "CONDITIONS": {
+        "AND": "AND",
+        "OR": "OR",
+        "ATTRIBUTES": {
+          "STAGE": "Current stage",
+          "ASSIGNEE": "Assignee",
+          "AMOUNT": "Amount",
+          "PROBABILITY": "Probability",
+          "CLOSE_DATE": "Close date",
+          "DAYS_IN_STAGE": "Days in stage"
+        },
+        "OPERATORS": {
+          "EQUAL_TO": "Equals",
+          "NOT_EQUAL_TO": "Does not equal",
+          "GREATER_THAN": "Greater than",
+          "LESS_THAN": "Less than",
+          "GTE": "Greater than or equal",
+          "LTE": "Less than or equal",
+          "CONTAINS": "Contains",
+          "IS_PRESENT": "Exists",
+          "IS_NOT_PRESENT": "Does not exist",
+          "DAYS_BEFORE": "Days before",
+          "IS_TODAY": "Is today",
+          "IS_PAST": "Is in the past",
+          "IS_FUTURE": "Is in the future"
+        }
+      },
+      "ACTIONS": {
+        "UNASSIGNED": "Unassigned",
+        "TYPES": {
+          "SEND_LEAD_MESSAGE": "Send message to lead",
+          "CHANGE_STAGE": "Move to another stage",
+          "CHANGE_PIPELINE": "Move to another pipeline",
+          "ASSIGN_AGENT": "Assign agent",
+          "UPDATE_FIELD": "Update deal field",
+          "SEND_WEBHOOK": "Send webhook"
+        }
+      },
+      "MESSAGE": {
+        "KINDS": {
+          "TEXT": "Text",
+          "MEDIA": "Media",
+          "BUTTONS": "Buttons/list",
+          "TEMPLATE": "Template"
+        },
+        "UPLOAD": "Attach media",
+        "ADD_BUTTON": "Add option",
+        "BUTTON_DEFAULT": "Option",
+        "EMPTY_PREVIEW": "Message preview",
+        "INVALID_TEMPLATE_JSON": "Template must be valid JSON."
+      },
+      "FIELDS": {
+        "NAME": "Name",
+        "AMOUNT": "Amount",
+        "CLOSE_DATE": "Close date",
+        "PROBABILITY": "Probability"
+      }
     }
   }
 }

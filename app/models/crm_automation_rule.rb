@@ -25,7 +25,7 @@
 #  fk_rails_...  (crm_pipeline_id => crm_pipelines.id)
 #
 class CrmAutomationRule < ApplicationRecord
-  EVENT_TRIGGERS = %w[deal_created deal_stage_changed deal_updated deal_won deal_lost].freeze
+  EVENT_TRIGGERS = %w[deal_created deal_entered_stage deal_stage_changed deal_updated deal_won deal_lost].freeze
   TIME_TRIGGERS = %w[deal_close_date_approaching deal_stagnant].freeze
   TRIGGER_TYPES = (EVENT_TRIGGERS + TIME_TRIGGERS).freeze
 
