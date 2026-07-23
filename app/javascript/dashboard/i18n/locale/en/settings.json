@@ -321,6 +321,11 @@
     "CONTACTS": "Contacts",
     "ACTIVE": "Active",
     "CRM": "CRM",
+    "HUB": "Hub",
+    "HUB_MY_BOT": "My Bot",
+    "HUB_PERFORMANCE": "Performance",
+    "HUB_TEST": "Test",
+    "HUB_PAYMENTS": "Payments",
     "COMPANIES": "Companies",
     "ALL_COMPANIES": "All Companies",
     "CAPTAIN": "Captain",
@@ -951,6 +956,72 @@
       "DESCRIPTION": "Are you sure you want to delete this policy? This action cannot be undone.",
       "CONFIRM_BUTTON_LABEL": "Delete",
       "CANCEL_BUTTON_LABEL": "Cancel"
+    }
+  },
+  "HUB": {
+    "TITLE": "Hub",
+    "LOADING": "Loading Hub...",
+    "ACTIONS": {
+      "REFRESH": "Refresh"
+    },
+    "NAV": {
+      "MY_BOT": "My Bot",
+      "PERFORMANCE": "Performance",
+      "TEST": "Test",
+      "PAYMENTS": "Payments"
+    },
+    "METRICS": {
+      "SESSIONS": "Sessions",
+      "MESSAGES": "Messages",
+      "USER_MESSAGES": "User messages",
+      "BOT_MESSAGES": "Bot messages",
+      "USERS": "Users",
+      "NEW_USERS": "New",
+      "RETURNING_USERS": "Returning",
+      "EVENTS": "Events"
+    },
+    "OVERVIEW": {
+      "TITLE": "My Bot",
+      "SUBTITLE": "Default period is the current month.",
+      "EMPTY_USAGE": "No usage in the selected period yet.",
+      "CHANNELS": "Connected channels",
+      "CONNECTED": "Connected",
+      "NO_CHANNELS": "No channel connected to this account."
+    },
+    "PERFORMANCE": {
+      "TITLE": "Performance",
+      "SUBTITLE": "Detailed bot metrics.",
+      "LOADING": "Loading performance...",
+      "HISTORY": "Usage history",
+      "TOTAL_MESSAGES": "Total messages",
+      "EMPTY_HISTORY": "No history in this period yet."
+    },
+    "TEST": {
+      "TITLE": "Test",
+      "SUBTITLE": "Bot test environment.",
+      "LOADING": "Loading test...",
+      "NOT_CONFIGURED": "Bot test is not configured yet.",
+      "WEBCHAT": "Botpress webchat",
+      "WIDGET_READY": "The script-loaded widget is available on this page.",
+      "FEEDBACK": "Feedback",
+      "CONVERSATION_ID": "Conversation ID",
+      "CONVERSATION_ID_PLACEHOLDER": "conversationId",
+      "COMMENT": "Comment",
+      "SEND_FEEDBACK": "Send feedback",
+      "FEEDBACK_SENT": "Feedback sent."
+    },
+    "PAYMENTS": {
+      "TITLE": "Payments",
+      "SUBTITLE": "Readonly commercial billing.",
+      "LOADING": "Loading payments...",
+      "MONTHLY_PLAN": "Monthly plan",
+      "DUE_DAY": "Due date",
+      "DAY": "Day {day}",
+      "CURRENT_MONTH": "Current month",
+      "LAST_MONTHS": "Last 6 months",
+      "DUE_ON": "Due on {date}",
+      "EMPTY_VALUE": "-",
+      "NO_PAYMENTS": "No payment registered."
     }
   },
   "CRM": {

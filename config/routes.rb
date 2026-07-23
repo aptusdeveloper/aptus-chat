@@ -208,6 +208,11 @@ Rails.application.routes.draw do
           resources :crm_automation_rules, only: [:index, :create, :show, :update, :destroy] do
             post :clone, on: :member
           end
+          get 'hub/overview', to: 'aptus_hub#overview'
+          get 'hub/performance', to: 'aptus_hub#performance'
+          get 'hub/webchat_config', to: 'aptus_hub#webchat_config'
+          get 'hub/payments', to: 'aptus_hub#payments'
+          post 'hub/feedback', to: 'aptus_hub#feedback'
           resources :contacts, only: [:index, :show, :update, :create, :destroy] do
             collection do
               get :active

@@ -345,6 +345,11 @@
     "LABELS": "Etiquetas",
     "CUSTOM_ATTRIBUTES": "Atributos Personalizados",
     "CRM": "CRM",
+    "HUB": "Hub",
+    "HUB_MY_BOT": "Meu Bot",
+    "HUB_PERFORMANCE": "Desempenho",
+    "HUB_TEST": "Testar",
+    "HUB_PAYMENTS": "Pagamentos",
     "AUTOMATION": "Automação",
     "MACROS": "Macros",
     "TEAMS": "Times",
@@ -951,6 +956,72 @@
       "DESCRIPTION": "Tem certeza de que deseja excluir esta política? Essa ação não pode ser desfeita.",
       "CONFIRM_BUTTON_LABEL": "Excluir",
       "CANCEL_BUTTON_LABEL": "Cancelar"
+    }
+  },
+  "HUB": {
+    "TITLE": "Hub",
+    "LOADING": "Carregando Hub...",
+    "ACTIONS": {
+      "REFRESH": "Atualizar"
+    },
+    "NAV": {
+      "MY_BOT": "Meu Bot",
+      "PERFORMANCE": "Desempenho",
+      "TEST": "Testar",
+      "PAYMENTS": "Pagamentos"
+    },
+    "METRICS": {
+      "SESSIONS": "Sessoes",
+      "MESSAGES": "Mensagens",
+      "USER_MESSAGES": "Mensagens usuario",
+      "BOT_MESSAGES": "Mensagens bot",
+      "USERS": "Usuarios",
+      "NEW_USERS": "Novos",
+      "RETURNING_USERS": "Recorrentes",
+      "EVENTS": "Eventos"
+    },
+    "OVERVIEW": {
+      "TITLE": "Meu Bot",
+      "SUBTITLE": "Periodo padrao do mes atual.",
+      "EMPTY_USAGE": "Ainda sem uso no periodo selecionado.",
+      "CHANNELS": "Canais conectados",
+      "CONNECTED": "Conectado",
+      "NO_CHANNELS": "Nenhum canal conectado nesta conta."
+    },
+    "PERFORMANCE": {
+      "TITLE": "Desempenho",
+      "SUBTITLE": "Metricas detalhadas do bot.",
+      "LOADING": "Carregando desempenho...",
+      "HISTORY": "Historico de uso",
+      "TOTAL_MESSAGES": "Mensagens totais",
+      "EMPTY_HISTORY": "Ainda sem historico no periodo."
+    },
+    "TEST": {
+      "TITLE": "Testar",
+      "SUBTITLE": "Ambiente de teste do bot.",
+      "LOADING": "Carregando teste...",
+      "NOT_CONFIGURED": "Teste do bot ainda nao configurado.",
+      "WEBCHAT": "Webchat Botpress",
+      "WIDGET_READY": "O widget carregado pelo script fica disponivel nesta pagina.",
+      "FEEDBACK": "Feedback",
+      "CONVERSATION_ID": "Conversation ID",
+      "CONVERSATION_ID_PLACEHOLDER": "conversationId",
+      "COMMENT": "Comentario",
+      "SEND_FEEDBACK": "Enviar feedback",
+      "FEEDBACK_SENT": "Feedback enviado."
+    },
+    "PAYMENTS": {
+      "TITLE": "Pagamentos",
+      "SUBTITLE": "Cobranca comercial somente leitura.",
+      "LOADING": "Carregando pagamentos...",
+      "MONTHLY_PLAN": "Plano mensal",
+      "DUE_DAY": "Vencimento",
+      "DAY": "Dia {day}",
+      "CURRENT_MONTH": "Mes atual",
+      "LAST_MONTHS": "Ultimos 6 meses",
+      "DUE_ON": "Vence em {date}",
+      "EMPTY_VALUE": "-",
+      "NO_PAYMENTS": "Nenhum pagamento registrado."
     }
   },
   "CRM": {

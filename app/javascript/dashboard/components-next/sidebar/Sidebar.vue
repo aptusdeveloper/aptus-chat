@@ -57,6 +57,7 @@ const isMobile = computed(() => windowWidth.value < 768);
 
 const accountId = useMapGetter('getCurrentAccountId');
 const currentUserId = useMapGetter('getCurrentUserID');
+const getAccount = useMapGetter('accounts/getAccount');
 const isFeatureEnabledonAccount = useMapGetter(
   'accounts/isFeatureEnabledonAccount'
 );
@@ -73,6 +74,19 @@ const hasConversationUnreadCounts = computed(() => {
     accountId.value,
     FEATURE_FLAGS.CONVERSATION_UNREAD_COUNTS
   );
+});
+
+const aptusHubConfig = computed(() => {
+  const account = getAccount.value(accountId.value);
+  return account?.custom_attributes?.aptus_hub || {};
+});
+
+const hasAptusHub = computed(() => {
+  const isEnabled =
+    aptusHubConfig.value.enabled === true ||
+    aptusHubConfig.value.enabled === 'true';
+
+  return isEnabled && !!aptusHubConfig.value.bot_id;
 });
 
 const fetchConversationUnreadCounts = ([currentAccountId, isEnabled]) => {
@@ -520,6 +534,41 @@ const menuItems = computed(() => {
         'crm_automation_edit',
       ],
     },
+    ...(hasAptusHub.value
+      ? [
+          {
+            name: 'Hub',
+            label: t('SIDEBAR.HUB'),
+            icon: 'i-lucide-bot',
+            children: [
+              {
+                name: 'Hub Meu Bot',
+                label: t('SIDEBAR.HUB_MY_BOT'),
+                icon: 'i-lucide-bot',
+                to: accountScopedRoute('hub_overview'),
+              },
+              {
+                name: 'Hub Desempenho',
+                label: t('SIDEBAR.HUB_PERFORMANCE'),
+                icon: 'i-lucide-chart-no-axes-column',
+                to: accountScopedRoute('hub_performance'),
+              },
+              {
+                name: 'Hub Testar',
+                label: t('SIDEBAR.HUB_TEST'),
+                icon: 'i-lucide-message-circle-play',
+                to: accountScopedRoute('hub_tester'),
+              },
+              {
+                name: 'Hub Pagamentos',
+                label: t('SIDEBAR.HUB_PAYMENTS'),
+                icon: 'i-lucide-credit-card',
+                to: accountScopedRoute('hub_payments'),
+              },
+            ],
+          },
+        ]
+      : []),
     {
       name: 'Contacts',
       label: t('SIDEBAR.CONTACTS'),
