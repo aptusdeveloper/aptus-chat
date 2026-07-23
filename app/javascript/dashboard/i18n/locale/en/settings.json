@@ -1183,6 +1183,7 @@
         "UPLOAD": "Attach media",
         "ADD_BUTTON": "Add option",
         "BUTTON_DEFAULT": "Option",
+        "BUTTON_REQUIRED": "Add at least one option for buttons/list.",
         "EMPTY_PREVIEW": "Message preview",
         "INVALID_TEMPLATE_JSON": "Template must be valid JSON."
       },

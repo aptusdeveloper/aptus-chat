@@ -7,6 +7,7 @@ RSpec.describe CrmAutomationRules::ActionService do
   let(:deal) { create(:crm_deal, account: account, crm_pipeline: pipeline, crm_stage: stage) }
 
   def perform_rule(actions)
+    deal
     rule = create(:crm_automation_rule, account: account, actions: actions)
     described_class.new(rule, deal).perform
     rule
@@ -86,8 +87,13 @@ RSpec.describe CrmAutomationRules::ActionService do
   end
 
   it 'sends template params for WhatsApp and Twilio channels' do
-    whatsapp_channel = create(:channel_whatsapp, account: account)
-    inbox = create(:inbox, account: account, channel: whatsapp_channel)
+    whatsapp_channel = create(
+      :channel_whatsapp,
+      account: account,
+      validate_provider_config: false,
+      sync_templates: false
+    )
+    inbox = whatsapp_channel.inbox
     conversation = create(:conversation, account: account, inbox: inbox)
     create(:crm_deal_conversation, crm_deal: deal, conversation: conversation)
 

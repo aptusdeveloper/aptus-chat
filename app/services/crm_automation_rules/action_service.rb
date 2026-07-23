@@ -58,7 +58,7 @@ class CrmAutomationRules::ActionService
   end
 
   def change_stage(params)
-    stage = @account.crm_stages.find(param_value(params, :stage_id, 0))
+    stage = CrmStage.where(account_id: @account.id).find(param_value(params, :stage_id, 0))
     @deal.update!(crm_stage: stage, crm_pipeline: stage.crm_pipeline)
   end
 
@@ -108,6 +108,7 @@ class CrmAutomationRules::ActionService
 
     message_params = build_lead_message_params(params)
     ensure_rich_message_supported!(conversation, message_params)
+    ensure_message_content_valid!(message_params)
     builder_params = ActionController::Parameters.new(message_params)
     Messages::MessageBuilder.new(nil, conversation, builder_params).perform
   end
@@ -162,6 +163,13 @@ class CrmAutomationRules::ActionService
     return if inbox.whatsapp? || inbox.twilio_whatsapp? || inbox.web_widget? || inbox.api?
 
     raise ArgumentError, "input_select is not supported for #{inbox.channel_type}"
+  end
+
+  def ensure_message_content_valid!(message_params)
+    return unless message_params[:content_type].to_s == 'input_select'
+
+    items = Array.wrap(message_params.dig(:content_attributes, :items)).compact_blank
+    raise ArgumentError, 'input_select requires at least one option' if items.blank?
   end
 
   def param_value(params, key, index = nil)

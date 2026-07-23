@@ -1183,6 +1183,7 @@
         "UPLOAD": "Anexar mídia",
         "ADD_BUTTON": "Adicionar opção",
         "BUTTON_DEFAULT": "Opção",
+        "BUTTON_REQUIRED": "Adicione pelo menos uma opção para botões/lista.",
         "EMPTY_PREVIEW": "Prévia da mensagem",
         "INVALID_TEMPLATE_JSON": "O template precisa ser um JSON válido."
       },

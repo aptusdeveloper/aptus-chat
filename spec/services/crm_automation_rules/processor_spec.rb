@@ -32,4 +32,24 @@ RSpec.describe CrmAutomationRules::Processor do
 
     described_class.run(trigger_type: 'deal_entered_stage', deal: deal)
   end
+
+  it 'allows retry when the recent execution failed' do
+    rule = create(
+      :crm_automation_rule,
+      account: deal.account,
+      crm_pipeline: deal.crm_pipeline,
+      trigger_type: 'deal_entered_stage'
+    )
+    create(
+      :crm_automation_execution,
+      crm_automation_rule: rule,
+      crm_deal: deal,
+      status: 'failed',
+      executed_at: 1.minute.ago
+    )
+
+    expect(CrmAutomationRules::ActionService).to receive(:new).with(rule, deal).and_call_original
+
+    described_class.run(trigger_type: 'deal_entered_stage', deal: deal)
+  end
 end

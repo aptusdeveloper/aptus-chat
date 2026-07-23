@@ -141,6 +141,11 @@ const createCondition = () => ({
   query_operator: 'AND',
 });
 
+const createDefaultButton = index => ({
+  title: t('CRM.AUTOMATIONS.MESSAGE.BUTTON_DEFAULT'),
+  value: `option_${index + 1}`,
+});
+
 function defaultActionParams(actionName) {
   if (actionName === 'send_lead_message') {
     return {
@@ -148,12 +153,7 @@ function defaultActionParams(actionName) {
       content: '',
       attachments: [],
       file_name: '',
-      buttons: [
-        {
-          title: t('CRM.AUTOMATIONS.MESSAGE.BUTTON_DEFAULT'),
-          value: 'option_1',
-        },
-      ],
+      buttons: [createDefaultButton(0)],
       template_json:
         '{\n  "name": "",\n  "language": "",\n  "processed_params": {}\n}',
     };
@@ -217,14 +217,24 @@ function removeAction(index) {
 }
 
 function addButton(action) {
-  action.action_params.buttons.push({
-    title: t('CRM.AUTOMATIONS.MESSAGE.BUTTON_DEFAULT'),
-    value: `option_${action.action_params.buttons.length + 1}`,
-  });
+  action.action_params.buttons.push(
+    createDefaultButton(action.action_params.buttons.length)
+  );
 }
 
 function removeButton(action, index) {
   action.action_params.buttons.splice(index, 1);
+}
+
+function setLeadMessageKind(action, kindId) {
+  action.action_params.message_kind = kindId;
+
+  if (
+    kindId === 'buttons' &&
+    (!action.action_params.buttons || !action.action_params.buttons.length)
+  ) {
+    action.action_params.buttons = [createDefaultButton(0)];
+  }
 }
 
 async function handleFileChange(action, event) {
@@ -260,7 +270,7 @@ function normalizeLeadMessageAction(action) {
   if (params.message_kind === 'buttons') {
     payload.content_attributes = {
       items: params.buttons
-        .filter(button => button.title.trim())
+        .filter(button => button.title?.trim())
         .map(button => ({
           title: button.title,
           value: button.value || button.title,
@@ -276,6 +286,26 @@ function normalizeLeadMessageAction(action) {
     action_name: action.action_name,
     action_params: payload,
   };
+}
+
+function hasValidButtonOptions(action) {
+  return action.action_params.buttons?.some(button => button.title?.trim());
+}
+
+function validateActions() {
+  const invalidButtonsAction = form.actions.find(
+    action =>
+      action.action_name === 'send_lead_message' &&
+      action.action_params.message_kind === 'buttons' &&
+      !hasValidButtonOptions(action)
+  );
+
+  if (invalidButtonsAction) {
+    error.value = t('CRM.AUTOMATIONS.MESSAGE.BUTTON_REQUIRED');
+    return false;
+  }
+
+  return true;
 }
 
 function normalizeAction(action) {
@@ -363,19 +393,20 @@ function leadMessageKind(params) {
 }
 
 function hydrateLeadMessageParams(params) {
+  const hydratedButtons =
+    params.buttons ||
+    params.content_attributes?.items ||
+    params.content_attributes?.items_attributes ||
+    [];
+
   return {
     message_kind: leadMessageKind(params),
     content: params.content || '',
     attachments: params.attachments || [],
     file_name: params.file_name || '',
-    buttons: params.buttons ||
-      params.content_attributes?.items ||
-      params.content_attributes?.items_attributes || [
-        {
-          title: t('CRM.AUTOMATIONS.MESSAGE.BUTTON_DEFAULT'),
-          value: 'option_1',
-        },
-      ],
+    buttons: hydratedButtons.length
+      ? hydratedButtons
+      : [createDefaultButton(0)],
     template_json: JSON.stringify(params.template_params || {}, null, 2),
   };
 }
@@ -483,6 +514,8 @@ async function saveAutomation() {
     error.value = t('CRM.AUTOMATIONS.FORM.ACTION_REQUIRED');
     return;
   }
+
+  if (!validateActions()) return;
 
   try {
     const payload = buildPayload();
@@ -883,7 +916,7 @@ onMounted(async () => {
                         ? 'bg-n-brand/10 text-n-blue-11'
                         : 'bg-n-alpha-2 text-n-slate-11 hover:bg-n-alpha-3'
                     "
-                    @click="action.action_params.message_kind = kind.id"
+                    @click="setLeadMessageKind(action, kind.id)"
                   >
                     <i class="w-4 h-4" :class="[kind.icon]" />
                     {{ kind.label }}

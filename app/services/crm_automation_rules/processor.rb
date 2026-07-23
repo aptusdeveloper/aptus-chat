@@ -6,7 +6,7 @@ class CrmAutomationRules::Processor
   end
 
   def self.recently_executed?(rule, deal, since: IDEMPOTENCY_WINDOW.ago)
-    CrmAutomationExecution.where(
+    CrmAutomationExecution.successful.where(
       crm_automation_rule: rule,
       crm_deal: deal,
       executed_at: since..Time.current
