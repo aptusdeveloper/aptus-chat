@@ -100,7 +100,7 @@ const stats = computed(() => [
   {
     key: 'llm_cost',
     label: t('HUB.METRICS.LLM_COST'),
-    value: formatCurrency(metrics.value.llm_cost),
+    value: formatCurrency(metrics.value.llm_cost, 'USD'),
     icon: 'i-lucide-circle-dollar-sign',
   },
 ]);

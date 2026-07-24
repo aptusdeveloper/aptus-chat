@@ -977,7 +977,7 @@
       "USERS": "Usuarios",
       "EVENTS": "Eventos",
       "TOKENS": "Tokens consumidos",
-      "LLM_COST": "Custo de uso"
+      "LLM_COST": "Custo de uso (USD)"
     },
     "PERFORMANCE": {
       "TITLE": "Desempenho",
