@@ -2,6 +2,7 @@
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
+import { vOnClickOutside } from '@vueuse/components';
 import AptusHubAPI from 'dashboard/api/aptusHub';
 import {
   formatCurrency,
@@ -34,6 +35,10 @@ const filters = ref(presetDayRange(30));
 const data = ref(null);
 const isLoading = ref(false);
 const error = ref('');
+
+const showCustomPopover = ref(false);
+const draftFrom = ref(filters.value.from);
+const draftTo = ref(filters.value.to);
 
 const metrics = computed(() => data.value?.metrics || {});
 const channels = computed(() => data.value?.channels || []);
@@ -128,12 +133,31 @@ async function loadPerformance() {
 
 function selectPreset(preset) {
   activePreset.value = preset.key;
+  showCustomPopover.value = false;
   filters.value = presetDayRange(preset.days);
   loadPerformance();
 }
 
-function selectCustom() {
+function toggleCustomPopover() {
+  if (showCustomPopover.value) {
+    showCustomPopover.value = false;
+    return;
+  }
+
+  draftFrom.value = filters.value.from;
+  draftTo.value = filters.value.to;
+  showCustomPopover.value = true;
+}
+
+function closeCustomPopover() {
+  showCustomPopover.value = false;
+}
+
+function applyCustomRange() {
   activePreset.value = 'custom';
+  filters.value = { from: draftFrom.value, to: draftTo.value };
+  showCustomPopover.value = false;
+  loadPerformance();
 }
 
 onMounted(loadPerformance);
@@ -205,48 +229,72 @@ onMounted(loadPerformance);
         >
           {{ preset.label }}
         </button>
-        <button
-          type="button"
-          class="h-8 px-3 rounded-md text-sm font-medium transition-colors"
-          :class="
-            activePreset === 'custom'
-              ? 'bg-n-solid-3 text-n-slate-12 shadow-sm'
-              : 'text-n-slate-10 hover:text-n-slate-12'
-          "
-          @click="selectCustom"
-        >
-          {{ t('HUB.PERFORMANCE.FILTER.CUSTOM') }}
-        </button>
+        <div class="relative">
+          <button
+            type="button"
+            class="h-8 px-3 rounded-md text-sm font-medium transition-colors"
+            :class="
+              activePreset === 'custom'
+                ? 'bg-n-solid-3 text-n-slate-12 shadow-sm'
+                : 'text-n-slate-10 hover:text-n-slate-12'
+            "
+            @click="toggleCustomPopover"
+          >
+            {{ t('HUB.PERFORMANCE.FILTER.CUSTOM') }}
+          </button>
+
+          <div
+            v-if="showCustomPopover"
+            v-on-click-outside="closeCustomPopover"
+            class="absolute z-20 top-full mt-2 ltr:left-0 rtl:right-0 w-64 rounded-lg border border-n-weak bg-white dark:bg-n-solid-2 p-3 shadow-lg"
+          >
+            <div class="flex flex-col gap-3">
+              <div>
+                <label class="block mb-1 text-xs font-medium text-n-slate-11">
+                  {{ t('HUB.PERFORMANCE.FILTER.FROM') }}
+                </label>
+                <input
+                  v-model="draftFrom"
+                  type="date"
+                  class="w-full h-9 rounded-lg border border-n-weak bg-n-background px-3 text-sm text-n-slate-12"
+                />
+              </div>
+              <div>
+                <label class="block mb-1 text-xs font-medium text-n-slate-11">
+                  {{ t('HUB.PERFORMANCE.FILTER.TO') }}
+                </label>
+                <input
+                  v-model="draftTo"
+                  type="date"
+                  class="w-full h-9 rounded-lg border border-n-weak bg-n-background px-3 text-sm text-n-slate-12"
+                />
+              </div>
+              <div class="flex justify-end gap-2">
+                <button
+                  type="button"
+                  class="h-8 px-3 rounded-lg text-sm font-medium text-n-slate-11 hover:bg-n-alpha-2"
+                  @click="closeCustomPopover"
+                >
+                  {{ t('HUB.PERFORMANCE.FILTER.CANCEL') }}
+                </button>
+                <button
+                  type="button"
+                  class="h-8 px-3 rounded-lg text-sm font-medium bg-n-brand text-white hover:opacity-90"
+                  @click="applyCustomRange"
+                >
+                  {{ t('HUB.PERFORMANCE.FILTER.APPLY') }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <template v-if="activePreset === 'custom'">
-        <input
-          v-model="filters.from"
-          type="date"
-          class="h-9 rounded-lg border border-n-weak bg-n-background px-3 text-sm text-n-slate-12"
-        />
-        <span class="text-sm text-n-slate-9">
-          {{ t('HUB.PERFORMANCE.FILTER.TO') }}
-        </span>
-        <input
-          v-model="filters.to"
-          type="date"
-          class="h-9 rounded-lg border border-n-weak bg-n-background px-3 text-sm text-n-slate-12"
-        />
-        <button
-          class="inline-flex items-center h-9 px-3 rounded-lg text-sm font-medium bg-n-brand text-white hover:opacity-90 disabled:opacity-60"
-          :disabled="isLoading"
-          @click="loadPerformance"
-        >
-          {{ t('HUB.PERFORMANCE.FILTER.APPLY') }}
-        </button>
-      </template>
-      <span v-else class="text-xs text-n-slate-9">
+      <span class="text-xs text-n-slate-9">
         {{ formatDate(filters.from) }} – {{ formatDate(filters.to) }}
       </span>
 
       <button
-        v-if="activePreset !== 'custom'"
         class="inline-flex items-center gap-2 h-9 px-3 rounded-lg text-sm font-medium text-n-slate-11 border border-n-weak hover:bg-n-alpha-2 ml-auto disabled:opacity-60"
         :disabled="isLoading"
         @click="loadPerformance"

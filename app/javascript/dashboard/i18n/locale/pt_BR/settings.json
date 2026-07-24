@@ -995,7 +995,9 @@
         "LAST_7_DAYS": "Ultimos 7 dias",
         "LAST_30_DAYS": "Ultimos 30 dias",
         "CUSTOM": "Personalizado",
-        "TO": "ate",
+        "FROM": "De",
+        "TO": "Ate",
+        "CANCEL": "Cancelar",
         "APPLY": "Aplicar"
       }
     },
