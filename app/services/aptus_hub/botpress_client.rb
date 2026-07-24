@@ -80,6 +80,7 @@ class AptusHub::BotpressClient
 
     totals[:total_users] = totals[:new_users] + totals[:returning_users]
     totals[:total_messages] = totals[:user_messages] + totals[:bot_messages]
+    totals[:llm_tokens] = totals[:llm_input_tokens] + totals[:llm_output_tokens]
     totals
   end
 
@@ -88,6 +89,10 @@ class AptusHub::BotpressClient
       totals[metric_key] += record[record_key].to_i
     end
     totals[:llm_cost] += record.dig(:llm, :cost, :sum).to_f
+    totals[:llm_input_tokens] += record.dig(:llm, :inputTokens).to_i
+    totals[:llm_output_tokens] += record.dig(:llm, :outputTokens).to_i
+    totals[:llm_calls] += record.dig(:llm, :calls).to_i
+    totals[:llm_errors] += record.dig(:llm, :errors).to_i
   end
 
   def empty_metrics
@@ -100,7 +105,12 @@ class AptusHub::BotpressClient
       returning_users: 0,
       total_users: 0,
       events: 0,
-      llm_cost: 0.0
+      llm_cost: 0.0,
+      llm_input_tokens: 0,
+      llm_output_tokens: 0,
+      llm_tokens: 0,
+      llm_calls: 0,
+      llm_errors: 0
     }
   end
 end

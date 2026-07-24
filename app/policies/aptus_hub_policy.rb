@@ -1,8 +1,4 @@
 class AptusHubPolicy < ApplicationPolicy
-  def overview?
-    view?
-  end
-
   def performance?
     view?
   end
@@ -12,6 +8,10 @@ class AptusHubPolicy < ApplicationPolicy
   end
 
   def payments?
+    view?
+  end
+
+  def payment_details?
     view?
   end
 

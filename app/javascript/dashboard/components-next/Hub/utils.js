@@ -25,6 +25,12 @@ export const formatDate = value => {
   return date.toLocaleDateString('pt-BR');
 };
 
+export const formatMonthLabel = month => {
+  if (!month) return '-';
+  const date = new Date(`${month}-01T00:00:00`);
+  return date.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+};
+
 export const paymentStatusLabel = status => {
   const labels = {
     paid: 'Pago',

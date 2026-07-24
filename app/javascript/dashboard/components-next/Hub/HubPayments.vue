@@ -1,15 +1,20 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import AptusHubAPI from 'dashboard/api/aptusHub';
+import Button from 'dashboard/components-next/button/Button.vue';
 import {
   formatCurrency,
   formatDate,
+  formatMonthLabel,
   hubErrorMessage,
   paymentStatusClass,
   paymentStatusLabel,
 } from './utils';
 
+const route = useRoute();
+const router = useRouter();
 const { t } = useI18n();
 const data = ref(null);
 const isLoading = ref(false);
@@ -33,6 +38,13 @@ async function loadPayments() {
   }
 }
 
+function openDetails(month) {
+  router.push({
+    name: 'hub_payment_details',
+    params: { accountId: route.params.accountId, month },
+  });
+}
+
 onMounted(loadPayments);
 </script>
 
@@ -47,17 +59,14 @@ onMounted(loadPayments);
           {{ t('HUB.PAYMENTS.SUBTITLE') }}
         </p>
       </div>
-      <button
-        class="inline-flex items-center gap-2 h-9 px-3 rounded-lg text-sm font-medium text-n-slate-11 border border-n-weak hover:bg-n-alpha-2 disabled:opacity-60"
-        :disabled="isLoading"
+      <Button
+        ghost
+        slate
+        icon="i-lucide-refresh-cw"
+        :label="t('HUB.ACTIONS.REFRESH')"
+        :is-loading="isLoading"
         @click="loadPayments"
-      >
-        <i
-          class="i-lucide-refresh-cw w-4 h-4"
-          :class="{ 'animate-spin': isLoading }"
-        />
-        {{ t('HUB.ACTIONS.REFRESH') }}
-      </button>
+      />
     </div>
 
     <div
@@ -114,50 +123,89 @@ onMounted(loadPayments);
         </div>
       </section>
 
-      <section
-        class="rounded-lg border border-n-weak bg-white dark:bg-n-solid-2"
-      >
-        <div class="px-4 py-3 border-b border-n-weak">
-          <h3 class="text-sm font-semibold text-n-slate-12">
-            {{ t('HUB.PAYMENTS.LAST_MONTHS') }}
-          </h3>
-        </div>
+      <h3 class="text-sm font-semibold text-n-slate-12 mb-2">
+        {{ t('HUB.PAYMENTS.LAST_MONTHS') }}
+      </h3>
 
-        <div v-if="history.length" class="divide-y divide-n-weak">
-          <div
-            v-for="payment in history"
-            :key="payment.month"
-            class="grid grid-cols-[1fr_auto_auto] items-center gap-3 px-4 py-3"
-          >
-            <div class="min-w-0">
-              <p class="text-sm font-medium text-n-slate-12">
-                {{ payment.month }}
-              </p>
-              <p class="text-xs text-n-slate-9">
-                {{
-                  t('HUB.PAYMENTS.DUE_ON', { date: formatDate(payment.due_on) })
-                }}
-              </p>
-            </div>
-            <span
-              class="inline-flex items-center h-7 px-2 rounded-md text-xs font-medium"
-              :class="paymentStatusClass(payment.status)"
+      <div
+        v-if="history.length"
+        class="overflow-hidden rounded-lg border border-n-weak bg-white dark:bg-n-solid-2"
+      >
+        <table class="w-full text-sm">
+          <thead class="bg-n-alpha-1 text-xs uppercase text-n-slate-9">
+            <tr>
+              <th class="px-4 py-3 text-left font-semibold">
+                {{ t('HUB.PAYMENTS.LIST.COLUMNS.MONTH') }}
+              </th>
+              <th class="px-4 py-3 text-left font-semibold">
+                {{ t('HUB.PAYMENTS.LIST.COLUMNS.VALUE') }}
+              </th>
+              <th class="px-4 py-3 text-left font-semibold">
+                {{ t('HUB.PAYMENTS.LIST.COLUMNS.DUE_DATE') }}
+              </th>
+              <th class="px-4 py-3 text-left font-semibold">
+                {{ t('HUB.PAYMENTS.LIST.COLUMNS.STATUS') }}
+              </th>
+              <th class="px-4 py-3 text-left font-semibold">
+                {{ t('HUB.PAYMENTS.LIST.COLUMNS.PAID_AT') }}
+              </th>
+              <th class="px-4 py-3 text-right font-semibold">
+                {{ t('HUB.PAYMENTS.LIST.COLUMNS.MANAGE') }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="payment in history"
+              :key="payment.month"
+              class="border-t border-n-weak hover:bg-n-alpha-1"
             >
-              {{ paymentStatusLabel(payment.status) }}
-            </span>
-            <span class="text-xs text-n-slate-9 min-w-24 text-right">
-              {{
-                payment.paid_at
-                  ? formatDate(payment.paid_at.slice(0, 10))
-                  : t('HUB.PAYMENTS.EMPTY_VALUE')
-              }}
-            </span>
-          </div>
-        </div>
-        <div v-else class="px-4 py-6 text-sm text-n-slate-10">
-          {{ t('HUB.PAYMENTS.NO_PAYMENTS') }}
-        </div>
-      </section>
+              <td class="px-4 py-3 font-medium text-n-slate-12 capitalize">
+                {{ formatMonthLabel(payment.month) }}
+              </td>
+              <td class="px-4 py-3 text-n-slate-11">
+                {{ formatCurrency(payment.total, payment.currency) }}
+              </td>
+              <td class="px-4 py-3 text-n-slate-11">
+                {{ formatDate(payment.due_on) }}
+              </td>
+              <td class="px-4 py-3">
+                <span
+                  class="inline-flex items-center h-7 px-2 rounded-md text-xs font-medium"
+                  :class="paymentStatusClass(payment.status)"
+                >
+                  {{ paymentStatusLabel(payment.status) }}
+                </span>
+              </td>
+              <td class="px-4 py-3 text-n-slate-11">
+                {{
+                  payment.paid_at
+                    ? formatDate(payment.paid_at.slice(0, 10))
+                    : t('HUB.PAYMENTS.EMPTY_VALUE')
+                }}
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex items-center justify-end">
+                  <Button
+                    ghost
+                    slate
+                    sm
+                    icon="i-lucide-receipt-text"
+                    :label="t('HUB.PAYMENTS.DETAILS_BUTTON')"
+                    @click="openDetails(payment.month)"
+                  />
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div
+        v-else
+        class="rounded-lg border border-n-weak bg-white dark:bg-n-solid-2 px-4 py-6 text-sm text-n-slate-10"
+      >
+        {{ t('HUB.PAYMENTS.NO_PAYMENTS') }}
+      </div>
     </template>
   </div>
 </template>

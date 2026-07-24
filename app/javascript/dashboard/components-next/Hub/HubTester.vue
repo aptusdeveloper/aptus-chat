@@ -1,72 +1,63 @@
 <script setup>
-import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useAlert } from 'dashboard/composables';
 import AptusHubAPI from 'dashboard/api/aptusHub';
 import { hubErrorMessage } from './utils';
+
+const WEBCHAT_LOADER_SCRIPT_URL =
+  'https://cdn.botpress.cloud/webchat/v3.7/inject.js';
+const WEBCHAT_CONTAINER_ID = 'aptus-hub-webchat-container';
 
 const { t } = useI18n();
 const config = ref(null);
 const isLoading = ref(false);
 const isScriptLoading = ref(false);
-const isSending = ref(false);
 const error = ref('');
-const comment = ref('');
-const conversationId = ref('');
 
-function normalizeEventPayload(data) {
-  if (typeof data !== 'string') return data;
+function appendScript(src, { defer = false, waitForLoad = false } = {}) {
+  const existing = document.querySelector(`script[src="${src}"]`);
+  if (existing) return Promise.resolve();
 
-  try {
-    return JSON.parse(data);
-  } catch {
-    return {};
-  }
-}
-
-function extractConversationId(payload) {
-  const data = normalizeEventPayload(payload);
-  if (!data || typeof data !== 'object') return '';
-
-  return (
-    data.conversationId ||
-    data.conversation_id ||
-    data.payload?.conversationId ||
-    data.payload?.conversation_id ||
-    data.data?.conversationId ||
-    data.data?.conversation_id ||
-    data.conversation?.id ||
-    ''
-  );
-}
-
-function handleWebchatMessage(event) {
-  const id = extractConversationId(event.data);
-  if (id) conversationId.value = id;
-}
-
-function ensureWebchatScript(scriptUrl) {
   return new Promise((resolve, reject) => {
-    const existing = document.querySelector(`script[src="${scriptUrl}"]`);
-    if (existing) {
-      resolve();
-      return;
+    const script = document.createElement('script');
+    script.src = src;
+    // async = false preserva a ordem de execução entre os dois scripts
+    // (o loader precisa rodar antes do script de config do bot)
+    script.async = false;
+    script.defer = defer;
+    script.dataset.aptusHubWebchat = 'true';
+
+    if (waitForLoad) {
+      script.onload = resolve;
+      script.onerror = reject;
     }
 
-    document
-      .querySelectorAll('script[data-aptus-hub-webchat="true"]')
-      .forEach(script => {
-        if (script.src !== scriptUrl) script.remove();
-      });
-
-    const script = document.createElement('script');
-    script.src = scriptUrl;
-    script.async = true;
-    script.dataset.aptusHubWebchat = 'true';
-    script.onload = resolve;
-    script.onerror = reject;
     document.body.appendChild(script);
+    if (!waitForLoad) resolve();
   });
+}
+
+function ensureWebchatWidget(scriptUrl) {
+  document
+    .querySelectorAll('script[data-aptus-hub-webchat="true"]')
+    .forEach(script => {
+      if (
+        script.src !== WEBCHAT_LOADER_SCRIPT_URL &&
+        script.src !== scriptUrl
+      ) {
+        script.remove();
+      }
+    });
+
+  return appendScript(WEBCHAT_LOADER_SCRIPT_URL)
+    .then(() => appendScript(scriptUrl, { defer: true, waitForLoad: true }))
+    .then(() => {
+      // O script do bot inicializa no modo "fab" (bolinha flutuante) por padrão.
+      // window.botpress.config() troca pro modo embutido, renderizando dentro do nosso container.
+      window.botpress?.config?.({
+        configuration: { embeddedChatId: WEBCHAT_CONTAINER_ID },
+      });
+    });
 }
 
 async function loadConfig() {
@@ -79,7 +70,7 @@ async function loadConfig() {
 
     if (response.data.configured && response.data.script_url) {
       isScriptLoading.value = true;
-      await ensureWebchatScript(response.data.script_url);
+      await ensureWebchatWidget(response.data.script_url);
     }
   } catch (apiError) {
     error.value = hubErrorMessage(apiError);
@@ -89,38 +80,14 @@ async function loadConfig() {
   }
 }
 
-async function sendFeedback() {
-  if (!conversationId.value.trim() || !comment.value.trim()) return;
-  isSending.value = true;
-  error.value = '';
-
-  try {
-    await AptusHubAPI.feedback({
-      conversation_id: conversationId.value.trim(),
-      comment: comment.value.trim(),
-    });
-    comment.value = '';
-    useAlert(t('HUB.TEST.FEEDBACK_SENT'));
-  } catch (apiError) {
-    error.value = hubErrorMessage(apiError);
-  } finally {
-    isSending.value = false;
-  }
-}
-
 onMounted(() => {
-  window.addEventListener('message', handleWebchatMessage);
   loadConfig();
-});
-
-onBeforeUnmount(() => {
-  window.removeEventListener('message', handleWebchatMessage);
 });
 </script>
 
 <template>
-  <div class="flex-1 overflow-y-auto p-4">
-    <div class="mb-4">
+  <div class="h-full flex flex-col px-8 pb-8 pt-4 gap-4">
+    <div class="shrink-0">
       <h2 class="text-lg font-semibold text-n-slate-12">
         {{ t('HUB.TEST.TITLE') }}
       </h2>
@@ -131,7 +98,7 @@ onBeforeUnmount(() => {
 
     <div
       v-if="error"
-      class="mb-4 rounded-lg border border-n-ruby-5 bg-n-ruby-2 px-4 py-3 text-sm text-n-ruby-11"
+      class="shrink-0 rounded-lg border border-n-ruby-5 bg-n-ruby-2 px-4 py-3 text-sm text-n-ruby-11"
     >
       {{ error }}
     </div>
@@ -157,68 +124,18 @@ onBeforeUnmount(() => {
         </p>
       </section>
 
-      <div v-else class="grid gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
-        <section
-          class="rounded-lg border border-n-weak bg-white dark:bg-n-solid-2 min-h-[440px] p-4"
+      <div v-else class="flex-1 min-h-0 flex flex-col">
+        <div
+          v-if="isScriptLoading"
+          class="flex-1 flex items-center justify-center text-n-slate-9"
         >
-          <div class="flex items-center gap-2 text-sm text-n-slate-10">
-            <i
-              class="w-4 h-4"
-              :class="
-                isScriptLoading
-                  ? 'i-lucide-loader-2 animate-spin'
-                  : 'i-lucide-message-circle-play'
-              "
-            />
-            {{ t('HUB.TEST.WEBCHAT') }}
-          </div>
-          <div
-            class="mt-20 grid place-content-center text-center text-n-slate-9"
-          >
-            <i class="i-lucide-bot w-12 h-12 mx-auto mb-3" />
-            <p class="text-sm">
-              {{ t('HUB.TEST.WIDGET_READY') }}
-            </p>
-          </div>
-        </section>
-
-        <section
-          class="rounded-lg border border-n-weak bg-white dark:bg-n-solid-2 p-4"
-        >
-          <h3 class="text-sm font-semibold text-n-slate-12 mb-3">
-            {{ t('HUB.TEST.FEEDBACK') }}
-          </h3>
-
-          <label class="block text-xs font-medium text-n-slate-10 mb-1">
-            {{ t('HUB.TEST.CONVERSATION_ID') }}
-          </label>
-          <input
-            v-model="conversationId"
-            class="w-full h-9 rounded-lg border border-n-weak bg-n-background px-3 text-sm text-n-slate-12 mb-3"
-            :placeholder="t('HUB.TEST.CONVERSATION_ID_PLACEHOLDER')"
-          />
-
-          <label class="block text-xs font-medium text-n-slate-10 mb-1">
-            {{ t('HUB.TEST.COMMENT') }}
-          </label>
-          <textarea
-            v-model="comment"
-            rows="6"
-            class="w-full rounded-lg border border-n-weak bg-n-background px-3 py-2 text-sm text-n-slate-12 resize-none"
-          />
-
-          <button
-            class="mt-3 inline-flex items-center justify-center gap-2 h-9 px-3 rounded-lg text-sm font-medium bg-n-brand text-white hover:opacity-90 disabled:opacity-60 w-full"
-            :disabled="isSending || !conversationId.trim() || !comment.trim()"
-            @click="sendFeedback"
-          >
-            <i
-              class="i-lucide-send w-4 h-4"
-              :class="{ 'animate-pulse': isSending }"
-            />
-            {{ t('HUB.TEST.SEND_FEEDBACK') }}
-          </button>
-        </section>
+          <i class="i-lucide-loader-2 w-8 h-8 animate-spin" />
+        </div>
+        <div
+          :id="WEBCHAT_CONTAINER_ID"
+          class="flex-1 min-h-0"
+          :class="{ hidden: isScriptLoading }"
+        />
       </div>
     </template>
   </div>

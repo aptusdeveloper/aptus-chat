@@ -542,12 +542,6 @@ const menuItems = computed(() => {
             icon: 'i-lucide-bot',
             children: [
               {
-                name: 'Hub Meu Bot',
-                label: t('SIDEBAR.HUB_MY_BOT'),
-                icon: 'i-lucide-bot',
-                to: accountScopedRoute('hub_overview'),
-              },
-              {
                 name: 'Hub Desempenho',
                 label: t('SIDEBAR.HUB_PERFORMANCE'),
                 icon: 'i-lucide-chart-no-axes-column',
@@ -556,7 +550,7 @@ const menuItems = computed(() => {
               {
                 name: 'Hub Testar',
                 label: t('SIDEBAR.HUB_TEST'),
-                icon: 'i-lucide-message-circle-play',
+                icon: 'i-lucide-square-play',
                 to: accountScopedRoute('hub_tester'),
               },
               {

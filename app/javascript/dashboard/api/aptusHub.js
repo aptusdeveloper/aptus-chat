@@ -6,10 +6,6 @@ class AptusHubAPI extends ApiClient {
     super('hub', { accountScoped: true });
   }
 
-  overview(params = {}) {
-    return axios.get(`${this.url}/overview`, { params });
-  }
-
   performance(params = {}) {
     return axios.get(`${this.url}/performance`, { params });
   }
@@ -24,6 +20,10 @@ class AptusHubAPI extends ApiClient {
 
   payments() {
     return axios.get(`${this.url}/payments`);
+  }
+
+  paymentDetails(month) {
+    return axios.get(`${this.url}/payments/${month}`);
   }
 }
 

@@ -3,22 +3,16 @@ class AptusHub::CustomerPortalService
 
   attr_reader :account, :user, :config
 
-  def initialize(account:, user:, botpress_client: AptusHub::BotpressClient.new)
+  def initialize(
+    account:, user:,
+    botpress_client: AptusHub::BotpressClient.new,
+    cost_calculator: nil
+  )
     @account = account
     @user = user
     @botpress_client = botpress_client
     @config = AptusHub::AccountConfig.new(account)
-  end
-
-  def overview(from:, to:)
-    analytics = fetch_analytics(from, to)
-
-    {
-      bot: bot_payload,
-      period: period_payload(from, to),
-      metrics: analytics[:metrics],
-      channels: channels_payload
-    }
+    @cost_calculator = cost_calculator || AptusHub::PaymentCostCalculator.new(config: @config)
   end
 
   def performance(from:, to:)
@@ -28,6 +22,7 @@ class AptusHub::CustomerPortalService
       bot: bot_payload,
       period: period_payload(from, to),
       metrics: analytics[:metrics],
+      channels: channels_payload,
       usage_history: usage_history(analytics[:records], analytics[:metrics])
     }
   end
@@ -57,6 +52,22 @@ class AptusHub::CustomerPortalService
     }
   end
 
+  def payment_details(month:, today: Time.zone.today)
+    from, to = month_range(month)
+    analytics = fetch_analytics(from, to)
+    metrics = analytics[:metrics]
+    payment = config.payments.find { |item| item[:month] == month }
+
+    {
+      month: month,
+      status: payment_status(month, payment, today),
+      due_on: due_date_for(month).strftime('%Y-%m-%d'),
+      paid_at: payment&.dig(:paid_at),
+      costs: cost_calculator.breakdown(month: month, metrics: metrics, payment: payment, today: today),
+      metrics: metrics
+    }
+  end
+
   def create_feedback!(conversation_id:, comment:)
     payload = {
       'conversation_id' => conversation_id,
@@ -76,7 +87,7 @@ class AptusHub::CustomerPortalService
 
   private
 
-  attr_reader :botpress_client
+  attr_reader :botpress_client, :cost_calculator
 
   def fetch_analytics(from, to)
     botpress_client.analytics(bot_id: config.bot_id, from: from, to: to)
@@ -156,14 +167,22 @@ class AptusHub::CustomerPortalService
     Array.new(count) { |offset| (current_month - offset.months).strftime('%Y-%m') }
   end
 
+  def month_range(month)
+    year, month_number = month.split('-').map(&:to_i)
+    from = Date.new(year, month_number, 1)
+    [from, from.end_of_month]
+  end
+
   def payment_history_item(month, today)
-    payment = config.payments.find { |item| item[:month] == month }
+    details = payment_details(month: month, today: today)
 
     {
-      month: month,
-      status: payment_status(month, payment, today),
-      due_on: due_date_for(month).strftime('%Y-%m-%d'),
-      paid_at: payment&.dig(:paid_at)
+      month: details[:month],
+      status: details[:status],
+      due_on: details[:due_on],
+      paid_at: details[:paid_at],
+      total: details.dig(:costs, :total),
+      currency: details.dig(:costs, :currency)
     }
   end
 

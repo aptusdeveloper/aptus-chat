@@ -1,0 +1,25 @@
+<div class="field-unit__label">
+  <%= f.label field.attribute %>
+</div>
+<div class="field-unit__field">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <% field.values.each do |key, value| %>
+      <% meta = AptusHubConfigField::FIELDS.find { |item| item[:key] == key } %>
+      <div class="flex flex-col gap-1">
+        <label class="text-sm text-slate-700"><%= meta[:label] %></label>
+
+        <% if meta[:type] == :boolean %>
+          <span>
+            <%= check_box "account[aptus_hub]", key, { checked: ActiveModel::Type::Boolean.new.cast(value), class: "h-4 w-4 rounded border-slate-300" }, true, false %>
+          </span>
+        <% elsif meta[:type] == :select %>
+          <%= select_tag "account[aptus_hub][#{key}]", options_for_select(meta[:options], value), class: "rounded-md border border-slate-300 px-2 py-1 text-sm w-full" %>
+        <% elsif meta[:type] == :number %>
+          <%= number_field "account[aptus_hub]", key, value: value, step: 'any', class: "rounded-md border border-slate-300 px-2 py-1 text-sm w-full" %>
+        <% else %>
+          <%= text_field "account[aptus_hub]", key, value: value, class: "rounded-md border border-slate-300 px-2 py-1 text-sm w-full" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>

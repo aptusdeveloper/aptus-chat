@@ -38,6 +38,7 @@ class SuperAdmin::AccountsController < SuperAdmin::ApplicationController
     permitted_params[:limits] = permitted_params[:limits].to_h.compact if permitted_params.key?(:limits)
     permitted_params[:captain_models] = permitted_params[:captain_models].to_h.compact_blank.presence if permitted_params.key?(:captain_models)
     permitted_params[:selected_feature_flags] = params[:enabled_features].keys.map(&:to_sym) if params[:enabled_features].present?
+    permitted_params[:aptus_hub] = merged_aptus_hub_params(permitted_params[:aptus_hub]) if permitted_params.key?(:aptus_hub)
     permitted_params
   end
 
@@ -65,6 +66,15 @@ class SuperAdmin::AccountsController < SuperAdmin::ApplicationController
     # rubocop:disable Rails/I18nLocaleTexts
     redirect_back(fallback_location: [namespace, requested_resource], notice: 'Account deletion is in progress.')
     # rubocop:enable Rails/I18nLocaleTexts
+  end
+
+  private
+
+  # `payments`/`feedback` are managed by the Aptus Hub API itself (not editable in this form),
+  # so we merge instead of overwriting to avoid wiping them out on every account update.
+  def merged_aptus_hub_params(submitted)
+    current = params[:id].present? ? (Account.find(params[:id]).aptus_hub || {}) : {}
+    current.with_indifferent_access.merge(submitted.to_h.compact_blank)
   end
 end
 

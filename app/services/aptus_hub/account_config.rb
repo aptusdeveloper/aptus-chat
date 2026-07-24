@@ -40,6 +40,18 @@ class AptusHub::AccountConfig
     numeric_value(raw[:monthly_fee].presence || raw[:monthlyFee], 0)
   end
 
+  def bot_fixed_cost
+    numeric_value(raw[:bot_fixed_cost].presence || raw[:botFixedCost], 10)
+  end
+
+  def markup_rate
+    numeric_value(raw[:markup_rate].presence || raw[:markupRate], 0.14)
+  end
+
+  def tax_rate
+    numeric_value(raw[:tax_rate].presence || raw[:taxRate], 0.07)
+  end
+
   def currency
     value = raw[:currency].presence || 'BRL'
     value.to_s.upcase == 'USD' ? 'USD' : 'BRL'
@@ -70,7 +82,8 @@ class AptusHub::AccountConfig
       {
         month: month,
         status: attrs[:status].to_s == 'paid' ? 'paid' : 'pending',
-        paid_at: attrs[:paid_at].presence || attrs[:paidAt].presence
+        paid_at: attrs[:paid_at].presence || attrs[:paidAt].presence,
+        usd_brl_rate: numeric_value(attrs[:usd_brl_rate].presence || attrs[:usdBrlRate], nil)
       }
     end
   end
@@ -86,6 +99,21 @@ class AptusHub::AccountConfig
     current_feedback = Array.wrap(raw[:feedback]).last(FEEDBACK_LIMIT - 1)
     merged_hub = raw.to_h.merge('feedback' => current_feedback + [payload])
 
+    account.custom_attributes = account.custom_attributes.to_h.merge(HUB_KEY => merged_hub)
+    account.save!
+  end
+
+  def freeze_exchange_rate!(month, rate)
+    current_payments = Array.wrap(raw[:payments]).map(&:with_indifferent_access)
+    existing = current_payments.find { |payment| payment[:month].to_s == month }
+
+    if existing
+      existing[:usd_brl_rate] = rate
+    else
+      current_payments << { 'month' => month, 'status' => 'pending', 'usd_brl_rate' => rate }
+    end
+
+    merged_hub = raw.to_h.merge('payments' => current_payments)
     account.custom_attributes = account.custom_attributes.to_h.merge(HUB_KEY => merged_hub)
     account.save!
   end

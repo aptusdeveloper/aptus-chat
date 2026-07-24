@@ -322,7 +322,6 @@
     "ACTIVE": "Active",
     "CRM": "CRM",
     "HUB": "Hub",
-    "HUB_MY_BOT": "My Bot",
     "HUB_PERFORMANCE": "Performance",
     "HUB_TEST": "Test",
     "HUB_PAYMENTS": "Payments",
@@ -965,50 +964,36 @@
       "REFRESH": "Refresh"
     },
     "NAV": {
-      "MY_BOT": "My Bot",
       "PERFORMANCE": "Performance",
       "TEST": "Test",
       "PAYMENTS": "Payments"
     },
     "METRICS": {
       "SESSIONS": "Sessions",
-      "MESSAGES": "Messages",
       "USER_MESSAGES": "User messages",
       "BOT_MESSAGES": "Bot messages",
       "USERS": "Users",
-      "NEW_USERS": "New",
-      "RETURNING_USERS": "Returning",
-      "EVENTS": "Events"
-    },
-    "OVERVIEW": {
-      "TITLE": "My Bot",
-      "SUBTITLE": "Default period is the current month.",
-      "EMPTY_USAGE": "No usage in the selected period yet.",
-      "CHANNELS": "Connected channels",
-      "CONNECTED": "Connected",
-      "NO_CHANNELS": "No channel connected to this account."
+      "EVENTS": "Events",
+      "TOKENS": "Tokens used",
+      "LLM_COST": "Usage cost"
     },
     "PERFORMANCE": {
       "TITLE": "Performance",
-      "SUBTITLE": "Detailed bot metrics.",
+      "SUBTITLE": "Default period is the current month.",
       "LOADING": "Loading performance...",
       "HISTORY": "Usage history",
       "TOTAL_MESSAGES": "Total messages",
-      "EMPTY_HISTORY": "No history in this period yet."
+      "EMPTY_HISTORY": "No history in this period yet.",
+      "CHANNELS": "Connected channels",
+      "CONNECTED": "Connected",
+      "NO_CHANNELS": "No channel connected to this account.",
+      "USERS_BREAKDOWN": "{new} new • {returning} returning"
     },
     "TEST": {
       "TITLE": "Test",
       "SUBTITLE": "Bot test environment.",
       "LOADING": "Loading test...",
-      "NOT_CONFIGURED": "Bot test is not configured yet.",
-      "WEBCHAT": "Botpress webchat",
-      "WIDGET_READY": "The script-loaded widget is available on this page.",
-      "FEEDBACK": "Feedback",
-      "CONVERSATION_ID": "Conversation ID",
-      "CONVERSATION_ID_PLACEHOLDER": "conversationId",
-      "COMMENT": "Comment",
-      "SEND_FEEDBACK": "Send feedback",
-      "FEEDBACK_SENT": "Feedback sent."
+      "NOT_CONFIGURED": "Bot test is not configured yet."
     },
     "PAYMENTS": {
       "TITLE": "Payments",
@@ -1021,7 +1006,33 @@
       "LAST_MONTHS": "Last 6 months",
       "DUE_ON": "Due on {date}",
       "EMPTY_VALUE": "-",
-      "NO_PAYMENTS": "No payment registered."
+      "NO_PAYMENTS": "No payment registered.",
+      "DETAILS_BUTTON": "Details",
+      "LIST": {
+        "COLUMNS": {
+          "MONTH": "Month",
+          "VALUE": "Value",
+          "DUE_DATE": "Due date",
+          "STATUS": "Status",
+          "PAID_AT": "Paid at",
+          "MANAGE": "Manage"
+        }
+      },
+      "DETAILS": {
+        "BACK": "Back",
+        "SUBTITLE": "Full breakdown of this month's charge.",
+        "LOADING": "Loading details...",
+        "COSTS": "Costs",
+        "LLM_COST": "LLM / tokens cost",
+        "BOT_FIXED_COST": "Bot fixed cost",
+        "API_SUBTOTAL": "API subtotal (USD)",
+        "EXCHANGE_RATE": "USD -> BRL rate",
+        "EXCHANGE_RATE_LIVE_HINT": "This is the current rate. The final rate will be locked in once this month closes.",
+        "API_COST_BRL": "Usage cost (BRL, incl. markup and taxes)",
+        "MONTHLY_FEE": "Aptus monthly fee",
+        "TOTAL": "Total",
+        "METRICS": "Metrics for this month"
+      }
     }
   },
   "CRM": {
@@ -1104,12 +1115,19 @@
       },
       "TRIGGERS": {
         "DEAL_CREATED": "Deal created",
+        "DEAL_CREATED_DESCRIPTION": "Fires as soon as a new deal is created in the funnel.",
         "DEAL_ENTERED_STAGE": "Deal entered a stage",
+        "DEAL_ENTERED_STAGE_DESCRIPTION": "Fires when the deal enters the stage you select below.",
         "DEAL_STAGE_CHANGED": "Deal stage changed",
+        "DEAL_STAGE_CHANGED_DESCRIPTION": "Fires whenever the deal moves to a different stage, any stage.",
         "DEAL_WON": "Deal won",
+        "DEAL_WON_DESCRIPTION": "Fires when the deal is marked as won.",
         "DEAL_LOST": "Deal lost",
+        "DEAL_LOST_DESCRIPTION": "Fires when the deal is marked as lost.",
         "DEAL_STAGNANT": "Stagnant in stage for X days",
-        "CLOSE_DATE_APPROACHING": "Close date in X days"
+        "DEAL_STAGNANT_DESCRIPTION": "Fires when the deal has been stuck in its current stage for the number of days you set below.",
+        "CLOSE_DATE_APPROACHING": "Close date in X days",
+        "CLOSE_DATE_APPROACHING_DESCRIPTION": "Fires when the expected close date is approaching, within the number of days you set below."
       },
       "FORM": {
         "NEW_TITLE": "New automation",
@@ -1118,6 +1136,9 @@
         "NAME": "Automation name",
         "NAME_REQUIRED": "Enter a name for the automation.",
         "ACTION_REQUIRED": "Add at least one action.",
+        "STAGE_REQUIRED": "Select a target stage for the \"Change stage\" action.",
+        "PIPELINE_REQUIRED": "Select a target pipeline for the \"Change pipeline\" action.",
+        "WEBHOOK_URL_REQUIRED": "Enter a URL for the \"Send webhook\" action.",
         "PIPELINE": "Pipeline",
         "TRIGGER": "Trigger",
         "STAGE": "Stage",

@@ -9,12 +9,6 @@ const accountId = computed(() => route.params.accountId);
 
 const tabs = computed(() => [
   {
-    name: 'hub_overview',
-    label: t('HUB.NAV.MY_BOT'),
-    icon: 'i-lucide-bot',
-    to: { name: 'hub_overview', params: { accountId: accountId.value } },
-  },
-  {
     name: 'hub_performance',
     label: t('HUB.NAV.PERFORMANCE'),
     icon: 'i-lucide-chart-no-axes-column',
@@ -23,7 +17,7 @@ const tabs = computed(() => [
   {
     name: 'hub_tester',
     label: t('HUB.NAV.TEST'),
-    icon: 'i-lucide-message-circle-play',
+    icon: 'i-lucide-square-play',
     to: { name: 'hub_tester', params: { accountId: accountId.value } },
   },
   {

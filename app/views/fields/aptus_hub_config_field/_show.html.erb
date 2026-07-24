@@ -1,0 +1,9 @@
+<div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+  <% field.values.each do |key, value| %>
+    <% meta = AptusHubConfigField::FIELDS.find { |item| item[:key] == key } %>
+    <div class="text-sm">
+      <span class="text-slate-500"><%= meta[:label] %>:</span>
+      <span class="text-slate-800"><%= value.presence || '-' %></span>
+    </div>
+  <% end %>
+</div>

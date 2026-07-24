@@ -3,10 +3,7 @@ class Api::V1::Accounts::AptusHubController < Api::V1::Accounts::BaseController
   before_action :ensure_hub_available!
 
   rescue_from AptusHub::BotpressClient::Error, with: :render_hub_error
-
-  def overview
-    render json: portal_service.overview(from: period_from, to: period_to)
-  end
+  rescue_from AptusHub::ExchangeRateClient::Error, with: :render_hub_error
 
   def performance
     render json: portal_service.performance(from: period_from, to: period_to)
@@ -18,6 +15,10 @@ class Api::V1::Accounts::AptusHubController < Api::V1::Accounts::BaseController
 
   def payments
     render json: portal_service.payments
+  end
+
+  def payment_details
+    render json: portal_service.payment_details(month: params[:month])
   end
 
   def feedback

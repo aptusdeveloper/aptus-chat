@@ -346,7 +346,6 @@
     "CUSTOM_ATTRIBUTES": "Atributos Personalizados",
     "CRM": "CRM",
     "HUB": "Hub",
-    "HUB_MY_BOT": "Meu Bot",
     "HUB_PERFORMANCE": "Desempenho",
     "HUB_TEST": "Testar",
     "HUB_PAYMENTS": "Pagamentos",
@@ -965,50 +964,36 @@
       "REFRESH": "Atualizar"
     },
     "NAV": {
-      "MY_BOT": "Meu Bot",
       "PERFORMANCE": "Desempenho",
       "TEST": "Testar",
       "PAYMENTS": "Pagamentos"
     },
     "METRICS": {
       "SESSIONS": "Sessoes",
-      "MESSAGES": "Mensagens",
       "USER_MESSAGES": "Mensagens usuario",
       "BOT_MESSAGES": "Mensagens bot",
       "USERS": "Usuarios",
-      "NEW_USERS": "Novos",
-      "RETURNING_USERS": "Recorrentes",
-      "EVENTS": "Eventos"
-    },
-    "OVERVIEW": {
-      "TITLE": "Meu Bot",
-      "SUBTITLE": "Periodo padrao do mes atual.",
-      "EMPTY_USAGE": "Ainda sem uso no periodo selecionado.",
-      "CHANNELS": "Canais conectados",
-      "CONNECTED": "Conectado",
-      "NO_CHANNELS": "Nenhum canal conectado nesta conta."
+      "EVENTS": "Eventos",
+      "TOKENS": "Tokens consumidos",
+      "LLM_COST": "Custo de uso"
     },
     "PERFORMANCE": {
       "TITLE": "Desempenho",
-      "SUBTITLE": "Metricas detalhadas do bot.",
+      "SUBTITLE": "Periodo padrao do mes atual.",
       "LOADING": "Carregando desempenho...",
       "HISTORY": "Historico de uso",
       "TOTAL_MESSAGES": "Mensagens totais",
-      "EMPTY_HISTORY": "Ainda sem historico no periodo."
+      "EMPTY_HISTORY": "Ainda sem historico no periodo.",
+      "CHANNELS": "Canais conectados",
+      "CONNECTED": "Conectado",
+      "NO_CHANNELS": "Nenhum canal conectado nesta conta.",
+      "USERS_BREAKDOWN": "{new} novos • {returning} recorrentes"
     },
     "TEST": {
       "TITLE": "Testar",
       "SUBTITLE": "Ambiente de teste do bot.",
       "LOADING": "Carregando teste...",
-      "NOT_CONFIGURED": "Teste do bot ainda nao configurado.",
-      "WEBCHAT": "Webchat Botpress",
-      "WIDGET_READY": "O widget carregado pelo script fica disponivel nesta pagina.",
-      "FEEDBACK": "Feedback",
-      "CONVERSATION_ID": "Conversation ID",
-      "CONVERSATION_ID_PLACEHOLDER": "conversationId",
-      "COMMENT": "Comentario",
-      "SEND_FEEDBACK": "Enviar feedback",
-      "FEEDBACK_SENT": "Feedback enviado."
+      "NOT_CONFIGURED": "Teste do bot ainda nao configurado."
     },
     "PAYMENTS": {
       "TITLE": "Pagamentos",
@@ -1021,7 +1006,33 @@
       "LAST_MONTHS": "Ultimos 6 meses",
       "DUE_ON": "Vence em {date}",
       "EMPTY_VALUE": "-",
-      "NO_PAYMENTS": "Nenhum pagamento registrado."
+      "NO_PAYMENTS": "Nenhum pagamento registrado.",
+      "DETAILS_BUTTON": "Detalhes",
+      "LIST": {
+        "COLUMNS": {
+          "MONTH": "Mes",
+          "VALUE": "Valor",
+          "DUE_DATE": "Vencimento",
+          "STATUS": "Status",
+          "PAID_AT": "Pago em",
+          "MANAGE": "Gerenciar"
+        }
+      },
+      "DETAILS": {
+        "BACK": "Voltar",
+        "SUBTITLE": "Detalhamento completo da cobranca deste mes.",
+        "LOADING": "Carregando detalhes...",
+        "COSTS": "Custos",
+        "LLM_COST": "Custo de LLM / tokens",
+        "BOT_FIXED_COST": "Custo fixo do bot",
+        "API_SUBTOTAL": "Subtotal API (USD)",
+        "EXCHANGE_RATE": "Cotacao USD -> BRL",
+        "EXCHANGE_RATE_LIVE_HINT": "Esta e a cotacao atual. O valor final sera travado quando este mes fechar.",
+        "API_COST_BRL": "Custo de uso (BRL, com markup e impostos)",
+        "MONTHLY_FEE": "Mensalidade Aptus",
+        "TOTAL": "Total",
+        "METRICS": "Metricas do mes"
+      }
     }
   },
   "CRM": {
@@ -1104,12 +1115,19 @@
       },
       "TRIGGERS": {
         "DEAL_CREATED": "Negócio criado",
+        "DEAL_CREATED_DESCRIPTION": "Dispara assim que um novo negócio é criado no funil.",
         "DEAL_ENTERED_STAGE": "Negócio entrou em uma etapa",
+        "DEAL_ENTERED_STAGE_DESCRIPTION": "Dispara quando o negócio entra na etapa selecionada abaixo.",
         "DEAL_STAGE_CHANGED": "Negócio mudou de etapa",
+        "DEAL_STAGE_CHANGED_DESCRIPTION": "Dispara sempre que o negócio muda de etapa, para qualquer etapa.",
         "DEAL_WON": "Negócio ganho",
+        "DEAL_WON_DESCRIPTION": "Dispara quando o negócio é marcado como ganho.",
         "DEAL_LOST": "Negócio perdido",
+        "DEAL_LOST_DESCRIPTION": "Dispara quando o negócio é marcado como perdido.",
         "DEAL_STAGNANT": "Parado na etapa por X dias",
-        "CLOSE_DATE_APPROACHING": "Data de fechamento em X dias"
+        "DEAL_STAGNANT_DESCRIPTION": "Dispara quando o negócio fica parado na etapa atual pelo número de dias definido abaixo.",
+        "CLOSE_DATE_APPROACHING": "Data de fechamento em X dias",
+        "CLOSE_DATE_APPROACHING_DESCRIPTION": "Dispara quando a data de fechamento prevista está próxima, dentro do número de dias definido abaixo."
       },
       "FORM": {
         "NEW_TITLE": "Nova automação",
@@ -1118,6 +1136,9 @@
         "NAME": "Nome da automação",
         "NAME_REQUIRED": "Informe um nome para a automação.",
         "ACTION_REQUIRED": "Adicione pelo menos uma ação.",
+        "STAGE_REQUIRED": "Selecione a etapa de destino da ação \"Mudar etapa\".",
+        "PIPELINE_REQUIRED": "Selecione o funil de destino da ação \"Mudar funil\".",
+        "WEBHOOK_URL_REQUIRED": "Informe a URL da ação \"Enviar webhook\".",
         "PIPELINE": "Funil",
         "TRIGGER": "Gatilho",
         "STAGE": "Etapa",
