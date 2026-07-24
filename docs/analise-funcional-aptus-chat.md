@@ -12,6 +12,13 @@
 > - **Escondido (APTUS-HIDDEN)** — removido da navegação por decisão deliberada da Aptus para o MVP. Não é tratado como disponível em nenhuma tabela de funcionalidades ativas.
 > - **Parcialmente implementado** — parte do fluxo existe, parte não.
 > - **Necessita validação manual** — não foi possível confirmar 100% apenas lendo o código.
+>
+> **Atualização de 2026-07-24**: a versão original deste documento foi escrita a partir do estado do código anterior a uma leva de commits de 23–24/07 que não estava refletida no texto (o arquivo ficou "untracked" no working tree e só foi commitado junto do último desses commits). Esta revisão incorpora essas mudanças:
+> - `feat(crm): add CRM module...` (08/07) e `feat(crm): custom attributes...` (21/07) — já cobertos pela versão original.
+> - `d4977a402 Add CRM automations builder` (23/07) e `03565663a chore(crm-automations): rework condition/action inputs...` (24/07) — o motor de automação do CRM (seção 8.7) **ganhou UI completa** nesse meio tempo; a versão anterior deste doc ainda o descrevia como "só configurável via banco de dados", o que deixou de ser verdade.
+> - `4f34c9c27 Add customer Hub MVP` (23/07) e `0803853e8 feat(aptus-hub): expand Hub tabs...` (24/07) — um módulo inteiramente novo, **Aptus Hub**, não existia na versão anterior deste documento. Ver seção 28.
+> - `3d0354b82 fix(sidebar): split CRM into Funil/Automações submenu...` (24/07) — reflete-se na seção 5.
+> - `f4d92919b Fix CRM automation action execution` (23/07) — incorporado na seção 8.7.
 
 ---
 
@@ -23,28 +30,31 @@ O **Aptus Chat** (nome interno atual, que será renomeado para **Aptus Hub**) é
 
 1. **Central de atendimento multicanal** — conversas de WhatsApp, e-mail, Instagram, Facebook, Telegram, Line, SMS, chat do site (Web Widget) e canais via API genérica chegam numa caixa de entrada única, com atribuição a agentes/times, respostas prontas, macros, notas internas, menções e histórico completo por contato.
 2. **Gestão de contatos** — cadastro, edição, importação/exportação em CSV, mesclagem de duplicados, segmentação por filtros salvos, atributos personalizados, bloqueio.
-3. **CRM em Kanban** (funcionalidade nova, criada pela Aptus) — funis de vendas/atendimento com estágios personalizáveis, cards de negócio (“deals”) que já nascem automaticamente vinculados a cada nova conversa, com um motor de automação por trás (ainda sem tela de configuração).
+3. **CRM em Kanban** (funcionalidade nova, criada pela Aptus) — funis de vendas/atendimento com estágios personalizáveis, cards de negócio (“deals”) que já nascem automaticamente vinculados a cada nova conversa, com um motor de automação configurável pela própria interface (gatilhos, condições e ações, incluindo disparo automático de mensagem ao lead).
 4. **Administração de agentes, times e distribuição** — convite de agentes, papéis (agente/administrador), times, atribuição automática round-robin, políticas de atribuição mais avançadas (parcialmente ativas).
 5. **Automação de atendimento** — regras que reagem a eventos de conversa (criação, atualização, nova mensagem) e disparam ações como atribuir, rotular, mudar status, enviar e-mail, dispararwebhook.
 6. **Configurações extensas de conta** — canais, labels, atributos personalizados, automações, bots via webhook, macros, respostas prontas, integrações, papéis customizados (Enterprise), SLA (Enterprise), fluxo de auto-resolução de conversas.
+7. **Aptus Hub** (módulo novo, adicionado em 23–24/07) — portal por conta, habilitado manualmente pelo Super Admin, onde agentes/administradores daquela conta acompanham o desempenho do bot Botpress (sessões, mensagens, usuários, custo de LLM/tokens), testam o bot ao vivo via webchat embutido, e veem o detalhamento financeiro mensal (custo do bot + mensalidade Aptus, convertido USD→BRL com markup e imposto configuráveis). Ver seção 28.
 
 ## Estágio atual do produto
 
-O sistema está em fase de **adaptação de um produto open source maduro (Chatwoot) para um caso de uso específico da Aptus**, com um MVP claramente recortado: várias funcionalidades nativas do Chatwoot (Relatórios, Central de Ajuda/Portais, Campanhas, Companies, a IA “Captain”/Copilot, assinatura de mensagens) foram **deliberadamente escondidas da navegação** para reduzir escopo, mas continuam existindo no código-fonte, muitas vezes com o backend totalmente funcional por baixo. Em paralelo, a Aptus já começou a **construir funcionalidade própria** (o módulo de CRM), em um ritmo de desenvolvimento ativo (dois commits significativos apenas nos últimos 15 dias antes desta análise).
+O sistema está em fase de **adaptação de um produto open source maduro (Chatwoot) para um caso de uso específico da Aptus**, com um MVP claramente recortado: várias funcionalidades nativas do Chatwoot (Relatórios, Central de Ajuda/Portais, Campanhas, Companies, a IA “Captain”/Copilot, assinatura de mensagens) foram **deliberadamente escondidas da navegação** para reduzir escopo, mas continuam existindo no código-fonte, muitas vezes com o backend totalmente funcional por baixo. Em paralelo, a Aptus já construiu duas frentes de funcionalidade própria em ritmo bem ativo (commits diários entre 21 e 24/07): o módulo de **CRM Kanban**, cujo motor de automação ganhou interface completa nesta última leva de commits, e o módulo **Aptus Hub**, que nasceu já como o portal de acompanhamento do bot/faturamento por cliente (ver seção 28) — potencialmente sobrepondo-se em propósito ao projeto `aptus-hub` (Angular, porta 4200) descrito no `CLAUDE.md` do workspace principal como "painel do cliente operador, em desenvolvimento". Essa sobreposição de arquitetura ainda não parece ter sido decidida (ver seção 27).
 
 ## O que uma empresa consegue fazer no sistema hoje
 
 - Atender clientes por WhatsApp e outros canais em uma única tela, com toda a equipe podendo colaborar via notas internas, menções e transferência de conversas.
 - Organizar sua base de contatos e aplicar segmentações e rótulos.
-- Acompanhar oportunidades/leads em um quadro Kanban que já se popula sozinho a cada nova conversa.
+- Acompanhar oportunidades/leads em um quadro Kanban que já se popula sozinho a cada nova conversa, com automações configuráveis pela própria interface (gatilhos, condições e ações, incluindo disparo de mensagem automática ao lead).
 - Configurar regras de automação para reduzir trabalho manual do time de atendimento.
 - Administrar quem tem acesso a quê, dentro de um modelo de dois papéis (agente/administrador), com um mecanismo mais granular de papéis customizados já implementado no código, porém desligado por padrão.
+- Acompanhar, por conta/cliente, o desempenho e o custo do bot Botpress associado, e testar o bot ao vivo, pelo módulo Aptus Hub (quando habilitado para a conta).
 
 ## Principais diferenças em relação ao Chatwoot original
 
 | Diferença | Descrição |
 |---|---|
-| **CRM Kanban** | Não existe no Chatwoot original — é uma adição 100% nova da Aptus (ver seção 8). |
+| **CRM Kanban** | Não existe no Chatwoot original — é uma adição 100% nova da Aptus (ver seção 8), incluindo motor de automação com UI própria. |
+| **Aptus Hub** | Módulo novo (23–24/07), também 100% Aptus — portal de desempenho/custo/teste do bot por conta (ver seção 28). |
 | **Escopo reduzido de MVP** | Reports, Central de Ajuda, Campanhas, Companies, IA “Captain” e assinatura de mensagens foram retirados da navegação, mas não do código. |
 | **Marca própria** | Nome da instalação, logotipo e tela de login já rebrandeados para Aptus; o sistema se comporta como “instância com marca própria” em vários pontos de lógica de paywall. |
 | **Cadastro público desativado** | Só é possível entrar no sistema por convite de um administrador — não há tela pública de criação de conta. |
@@ -311,9 +321,12 @@ Ordem exata em que aparece para o usuário (`app/javascript/dashboard/components
 |---|---|---|---|---|---|---|
 | 1 | **Inbox** | `inbox_view` | Todos | Sempre | — | Contador de não lidas |
 | 2 | **Conversation** (ícone de balão) | — | Todos | Sempre | All, Mentions, Participating, Unattended, Folders (visões salvas), Teams (meus times), Channels (minhas inboxes), Labels | Contadores por item, quando aplicável |
-| 3 | **CRM** (ícone kanban) | `crm_kanban` | Todos | Sempre | — | — |
+| 3 | **CRM** (ícone aperto de mãos, desde 24/07 — antes usava o mesmo ícone kanban do submenu) | — | Todos (Funil); só Admin acessa Automações (rota tem `permissions: ['administrator']`, mas o item de menu aparece para ambos) | Sempre | **Funil** (`crm_kanban`, ícone kanban) e **Automações** (`crm_automations`, ícone workflow) — ver seção 8.7 | — |
 | 4 | **Contacts** (ícone contato) | — | Todos | Sempre | All Contacts, Active, Segments, Tagged With | — |
-| 5 | **Settings** (ícone engrenagem) | — | Depende do item (ver abaixo) | Sempre visível o grupo | 18 subitens (ver seção 14) | — |
+| 5 | **Hub** (ícone a definir, adicionado 23/07) | — | Todos (mesma regra de acesso do resto: `administrator`/`agent`) | **Só aparece se a conta tiver `custom_attributes.aptus_hub.enabled = true` E `bot_id` preenchido** — configurado pelo Super Admin em Super Admin → Accounts (campo `AptusHubConfigField`); em nenhuma conta atual isso está confirmado como ligado por padrão | **Desempenho** (`hub_performance`, rota-raiz do grupo), **Testar** (`hub_tester`), **Pagamentos** (`hub_payments`, também cobre a subrota de detalhe `hub_payment_details`) | — |
+| 6 | **Settings** (ícone engrenagem) | — | Depende do item (ver abaixo) | Sempre visível o grupo | 18 subitens (ver seção 14) | — |
+
+> **Nota sobre o item Hub**: diferente de todos os outros itens do menu (que são incondicionais ou dependem de uma feature flag global), o Hub é **ligado individualmente por conta**, criado para o caso de uso de portal do cliente. Ver seção 28 para o detalhamento completo.
 
 ## Itens removidos do menu (APTUS-HIDDEN) — não fazem parte do catálogo de disponíveis
 
@@ -541,15 +554,30 @@ Ao criar uma conta nova, o sistema **cria automaticamente** um funil chamado “
 
 É possível criar campos personalizados específicos para negócios de um determinado funil (ex: “Origem do lead”, apenas para o funil “Vendas”). Isso pode ser feito de duas formas: diretamente pelo painel lateral do negócio (criando o campo ali mesmo) ou pela tela geral de Configurações → Atributos Personalizados, escolhendo “Modelo = Negócio” e selecionando o funil.
 
-## 8.7 Motor de automação do CRM — implementado no backend, mas sem tela de configuração
+## 8.7 Motor de automação do CRM — hoje com UI própria completa (atualizado 23–24/07)
 
-Existe um motor de regras de automação específico do CRM, rodando de fato em segundo plano:
-- **Gatilhos por evento**: negócio criado, negócio mudou de estágio, negócio atualizado, negócio ganho, negócio perdido.
-- **Gatilhos por tempo**: data de fechamento se aproximando, negócio parado há X dias sem movimentação — verificados por um job agendado que roda todos os dias às 8h.
-- **Condições** ricas (igual a, contém, dias antes de, dias parado no estágio, etc.), combináveis com E/OU.
-- **Ações possíveis**: mudar de estágio, mudar de funil, atribuir agente responsável, atualizar um campo, disparar um webhook. (Duas ações — “enviar e-mail ao responsável” e “adicionar nota” — estão previstas no código mas **não foram implementadas**, apenas registram um aviso de "não implementado".)
+> **Mudança relevante desde a versão anterior deste documento**: este recurso passou de "só configurável via banco de dados" para **totalmente utilizável pela interface**, em dois commits (`Add CRM automations builder`, 23/07, e `rework condition/action inputs and time-based idempotency`, 24/07).
 
-**Limitação importante**: não existe, hoje, nenhuma tela ou endpoint de API pública para um usuário criar ou editar essas regras — elas só podem ser cadastradas diretamente no banco de dados/console Rails. Ou seja, o motor funciona, mas **não é utilizável por um usuário comum do sistema**. Isso está detalhado também na seção 22 (funcionalidades parcialmente implementadas).
+**Como acessar:** Menu lateral → CRM → Automações. **Rota:** `crm_automations` (lista), `crm_automation_new`/`crm_automation_edit` (formulário). **Quem pode acessar:** **somente administrador** — a rota tem `permissions: ['administrator']`, diferente do resto do CRM (Funil), que agentes também acessam. O item de menu "Automações", porém, aparece para qualquer agente; ao clicar, um agente sem permissão é bloqueado pelo guard de rota (não há um "cadeado visual" no próprio item).
+
+**Elementos disponíveis:**
+- **Lista de automações**: nome do funil (ou "todos os funis"), tipo de gatilho, contagem de ações, data de atualização, toggle ativo/inativo, clonar, excluir (com confirmação).
+- **Formulário** (reconstruído em cima dos componentes do design system — cards, radio cards, filtro, switch — em vez de `<select>` cru): gatilho, condições e ações.
+
+**Gatilhos por evento**: negócio criado, negócio mudou de estágio, negócio entrou em um estágio específico, negócio atualizado, negócio ganho, negócio perdido.
+**Gatilhos por tempo**: data de fechamento se aproximando, negócio parado há X dias sem movimentação — verificados por um job agendado que roda todos os dias às 8h.
+**Condições**: sobre estágio, responsável, valor, probabilidade, data de fechamento, dias parado no estágio — com o **operador de comparação disponível agora dependente do tipo do atributo escolhido** (ex.: estágio só aceita "igual a"/"diferente de"; número aceita "maior que"/"menor que"; data aceita "antes de X dias"/"é hoje"/"passado"/"futuro"), combináveis.
+**Ações disponíveis**: mudar de estágio, mudar de funil, atribuir agente responsável, atualizar um campo, disparar um webhook, e **enviar mensagem ao lead** (nova, real) — dispara uma mensagem (texto, mídia, botões ou template) na conversa vinculada ao negócio. As duas ações antigas que só existiam como stub ("enviar e-mail ao responsável" e "adicionar nota") foram **removidas do código** em vez de implementadas.
+
+**Idempotência**: antes bastava uma janela fixa de 5 minutos para não repetir a mesma execução; agora a checagem é contra o `updated_at` do negócio — a regra só volta a disparar quando o negócio muda de novo, e não apenas porque o tempo passou.
+
+**Restrições ou condições:** Nenhuma feature flag — depende só da role de administrador.
+**Observações:** Continua sem testes automatizados no restante do módulo de CRM (ver 8.8), mas a suíte de specs de `action_service`, `processor` e o controller de automações foi ampliada nesses commits.
+
+Referências para conferência:
+- `app/controllers/api/v1/accounts/crm_automation_rules_controller.rb`, `app/policies/crm_automation_rule_policy.rb`
+- `app/javascript/dashboard/components-next/Crm/automations/CrmAutomationsIndex.vue`, `CrmAutomationForm.vue`, `constants.js`
+- `app/services/crm_automation_rules/action_service.rb`, `conditions_filter_service.rb`, `processor.rb`
 
 ## 8.8 Limitações confirmadas de implementação
 
@@ -559,8 +587,7 @@ Existe um motor de regras de automação específico do CRM, rodando de fato em 
 | Definir/alterar o contato vinculado a um negócio pela interface | **Não existe** — só é preenchido automaticamente pela criação da conversa |
 | Definir/alterar o responsável (assignee) de um negócio pela interface | **Não existe seletor** — o painel só mostra o nome do responsável, se já estiver preenchido via API |
 | Ver o vínculo negócio↔conversa dentro da própria tela de conversa | **Não existe** — o vínculo existe só no banco de dados; não aparece no painel lateral da conversa |
-| Configurar regras de automação do CRM pela interface | **Não existe** — só via banco de dados |
-| Testes automatizados cobrindo o módulo de CRM | **Não existem** — nenhum teste automatizado foi encontrado para nenhuma parte do módulo |
+| Testes automatizados cobrindo o módulo de CRM | Motor de automação (`action_service`, `processor`, `conditions_filter_service`, controller) tem specs; o restante do CRM (deals, pipelines, stages, componentes Vue) **continua sem nenhum teste automatizado** |
 
 ## 8.9 Nota de desambiguação importante
 
@@ -715,7 +742,7 @@ Sequência de ações pré-configurada que o agente executa manualmente sobre um
 
 ## 11.3 Motor de automação do CRM (ver também seção 8.7)
 
-Roda em paralelo ao motor de automação de conversas, mas é **específico dos negócios do CRM** e hoje **não tem nenhuma tela de configuração** — só pode ser alimentado diretamente no banco de dados. Gatilhos por evento (negócio criado/mudou de estágio/atualizado/ganho/perdido) e por tempo (data de fechamento próxima, negócio parado), com ações como mudar estágio/funil, atribuir agente, atualizar campo, disparar webhook.
+Roda em paralelo ao motor de automação de conversas, mas é **específico dos negócios do CRM**. Desde 23–24/07 tem **tela própria de configuração** (Menu → CRM → Automações, restrita a administrador). Gatilhos por evento (negócio criado/mudou de estágio/entrou em estágio/atualizado/ganho/perdido) e por tempo (data de fechamento próxima, negócio parado), com ações como mudar estágio/funil, atribuir agente, atualizar campo, disparar webhook e enviar mensagem ao lead (texto/mídia/botões/template) na conversa vinculada.
 
 ## 11.4 Webhooks de conta/inbox
 
@@ -1025,7 +1052,6 @@ Referências para conferência:
 
 | Funcionalidade | O que está pronto | O que falta |
 |---|---|---|
-| Motor de automação do CRM | Backend completo (gatilhos, condições, ações), roda de fato via job agendado | Nenhuma tela ou endpoint de API pública para criar/editar regras — só via banco de dados diretamente |
 | Edição completa de um negócio do CRM | Nome, estágio e atributos personalizados editáveis pela interface | Valor, moeda, data de fechamento, probabilidade, contato vinculado e responsável **não têm campo na interface** (só acessíveis via chamada direta à API) |
 | Vínculo negócio↔conversa | Existe no banco de dados (toda conversa gera um negócio) | Não aparece em nenhum lugar da tela de conversa — só é visível entrando pelo card do CRM |
 | Ação "enviar e-mail ao responsável" e "adicionar nota" (automação do CRM) | Estrutura da ação existe | Implementação real ausente — apenas grava um aviso de "não implementado" |
@@ -1126,8 +1152,9 @@ Referências para conferência:
 | Conversas | Atributos obrigatórios antes de resolver | Automático ao resolver | Agente/Admin | Disponível com condição | Não | Feature paga, off por padrão |
 | Contatos | CRUD, import/export, merge, segmentos | Menu → Contacts | Agente (CRUD)/Admin (import/export) | Disponível | Sim (import/export) | — |
 | Empresas (Companies) | Vínculo contato-empresa | — | — | Escondido (APTUS-HIDDEN) | — | Backend intacto |
-| CRM | Kanban de negócios/funis/estágios | Menu → CRM | Agente (negócios)/Admin (funis) | Disponível | Não | Funcionalidade nova da Aptus |
-| CRM | Automação de negócios (motor) | — | Ninguém (sem UI) | Parcialmente implementada | Não | Só configurável via banco |
+| CRM | Kanban de negócios/funis/estágios | Menu → CRM → Funil | Agente (negócios)/Admin (funis) | Disponível | Não | Funcionalidade nova da Aptus |
+| CRM | Automação de negócios (motor + UI) | Menu → CRM → Automações | Admin | Disponível | Não | UI completa desde 23–24/07 (ver 8.7) |
+| Hub | Portal do bot/cliente (desempenho, teste, pagamentos) | Menu → Hub | Agente/Admin, só se habilitado por conta | Disponível com condição | Não | Módulo novo, 23–24/07 (ver seção 28) |
 | Inboxes | Canais (WhatsApp, e-mail, site, etc.) | Configurações → Inboxes | Admin | Disponível | — | Twitter/360dialog fora do assistente |
 | Inboxes | Canal de voz | Configurações → Inboxes | Admin | Disponível com condição | — | Feature paga, off por padrão |
 | Times/Agentes | Convite, papéis, times, distribuição automática | Configurações → Agents/Teams | Admin | Disponível | Sim (confirmação) | — |
@@ -1196,6 +1223,14 @@ Referências para conferência:
 
 10. Validar em ambiente real se o "Assignment V2" (ativo por padrão) está de fato distribuindo conversas automaticamente como esperado
    - Testar criando conversas novas em uma inbox com atribuição automática ligada e observar a distribuição entre agentes online.
+
+11. Decidir o destino do projeto `aptus-hub` (Angular, porta 4200) frente ao novo módulo Hub dentro do aptus-chat
+   - O `CLAUDE.md` do workspace principal descreve `aptus-hub` como "painel admin, em desenvolvimento", destinado a analytics do bot para o cliente operador — exatamente o que o novo módulo Hub do aptus-chat (seção 28) já entrega.
+   - Confirmar com o time se um dos dois será descontinuado, se vão coexistir com propósitos diferentes, ou se o Hub do aptus-chat é a nova direção e o projeto Angular separado deve ser abandonado.
+
+12. Validar se a policy do Hub (`administrator?` ou `agent?` da própria conta) é o modelo de acesso pretendido para clientes
+   - Hoje, qualquer pessoa convidada como agente/admin de uma conta-cliente vê o Hub *e* a caixa de entrada de conversas, CRM e demais telas dessa conta — não existe hoje um papel "só enxerga o Hub".
+   - Confirmar se o modelo real é "o cliente é convidado como agente/admin da própria conta e atende ele mesmo pelo Chatwoot", ou se é esperado um papel mais restrito antes de convidar o primeiro cliente real.
 ```
 
 ---
@@ -1204,14 +1239,15 @@ Referências para conferência:
 
 ## Resumo das principais áreas disponíveis
 
-O Aptus Chat, hoje, entrega de forma sólida e funcional: atendimento multicanal (conversas), gestão de contatos, administração de agentes/times com distribuição automática, automações de atendimento, e um módulo de CRM em Kanban recém-criado e em desenvolvimento ativo. Por trás, existe uma quantidade relevante de funcionalidades do Chatwoot original que foram cuidadosamente removidas da navegação para focar o escopo do MVP (Reports, Central de Ajuda, Campanhas, Empresas, IA Captain), mas que continuam presentes e, em vários casos, ainda rodando em segundo plano.
+O Aptus Chat, hoje, entrega de forma sólida e funcional: atendimento multicanal (conversas), gestão de contatos, administração de agentes/times com distribuição automática, automações de atendimento, um módulo de CRM em Kanban com motor de automação já configurável pela interface, e um novo portal por conta (Aptus Hub) para acompanhar desempenho, custo e testar o bot. Por trás, existe uma quantidade relevante de funcionalidades do Chatwoot original que foram cuidadosamente removidas da navegação para focar o escopo do MVP (Reports, Central de Ajuda, Campanhas, Empresas, IA Captain), mas que continuam presentes e, em vários casos, ainda rodando em segundo plano.
 
 ## Funcionalidades mais importantes para o MVP
 
 - Conversas multicanal + distribuição automática (núcleo do produto).
 - Contatos (cadastro, histórico, atributos).
-- CRM Kanban (diferencial competitivo já em construção).
+- CRM Kanban + automações configuráveis (diferencial competitivo, já com motor e UI completos).
 - Automações básicas de atendimento.
+- Aptus Hub — provisionamento e faturamento por cliente, com portal de acompanhamento (ver seção 28).
 
 ## Funcionalidades que parecem secundárias neste momento
 
@@ -1220,31 +1256,95 @@ O Aptus Chat, hoje, entrega de forma sólida e funcional: atendimento multicanal
 
 ## Funcionalidades parcialmente implementadas que merecem decisão de produto
 
-- Motor de automação do CRM sem interface de configuração.
 - Edição incompleta de campos do negócio (valor, responsável, contato) pela interface.
 - Integração OpenAI e Notion, hoje inertes.
+- Aptus Hub: métricas e webchat de teste funcionam de ponta a ponta; mas não existe hoje um fluxo de onboarding guiado — habilitar o Hub para um cliente novo depende de um Super Admin preencher manualmente ~12 campos em Super Admin → Accounts (bot_id, monthly_fee, bot_fixed_cost, markup, tax, etc.), sem validação cruzada com o que está de fato configurado no Botpress Cloud/Firestore do `aws-backend`.
+
+## Lacunas que merecem atenção antes do primeiro cliente real (não bloqueiam o piloto interno, mas bloqueiam produção)
+
+Esta análise foi encomendada para responder "o que falta de essencial para usarmos como MVP com os primeiros clientes" — as próximas quatro são as lacunas mais diretamente ligadas a essa pergunta, e nenhuma delas é sobre uma tela faltando (o produto, tela por tela, já está bem coberto):
+
+1. **Decisão de arquitetura pendente: dois "Hub" concorrentes.** O workspace tem um projeto `aptus-hub` (Angular, porta 4200, "em desenvolvimento") descrito no `CLAUDE.md` principal como o painel onde o cliente operador verá analytics do próprio bot — e agora existe um módulo `Hub` dentro do próprio aptus-chat que já faz exatamente isso (e mais: pagamentos, teste ao vivo), rodando em produção real (Rails, não maquete). Levar os primeiros clientes ao ar sem decidir qual dos dois é "o produto" arrisca investimento duplicado.
+2. **Modelo de acesso do cliente ainda não diferenciado do modelo de acesso do agente de atendimento.** A policy do Hub (`administrator? || agent?`) é a mesma do resto da conta — hoje não há como convidar um cliente para "só ver o Hub" sem também lhe dar acesso à caixa de entrada de conversas, CRM e configurações daquela conta. Se o modelo pretendido é "o próprio cliente atende pelo Chatwoot", isso é aceitável; se não, falta uma role.
+3. **Provisionamento do Hub é 100% manual e sem validação.** Ativar o Hub para uma conta nova depende de um humano preencher campos de texto livre no Super Admin (inclusive o `bot_id` do Botpress) sem nenhuma checagem de que aquele bot existe, pertence ao workspace certo, ou está de fato integrado com a inbox WhatsApp daquela conta. Um erro de digitação silenciosamente mostra dados errados ou nenhum dado.
+4. **Credenciais do Botpress usadas pelo Hub são globais**, não por cliente (`BOTPRESS_API_URL`/`API_KEY`/`WORKSPACE_ID` do `.env`, decisão explícita registrada no commit `0803853e8`) — coerente com o resto do ecossistema Aptus (mesmo padrão do `aws-backend`), mas vale confirmar que o token global tem escopo para ler analytics de todos os bots de todos os clientes, incluindo os que ainda não existem.
 
 ## Áreas com maior complexidade
 
 - O motor de distribuição automática de conversas (duas gerações coexistindo — legado e V2 — mais capacidade de agente).
-- O cruzamento entre automações de conversa e automações de CRM (dois motores distintos).
+- O cruzamento entre três motores de automação distintos: conversas, CRM e (indiretamente) o Hub, que também dispara mensagens via CRM.
 
 ## Áreas com maior risco de dependências ocultas
 
 - Telas ocultas do menu (Reports, Campaigns, Portais, Companies, Captain) cujos backends continuam ativos e cujas rotas de frontend continuam alcançáveis — risco de exposição não intencional de funcionalidades fora do escopo do MVP.
 - E-mails que dependem de configuração de ambiente ausente (SMTP, e-mail do admin da instalação, Firebase) — risco de "funcionalidade parece existir mas nunca dispara" em produção.
+- Cotação de câmbio do Hub (`AptusHub::ExchangeRateClient`, API pública `awesomeapi.com.br`) sem cache/circuit breaker próprio — se a API externa cair no dia em que um cliente abre "Detalhes" do mês corrente, a tela quebra (ver seção 28).
 
 ## Sugestão de ordem para a futura revisão funcional
 
-1. Usuários, contas e permissões (papéis, custom roles, super admin).
+1. Usuários, contas e permissões (papéis, custom roles, super admin) — incluindo a decisão de role do cliente no Hub.
 2. Menu e navegação (decidir o destino definitivo das áreas ocultas: remover de vez, ou manter prontas para reativação futura).
 3. Conversas e mensageria (núcleo do produto).
 4. Contatos e empresas (decidir o destino de "Companies").
-5. CRM (completar a UI de edição de negócio, decidir se/como expor o motor de automação).
-6. Inboxes e canais (revisar canais fora do assistente — Twitter, 360dialog).
-7. Notificações e e-mails (garantir configuração de SMTP/Firebase/webhook de instalação em produção).
-8. Automações (unificar mentalmente os dois motores — conversas e CRM).
-9. Relatórios (decidir se serão reativados, e quando).
-10. Configurações e integrações (revisar quais integrações fazem sentido para o negócio da Aptus).
+5. CRM (completar a UI de edição de negócio).
+6. Aptus Hub (decidir frente ao projeto `aptus-hub` Angular; desenhar onboarding validado de cliente novo).
+7. Inboxes e canais (revisar canais fora do assistente — Twitter, 360dialog).
+8. Notificações e e-mails (garantir configuração de SMTP/Firebase/webhook de instalação em produção).
+9. Automações (unificar mentalmente os três motores — conversas, CRM e Hub).
+10. Relatórios (decidir se serão reativados, e quando).
+11. Configurações e integrações (revisar quais integrações fazem sentido para o negócio da Aptus).
 
 Este documento não alterou nenhuma funcionalidade do sistema — é exclusivamente um retrato do estado atual, para orientar as próximas decisões de produto.
+
+---
+
+# 28. Aptus Hub — portal de desempenho, teste e faturamento por cliente (módulo novo, 23–24/07)
+
+> Seção adicionada nesta atualização de 24/07 — não existia na versão anterior deste documento porque o módulo inteiro (`AptusHub::*`) foi criado depois da leitura de código original, nos commits `4f34c9c27` e `0803853e8`.
+
+## 28.1 O que é
+
+Um portal, dentro da própria conta do Chatwoot, para acompanhar o bot Botpress vinculado àquela conta-cliente: métricas de uso, custo de LLM, um teste ao vivo do bot via webchat embutido, e o detalhamento financeiro mensal (custo + mensalidade) que o cliente deve à Aptus. Tecnicamente é 100% Aptus (`app/services/aptus_hub/`, `app/controllers/api/v1/accounts/aptus_hub_controller.rb`, `app/javascript/dashboard/components-next/Hub/`) — não existe equivalente no Chatwoot original.
+
+**Como acessar:** Menu lateral → “Hub” (ícone de robô). **Rota:** `hub` → redireciona para `hub_performance`; filhos `hub_tester`, `hub_payments`, e a rota solta `hub_payment_details` (`/hub/payments/:month`, fora do `HubLayout`, acessível a partir de um card do histórico de pagamentos).
+**Quem pode acessar:** Qualquer agente ou administrador da conta (`AptusHubPolicy` — mesma regra do resto do Chatwoot, sem role específica de “cliente”).
+**Condição de exibição:** Só aparece no menu, e só responde na API (`ensure_hub_available!`), se a conta tiver `custom_attributes.aptus_hub.enabled = true` **e** `bot_id` preenchido. Ambos são configurados pelo Super Admin da instalação (ver 28.5) — não há self-service para o próprio cliente habilitar.
+
+## 28.2 Aba “Desempenho” (`hub_performance`)
+
+**Objetivo:** visão consolidada do uso do bot no período (padrão: mês corrente, sem seletor de período visível na versão atual).
+**Elementos disponíveis:** nome/status/modelo de IA do bot; seis indicadores (sessões, mensagens de usuário, mensagens do bot, usuários — com detalhamento novos/recorrentes, eventos, tokens de LLM); lista de canais (inboxes) da conta; um gráfico de histórico de uso (barras por dia/período, com base no maior valor de mensagens totais do período).
+**Fonte de dados:** `AptusHub::BotpressClient#analytics` — chamada em tempo real à API do Botpress Cloud (`GET /admin/bots/:bot_id/analytics`) usando credenciais **globais** da instalação (`BOTPRESS_API_URL`/`BOTPRESS_API_KEY`/`BOTPRESS_WORKSPACE_ID` do `.env`), não por cliente.
+**Observações:** esta aba absorveu a antiga aba “Meu Bot”/“Visão Geral” (componente `HubOverview.vue`, existente no commit de 23/07) — removida no rework de 24/07 e mesclada aqui, junto com a exposição de métricas de token/custo de LLM que a API do Botpress já devolvia mas que antes eram descartadas.
+
+## 28.3 Aba “Testar” (`hub_tester`)
+
+**Objetivo:** permitir que quem acessa o Hub converse com o próprio bot, sem precisar abrir o Botpress Cloud.
+**Como funciona:** busca a URL do script de webchat configurada para a conta (`webchat_script_url`); se presente, injeta dinamicamente o loader oficial do Botpress (`cdn.botpress.cloud/webchat/v3.7/inject.js`) mais o script específico do bot, e embute o widget dentro da própria página (modo `embeddedChatId`) em vez do balão flutuante padrão.
+**Se não configurado:** mostra um estado vazio (“bot não configurado para testes”) em vez de erro.
+**Ponto de atenção — funcionalidade órfã**: existe um endpoint completo de **feedback** (`POST .../aptus_hub/feedback`, `AptusHub::CustomerPortalService#create_feedback!`, testado em `HubTester.spec.js`) para registrar um comentário sobre uma conversa de teste (associado a `conversation_id`, usuário e timestamp, guardado em `custom_attributes.aptus_hub.feedback`). O componente `HubTester.vue` atual **não tem mais nenhum campo ou botão que chame esse endpoint** — foi retirado da tela no rework de 24/07 (o componente caiu de 225 para ~142 linhas). Ou seja, é o caso inverso do habitual neste documento: um backend funcional sem nenhuma tela que o acione.
+
+## 28.4 Aba “Pagamentos” (`hub_payments`) e tela “Detalhes” (`hub_payment_details`)
+
+**Objetivo:** mostrar o plano contratado e o histórico de faturamento dos últimos 6 meses, com um detalhamento de custo real por mês.
+**Lista de pagamentos:** mensalidade, moeda e dia de vencimento configurados (ver 28.5); para cada um dos 6 meses mais recentes, status (`paid`/`pending`/`overdue`, calculado comparando a data de vencimento com hoje, ou lido de um registro de pagamento salvo), data de vencimento, e (desde 24/07) o valor total já calculado — clicar em um mês abre a página de detalhes.
+**Tela de Detalhes (por mês):** indicadores de uso do mês (mesmas 6 métricas da aba Desempenho) e um **breakdown de custo real**: custo de LLM em USD (vindo direto do Botpress), custo fixo do bot em USD (configurável, ver 28.5), soma dos dois convertida para BRL usando uma cotação USD→BRL — **ao vivo** (API pública AwesomeAPI) se o mês for o corrente, ou **congelada** (gravada em `custom_attributes` na primeira vez que o mês é consultado) se for um mês passado — acrescida de um markup e um imposto configuráveis por conta, mais a mensalidade fixa da Aptus, resultando no total do mês.
+**Ponto de atenção — custo de performance/robustez**: carregar a aba “Pagamentos” dispara, para cada um dos 6 meses do histórico, uma chamada aos analytics do Botpress **e potencialmente uma chamada à cotação de câmbio** (`AptusHub::ExchangeRateClient`, sem cache) — até 12 chamadas HTTP externas síncronas numa única carga de tela, sem nenhum cache/circuit breaker. Se o Botpress ou a AwesomeAPI estiverem lentos ou fora do ar, a tela inteira falha (`rescue_from ... :render_hub_error`) em vez de degradar parcialmente.
+
+## 28.5 Provisionamento pelo Super Admin
+
+Desde `0803853e8`, todo o Hub é configurável por conta (antes só via SQL/console), em Super Admin → Accounts → editar conta → campo “Aptus Hub” (`AptusHubConfigField`, reaproveitando o padrão de campo customizado do Administrate já usado por `AccountLimitsField`): habilitado (sim/não), ID/nome/status/modelo de IA do bot, mensalidade, custo fixo do bot em USD (padrão US$10 — bate com o valor de referência já usado internamente pela Aptus), moeda, dia de vencimento, taxa de markup (padrão 14%), taxa de imposto (padrão 7%), URL do script de webchat. Tudo fica armazenado em `Account#aptus_hub` (`store_accessor` sobre `custom_attributes`), preservando o histórico de pagamentos/feedback já gravado.
+**Limitação confirmada:** o formulário aceita qualquer texto no campo `bot_id` — não há validação contra o Botpress Cloud (não confirma se o bot existe, se pertence ao workspace configurado, ou se está de fato ligado à inbox WhatsApp daquela conta). Um erro de digitação some silenciosamente atrás de um erro genérico "Não foi possível buscar os dados do bot agora" na tela do cliente.
+
+## 28.6 Relação com o restante do ecossistema Aptus
+
+- As credenciais do Botpress usadas aqui são as mesmas variáveis de ambiente globais (`BOTPRESS_API_URL`, `BOTPRESS_API_KEY`, `BOTPRESS_WORKSPACE_ID`) citadas no `CLAUDE.md` do workspace principal como usadas pelo `aws-backend` — decisão explícita registrada no próprio commit (“Botpress credentials remain global (.env) for now, by explicit decision”), não uma lacuna desta análise.
+- O valor padrão de custo fixo do bot (US$10) e o conceito de mensalidade por cliente batem com a precificação padrão já usada internamente pela Aptus para seus bots.
+- **Sobreposição a resolver**: o `CLAUDE.md` do workspace descreve `aptus-hub` (projeto Angular separado, porta 4200) como "em desenvolvimento", destinado a que "o cliente operador acessará para ver analytics do próprio bot, quando em produção" — a mesma proposta de valor que este módulo, dentro do aptus-chat, já entrega funcionando hoje. Não há, nesta análise, evidência de que essa sobreposição já tenha sido resolvida (ver seção 27).
+
+Referências para conferência:
+- `app/controllers/api/v1/accounts/aptus_hub_controller.rb`, `app/policies/aptus_hub_policy.rb`
+- `app/services/aptus_hub/account_config.rb`, `botpress_client.rb`, `customer_portal_service.rb`, `payment_cost_calculator.rb`, `exchange_rate_client.rb`
+- `app/fields/aptus_hub_config_field.rb`, `app/dashboards/account_dashboard.rb`, `app/views/fields/aptus_hub_config_field/`
+- `app/javascript/dashboard/components-next/Hub/*.vue`, `app/javascript/dashboard/routes/dashboard/hub/routes.js`
+- `app/javascript/dashboard/components-next/sidebar/Sidebar.vue` (bloco `hasAptusHub`)

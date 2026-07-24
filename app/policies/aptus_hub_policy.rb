@@ -8,11 +8,11 @@ class AptusHubPolicy < ApplicationPolicy
   end
 
   def payments?
-    view?
+    account_user&.administrator?
   end
 
   def payment_details?
-    view?
+    account_user&.administrator?
   end
 
   def feedback?

@@ -2,6 +2,7 @@
 import { h, ref, computed, onMounted, watch } from 'vue';
 import { provideSidebarContext, useSidebarResize } from './provider';
 import { useAccount } from 'dashboard/composables/useAccount';
+import { useAdmin } from 'dashboard/composables/useAdmin';
 import { useKbd } from 'dashboard/composables/utils/useKbd';
 import { useMapGetter } from 'dashboard/composables/store';
 import { useStore } from 'vuex';
@@ -88,6 +89,8 @@ const hasAptusHub = computed(() => {
 
   return isEnabled && !!aptusHubConfig.value.bot_id;
 });
+
+const { isAdmin } = useAdmin();
 
 const fetchConversationUnreadCounts = ([currentAccountId, isEnabled]) => {
   if (!currentAccountId) return;
@@ -565,13 +568,17 @@ const menuItems = computed(() => {
                 icon: 'i-lucide-square-play',
                 to: accountScopedRoute('hub_tester'),
               },
-              {
-                name: 'Hub Pagamentos',
-                label: t('SIDEBAR.HUB_PAYMENTS'),
-                icon: 'i-lucide-credit-card',
-                to: accountScopedRoute('hub_payments'),
-                activeOn: ['hub_payment_details'],
-              },
+              ...(isAdmin.value
+                ? [
+                    {
+                      name: 'Hub Pagamentos',
+                      label: t('SIDEBAR.HUB_PAYMENTS'),
+                      icon: 'i-lucide-credit-card',
+                      to: accountScopedRoute('hub_payments'),
+                      activeOn: ['hub_payment_details'],
+                    },
+                  ]
+                : []),
             ],
           },
         ]

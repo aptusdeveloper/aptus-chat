@@ -3,18 +3,39 @@ import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { vOnClickOutside } from '@vueuse/components';
+import { useAdmin } from 'dashboard/composables/useAdmin';
 import AptusHubAPI from 'dashboard/api/aptusHub';
 import {
   formatCurrency,
   formatDate,
+  formatHour,
   formatNumber,
+  formatShortDate,
+  formatWeekday,
   hubErrorMessage,
   presetDayRange,
 } from './utils';
 
+const CHART_METRICS = [
+  { key: 'total_messages', labelKey: 'HUB.PERFORMANCE.CHART.MESSAGES' },
+  { key: 'sessions', labelKey: 'HUB.PERFORMANCE.CHART.SESSIONS' },
+  { key: 'total_users', labelKey: 'HUB.PERFORMANCE.CHART.USERS' },
+  {
+    key: 'llm_cost',
+    labelKey: 'HUB.PERFORMANCE.CHART.COST',
+    currency: 'USD',
+  },
+];
+
+const CHART_TOP_PADDING = 20;
+const CHART_BOTTOM_PADDING = 10;
+const CHART_SIDE_PADDING = 2;
+const CHART_SHORT_RANGE_THRESHOLD = 7;
+
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
+const { isAdmin } = useAdmin();
 
 const PRESETS = [
   { key: 'today', days: 1, labelKey: 'HUB.PERFORMANCE.FILTER.TODAY' },
@@ -43,9 +64,79 @@ const draftTo = ref(filters.value.to);
 const metrics = computed(() => data.value?.metrics || {});
 const channels = computed(() => data.value?.channels || []);
 const history = computed(() => data.value?.usage_history || []);
-const maxMessages = computed(() =>
-  Math.max(...history.value.map(point => Number(point.total_messages || 0)), 1)
+
+const activeMetricKey = ref('total_messages');
+
+const chartMetrics = computed(() =>
+  CHART_METRICS.filter(
+    metric => isAdmin.value || metric.key !== 'llm_cost'
+  ).map(metric => ({ ...metric, label: t(metric.labelKey) }))
 );
+
+const activeMetric = computed(() =>
+  chartMetrics.value.find(metric => metric.key === activeMetricKey.value)
+);
+
+function metricValue(point) {
+  return Number(point[activeMetricKey.value] || 0);
+}
+
+function formatMetricValue(value) {
+  return activeMetric.value.currency
+    ? formatCurrency(value, activeMetric.value.currency)
+    : formatNumber(value);
+}
+
+const chartMax = computed(() => Math.max(...history.value.map(metricValue), 1));
+
+const chartPoints = computed(() => {
+  const points = history.value;
+  const count = points.length;
+  if (count < 2) return [];
+
+  const usableWidth = 100 - CHART_SIDE_PADDING * 2;
+  const usableHeight = 100 - CHART_TOP_PADDING - CHART_BOTTOM_PADDING;
+
+  return points.map((point, index) => {
+    const value = metricValue(point);
+    const x = CHART_SIDE_PADDING + (index / (count - 1)) * usableWidth;
+    const y =
+      100 - CHART_BOTTOM_PADDING - (value / chartMax.value) * usableHeight;
+    return { x, y, value, point };
+  });
+});
+
+const linePath = computed(() =>
+  chartPoints.value.map(point => `${point.x},${point.y}`).join(' ')
+);
+
+const areaPath = computed(() => {
+  if (!chartPoints.value.length) return '';
+  const first = chartPoints.value[0];
+  const last = chartPoints.value[chartPoints.value.length - 1];
+  return `${first.x},100 ${linePath.value} ${last.x},100`;
+});
+
+const isHourlyBreakdown = computed(() => {
+  const dates = history.value.map(point => point.date).filter(Boolean);
+  return dates.length > 1 && new Set(dates).size === 1;
+});
+
+function chartLabel(point) {
+  if (isHourlyBreakdown.value) {
+    return point.bucket_start ? formatHour(point.bucket_start) : '';
+  }
+
+  if (!point.date) return '';
+  return history.value.length <= CHART_SHORT_RANGE_THRESHOLD
+    ? formatWeekday(point.date)
+    : formatShortDate(point.date);
+}
+
+const singlePointValue = computed(() => {
+  if (history.value.length !== 1) return 0;
+  return metricValue(history.value[0]);
+});
 
 const statusLabel = computed(() => {
   const labels = {
@@ -56,59 +147,60 @@ const statusLabel = computed(() => {
   return labels[data.value?.bot?.status] || 'Ativo';
 });
 
-const stats = computed(() => [
-  {
-    key: 'sessions',
-    label: t('HUB.METRICS.SESSIONS'),
-    value: formatNumber(metrics.value.sessions),
-    icon: 'i-lucide-panel-top-open',
-  },
-  {
-    key: 'user_messages',
-    label: t('HUB.METRICS.USER_MESSAGES'),
-    value: formatNumber(metrics.value.user_messages),
-    icon: 'i-lucide-user-round',
-  },
-  {
-    key: 'bot_messages',
-    label: t('HUB.METRICS.BOT_MESSAGES'),
-    value: formatNumber(metrics.value.bot_messages),
-    icon: 'i-lucide-bot',
-  },
-  {
-    key: 'users',
-    label: t('HUB.METRICS.USERS'),
-    value: formatNumber(metrics.value.total_users),
-    icon: 'i-lucide-users',
-    sub: t('HUB.PERFORMANCE.USERS_BREAKDOWN', {
-      new: formatNumber(metrics.value.new_users),
-      returning: formatNumber(metrics.value.returning_users),
-    }),
-  },
-  {
-    key: 'events',
-    label: t('HUB.METRICS.EVENTS'),
-    value: formatNumber(metrics.value.events),
-    icon: 'i-lucide-mouse-pointer-click',
-  },
-  {
-    key: 'tokens',
-    label: t('HUB.METRICS.TOKENS'),
-    value: formatNumber(metrics.value.llm_tokens),
-    icon: 'i-lucide-cpu',
-  },
-  {
-    key: 'llm_cost',
-    label: t('HUB.METRICS.LLM_COST'),
-    value: formatCurrency(metrics.value.llm_cost, 'USD'),
-    icon: 'i-lucide-circle-dollar-sign',
-  },
-]);
+const stats = computed(() => {
+  const allStats = [
+    {
+      key: 'sessions',
+      label: t('HUB.METRICS.SESSIONS'),
+      value: formatNumber(metrics.value.sessions),
+      icon: 'i-lucide-panel-top-open',
+    },
+    {
+      key: 'user_messages',
+      label: t('HUB.METRICS.USER_MESSAGES'),
+      value: formatNumber(metrics.value.user_messages),
+      icon: 'i-lucide-user-round',
+    },
+    {
+      key: 'bot_messages',
+      label: t('HUB.METRICS.BOT_MESSAGES'),
+      value: formatNumber(metrics.value.bot_messages),
+      icon: 'i-lucide-bot',
+    },
+    {
+      key: 'users',
+      label: t('HUB.METRICS.USERS'),
+      value: formatNumber(metrics.value.total_users),
+      icon: 'i-lucide-users',
+      sub: t('HUB.PERFORMANCE.USERS_BREAKDOWN', {
+        new: formatNumber(metrics.value.new_users),
+        returning: formatNumber(metrics.value.returning_users),
+      }),
+    },
+    {
+      key: 'events',
+      label: t('HUB.METRICS.EVENTS'),
+      value: formatNumber(metrics.value.events),
+      icon: 'i-lucide-mouse-pointer-click',
+    },
+    {
+      key: 'tokens',
+      label: t('HUB.METRICS.TOKENS'),
+      value: formatNumber(metrics.value.llm_tokens),
+      icon: 'i-lucide-cpu',
+    },
+    {
+      key: 'llm_cost',
+      label: t('HUB.METRICS.LLM_COST'),
+      value: formatCurrency(metrics.value.llm_cost, 'USD'),
+      icon: 'i-lucide-circle-dollar-sign',
+    },
+  ];
 
-function barHeight(point) {
-  const percent = (Number(point.total_messages || 0) / maxMessages.value) * 100;
-  return `${Math.max(percent, point.total_messages ? 8 : 2)}%`;
-}
+  return isAdmin.value
+    ? allStats
+    : allStats.filter(stat => stat.key !== 'llm_cost');
+});
 
 function openTester() {
   router.push({
@@ -349,33 +441,83 @@ onMounted(loadPerformance);
       <section
         class="mb-4 rounded-lg border border-n-weak bg-white dark:bg-n-solid-2 p-4"
       >
-        <div class="flex items-center justify-between gap-3 mb-4">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
           <h3 class="text-sm font-semibold text-n-slate-12">
             {{ t('HUB.PERFORMANCE.HISTORY') }}
           </h3>
-          <span class="text-xs text-n-slate-9">
-            {{ t('HUB.PERFORMANCE.TOTAL_MESSAGES') }}
-          </span>
+          <div
+            class="inline-flex items-center gap-1 rounded-lg border border-n-weak bg-n-solid-1 p-1"
+          >
+            <button
+              v-for="metric in chartMetrics"
+              :key="metric.key"
+              type="button"
+              class="h-7 px-2.5 rounded-md text-xs font-medium transition-colors"
+              :class="
+                activeMetricKey === metric.key
+                  ? 'bg-n-solid-3 text-n-slate-12 shadow-sm'
+                  : 'text-n-slate-10 hover:text-n-slate-12'
+              "
+              @click="activeMetricKey = metric.key"
+            >
+              {{ metric.label }}
+            </button>
+          </div>
         </div>
 
-        <div
-          v-if="history.length"
-          class="h-52 flex items-end gap-2 border-b border-n-weak pb-2"
-        >
-          <div
-            v-for="point in history"
-            :key="point.label"
-            class="flex-1 min-w-8 h-full flex flex-col justify-end gap-2"
-          >
+        <div v-if="chartPoints.length">
+          <div class="relative h-60">
+            <svg
+              viewBox="0 0 100 100"
+              preserveAspectRatio="none"
+              class="absolute inset-0 w-full h-full"
+            >
+              <polygon :points="areaPath" class="fill-n-brand/10" />
+              <polyline
+                :points="linePath"
+                class="fill-none stroke-n-brand"
+                stroke-width="2"
+                stroke-linejoin="round"
+                stroke-linecap="round"
+                vector-effect="non-scaling-stroke"
+              />
+            </svg>
             <div
-              class="rounded-t bg-n-brand/70 min-h-1 transition-all"
-              :style="{ height: barHeight(point) }"
-              :title="formatNumber(point.total_messages)"
+              v-for="(point, index) in chartPoints"
+              :key="index"
+              class="absolute text-[10px] font-medium text-n-slate-11 -translate-x-1/2 -translate-y-full whitespace-nowrap"
+              :style="{ left: `${point.x}%`, top: `calc(${point.y}% - 6px)` }"
+            >
+              {{ formatMetricValue(point.value) }}
+            </div>
+            <div
+              v-for="(point, index) in chartPoints"
+              :key="index"
+              class="absolute size-1.5 rounded-full bg-n-brand -translate-x-1/2 -translate-y-1/2"
+              :style="{ left: `${point.x}%`, top: `${point.y}%` }"
             />
-            <span class="text-[11px] text-center text-n-slate-9 truncate">
-              {{ point.label }}
+          </div>
+          <div class="flex mt-2">
+            <span
+              v-for="(point, index) in chartPoints"
+              :key="index"
+              class="flex-1 text-[11px] text-center text-n-slate-9 truncate"
+            >
+              {{ chartLabel(point.point) }}
             </span>
           </div>
+        </div>
+        <div
+          v-else-if="history.length === 1"
+          class="py-8 flex flex-col items-center justify-center gap-1"
+        >
+          <span class="text-3xl font-semibold text-n-slate-12">
+            {{ formatMetricValue(singlePointValue) }}
+          </span>
+          <span class="text-xs text-n-slate-9">
+            {{ activeMetric.label }} · {{ formatDate(filters.from) }} –
+            {{ formatDate(filters.to) }}
+          </span>
         </div>
         <div v-else class="py-8 text-sm text-n-slate-10">
           {{ t('HUB.PERFORMANCE.EMPTY_HISTORY') }}

@@ -4,12 +4,13 @@ class AptusHub::CustomerPortalService
   attr_reader :account, :user, :config
 
   def initialize(
-    account:, user:,
+    account:, user:, admin: false,
     botpress_client: AptusHub::BotpressClient.new,
     cost_calculator: nil
   )
     @account = account
     @user = user
+    @admin = admin
     @botpress_client = botpress_client
     @config = AptusHub::AccountConfig.new(account)
     @cost_calculator = cost_calculator || AptusHub::PaymentCostCalculator.new(config: @config)
@@ -17,13 +18,14 @@ class AptusHub::CustomerPortalService
 
   def performance(from:, to:)
     analytics = fetch_analytics(from, to)
+    history = AptusHub::UsageHistoryBuilder.build(analytics[:records], analytics[:metrics])
 
     {
       bot: bot_payload,
       period: period_payload(from, to),
-      metrics: analytics[:metrics],
+      metrics: admin ? analytics[:metrics] : analytics[:metrics].except(:llm_cost),
       channels: channels_payload,
-      usage_history: usage_history(analytics[:records], analytics[:metrics])
+      usage_history: admin ? history : history.map { |point| point.except(:llm_cost) }
     }
   end
 
@@ -53,10 +55,8 @@ class AptusHub::CustomerPortalService
   end
 
   def payment_details(month:, today: Time.zone.today)
-    from, to = month_range(month)
-    analytics = fetch_analytics(from, to)
-    metrics = analytics[:metrics]
     payment = config.payments.find { |item| item[:month] == month }
+    metrics = resolve_metrics(month, payment, today)
 
     {
       month: month,
@@ -87,10 +87,21 @@ class AptusHub::CustomerPortalService
 
   private
 
-  attr_reader :botpress_client, :cost_calculator
+  attr_reader :botpress_client, :cost_calculator, :admin
 
   def fetch_analytics(from, to)
     botpress_client.analytics(bot_id: config.bot_id, from: from, to: to)
+  end
+
+  # A closed month's metrics never change, so once frozen on the account they're read
+  # from there for good; only the current (still-open) month is ever fetched live.
+  def resolve_metrics(month, payment, today)
+    return fetch_analytics(*month_range(month))[:metrics] if month == today.strftime('%Y-%m')
+    return payment[:metrics] if payment&.dig(:metrics).present?
+
+    fetch_analytics(*month_range(month))[:metrics].tap do |metrics|
+      config.freeze_period_data!(month, metrics: metrics)
+    end
   end
 
   def bot_payload
@@ -118,48 +129,6 @@ class AptusHub::CustomerPortalService
         status: 'connected'
       }
     end
-  end
-
-  def usage_history(records, fallback_metrics)
-    points = records.each_with_index.map do |record, index|
-      usage_history_point(record.with_indifferent_access, index)
-    end
-
-    points.presence || [fallback_usage_history_point(fallback_metrics)]
-  end
-
-  def usage_history_point(record, index)
-    {
-      label: record_label(record, index),
-      sessions: record[:sessions].to_i,
-      user_messages: record[:userMessages].to_i,
-      bot_messages: record[:botMessages].to_i,
-      total_messages: record[:userMessages].to_i + record[:botMessages].to_i,
-      total_users: record[:newUsers].to_i + record[:returningUsers].to_i
-    }
-  end
-
-  def fallback_usage_history_point(metrics)
-    {
-      label: 'Periodo',
-      sessions: metrics[:sessions],
-      user_messages: metrics[:user_messages],
-      bot_messages: metrics[:bot_messages],
-      total_messages: metrics[:total_messages],
-      total_users: metrics[:total_users]
-    }
-  end
-
-  def record_label(record, index)
-    date_value =
-      record[:date].presence ||
-      record[:startDate].presence ||
-      record[:endDate].presence
-    return "P#{index + 1}" if date_value.blank?
-
-    Date.iso8601(date_value.to_s[0, 10]).strftime('%d/%m')
-  rescue ArgumentError
-    "P#{index + 1}"
   end
 
   def month_ids(today, count)

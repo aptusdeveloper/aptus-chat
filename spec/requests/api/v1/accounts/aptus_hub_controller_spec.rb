@@ -30,6 +30,7 @@ RSpec.describe 'Api::V1::Accounts::AptusHubController', type: :request do
 
   before do
     account.update!(custom_attributes: { 'aptus_hub' => hub_config })
+    Redis::Alfred.scan_each(match: 'APTUS_HUB::*') { |key| Redis::Alfred.delete(key) }
   end
 
   describe 'GET /api/v1/accounts/:account_id/hub/performance' do
@@ -70,6 +71,19 @@ RSpec.describe 'Api::V1::Accounts::AptusHubController', type: :request do
 
       expect(response).to have_http_status(:bad_gateway)
       expect(response.parsed_body['error']).to eq('Nao foi possivel buscar os dados do bot agora.')
+    end
+
+    it 'caches analytics for a short period to avoid duplicate calls for the same range' do
+      stub_botpress_analytics(records: [{ sessions: 1 }])
+
+      2.times do
+        get "/api/v1/accounts/#{account.id}/hub/performance",
+            headers: headers,
+            params: { from: '2026-07-01', to: '2026-07-23' }
+      end
+
+      expect(response).to have_http_status(:success)
+      expect(a_request(:get, %r{https://botpress\.test/admin/bots/bot-1/analytics})).to have_been_made.once
     end
   end
 
@@ -154,6 +168,27 @@ RSpec.describe 'Api::V1::Accounts::AptusHubController', type: :request do
       expect(body.dig('costs', 'usd_brl_rate')).to eq(4.5)
       expect(body.dig('costs', 'rate_is_live')).to be(false)
     end
+
+    it 'fetches Botpress analytics only once for an already-frozen past month' do
+      travel_to Time.zone.local(2026, 7, 23) do
+        stub_botpress_analytics(
+          from: '2026-06-01', to: '2026-06-30',
+          records: [{ sessions: 3, userMessages: 1, botMessages: 1, newUsers: 1, returningUsers: 0, events: 0,
+                      llm: { cost: { sum: 2.0 } } }]
+        )
+        stub_exchange_rate(bid: '5.00')
+
+        get "/api/v1/accounts/#{account.id}/hub/payments/2026-06", headers: headers
+        get "/api/v1/accounts/#{account.id}/hub/payments/2026-06", headers: headers
+      end
+
+      expect(response).to have_http_status(:success)
+      expect(a_request(:get, %r{https://botpress\.test/admin/bots/bot-1/analytics})).to have_been_made.once
+      expect(a_request(:get, 'https://economia.awesomeapi.com.br/json/last/USD-BRL')).to have_been_made.once
+
+      saved = account.reload.custom_attributes.dig('aptus_hub', 'payments').find { |item| item['month'] == '2026-06' }
+      expect(saved.dig('metrics', 'sessions')).to eq(3)
+    end
   end
 
   describe 'GET /api/v1/accounts/:account_id/hub/payments' do
@@ -228,6 +263,44 @@ RSpec.describe 'Api::V1::Accounts::AptusHubController', type: :request do
           headers: other_user.create_new_auth_token
 
       expect(response).to have_http_status(:unauthorized)
+    end
+  end
+
+  describe 'financial data restricted to administrators' do
+    let(:agent) { create(:user, account: account, role: :agent) }
+    let(:agent_headers) { agent.create_new_auth_token }
+
+    it 'blocks an agent from the payments history' do
+      get "/api/v1/accounts/#{account.id}/hub/payments", headers: agent_headers
+
+      expect(response).to have_http_status(:unauthorized)
+    end
+
+    it 'blocks an agent from a month payment details' do
+      get "/api/v1/accounts/#{account.id}/hub/payments/2026-06", headers: agent_headers
+
+      expect(response).to have_http_status(:unauthorized)
+    end
+
+    it 'still allows performance for an agent, but without the llm_cost metric' do
+      stub_botpress_analytics(
+        records: [
+          {
+            sessions: 1, userMessages: 1, botMessages: 1, newUsers: 1, returningUsers: 0, events: 1,
+            llm: { cost: { sum: 3.5 } }
+          }
+        ]
+      )
+
+      get "/api/v1/accounts/#{account.id}/hub/performance",
+          headers: agent_headers,
+          params: { from: '2026-07-01', to: '2026-07-23' }
+
+      expect(response).to have_http_status(:success)
+      body = response.parsed_body
+      expect(body.dig('metrics', 'sessions')).to eq(1)
+      expect(body['metrics']).not_to have_key('llm_cost')
+      expect(body['usage_history'].first).not_to have_key('llm_cost')
     end
   end
 

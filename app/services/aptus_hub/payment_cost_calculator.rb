@@ -17,7 +17,7 @@ class AptusHub::PaymentCostCalculator
     return { rate: payment[:usd_brl_rate], live: false } if payment&.dig(:usd_brl_rate).present?
 
     rate = exchange_rate_client.current_usd_brl_rate
-    config.freeze_exchange_rate!(month, rate)
+    config.freeze_period_data!(month, rate: rate)
     { rate: rate, live: false }
   end
 

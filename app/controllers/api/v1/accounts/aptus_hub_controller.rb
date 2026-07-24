@@ -47,7 +47,8 @@ class Api::V1::Accounts::AptusHubController < Api::V1::Accounts::BaseController
   def portal_service
     @portal_service ||= AptusHub::CustomerPortalService.new(
       account: Current.account,
-      user: Current.user
+      user: Current.user,
+      admin: Current.account_user&.administrator? || false
     )
   end
 

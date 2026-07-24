@@ -83,7 +83,8 @@ class AptusHub::AccountConfig
         month: month,
         status: attrs[:status].to_s == 'paid' ? 'paid' : 'pending',
         paid_at: attrs[:paid_at].presence || attrs[:paidAt].presence,
-        usd_brl_rate: numeric_value(attrs[:usd_brl_rate].presence || attrs[:usdBrlRate], nil)
+        usd_brl_rate: numeric_value(attrs[:usd_brl_rate].presence || attrs[:usdBrlRate], nil),
+        metrics: attrs[:metrics].presence
       }
     end
   end
@@ -103,15 +104,16 @@ class AptusHub::AccountConfig
     account.save!
   end
 
-  def freeze_exchange_rate!(month, rate)
+  # Persists data for a month that will never change again (a closed month's exchange
+  # rate and/or bot metrics), so it's fetched from the external APIs at most once.
+  def freeze_period_data!(month, rate: nil, metrics: nil)
     current_payments = Array.wrap(raw[:payments]).map(&:with_indifferent_access)
     existing = current_payments.find { |payment| payment[:month].to_s == month }
+    attrs = existing || { 'month' => month, 'status' => 'pending' }
 
-    if existing
-      existing[:usd_brl_rate] = rate
-    else
-      current_payments << { 'month' => month, 'status' => 'pending', 'usd_brl_rate' => rate }
-    end
+    attrs['usd_brl_rate'] = rate if rate.present?
+    attrs['metrics'] = metrics if metrics.present?
+    current_payments << attrs unless existing
 
     merged_hub = raw.to_h.merge('payments' => current_payments)
     account.custom_attributes = account.custom_attributes.to_h.merge(HUB_KEY => merged_hub)

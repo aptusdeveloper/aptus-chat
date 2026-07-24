@@ -9,6 +9,10 @@ const commonMeta = {
   permissions: ['administrator', 'agent'],
 };
 
+const adminMeta = {
+  permissions: ['administrator'],
+};
+
 export const routes = [
   {
     path: frontendURL('accounts/:accountId/hub'),
@@ -33,7 +37,7 @@ export const routes = [
         path: 'payments',
         component: HubPayments,
         name: 'hub_payments',
-        meta: commonMeta,
+        meta: adminMeta,
       },
     ],
   },
@@ -41,6 +45,6 @@ export const routes = [
     path: frontendURL('accounts/:accountId/hub/payments/:month'),
     component: HubPaymentDetails,
     name: 'hub_payment_details',
-    meta: commonMeta,
+    meta: adminMeta,
   },
 ];

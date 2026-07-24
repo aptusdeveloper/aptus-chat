@@ -1,6 +1,12 @@
 class AptusHub::BotpressClient
   class Error < StandardError; end
 
+  # Short-lived cache only: it protects the current (still-open) month from repeated
+  # calls within the same minute. Closed months are never fetched twice at all, because
+  # AptusHub::CustomerPortalService reads them straight from the account's frozen data
+  # instead of calling this client again.
+  CACHE_TTL = 1.minute
+
   ANALYTICS_FIELD_MAP = {
     sessions: :sessions,
     user_messages: :userMessages,
@@ -11,19 +17,13 @@ class AptusHub::BotpressClient
   }.freeze
 
   def analytics(bot_id:, from:, to:)
-    response = HTTParty.get(
-      "#{api_url}/admin/bots/#{CGI.escape(bot_id)}/analytics",
-      query: {
-        startDate: from.strftime('%Y-%m-%d'),
-        endDate: to.strftime('%Y-%m-%d')
-      },
-      headers: headers,
-      timeout: 30
-    )
+    cache_key = analytics_cache_key(bot_id, from, to)
+    cached = Redis::Alfred.get(cache_key)
+    return JSON.parse(cached, symbolize_names: true) if cached.present?
 
-    raise Error, 'Nao foi possivel buscar os dados do bot agora.' unless response.success?
-
-    parse_analytics_response(response)
+    result = parse_analytics_response(fetch_from_botpress(bot_id, from, to))
+    Redis::Alfred.setex(cache_key, result.to_json, CACHE_TTL)
+    result
   rescue Error
     raise
   rescue StandardError => e
@@ -32,6 +32,36 @@ class AptusHub::BotpressClient
   end
 
   private
+
+  def fetch_from_botpress(bot_id, from, to)
+    response = HTTParty.get(
+      "#{api_url}/admin/bots/#{CGI.escape(bot_id)}/analytics",
+      query: {
+        startDate: from.strftime('%Y-%m-%d'),
+        endDate: analytics_end_date(from, to).strftime('%Y-%m-%d')
+      },
+      headers: headers,
+      timeout: 30
+    )
+
+    raise Error, 'Nao foi possivel buscar os dados do bot agora.' unless response.success?
+
+    response
+  end
+
+  def analytics_cache_key(bot_id, from, to)
+    format(
+      Redis::RedisKeys::APTUS_HUB_ANALYTICS_KEY,
+      bot_id: bot_id, from: from.strftime('%Y-%m-%d'), to: to.strftime('%Y-%m-%d')
+    )
+  end
+
+  # Botpress rejects a same-day range (startDate must be strictly before
+  # endDate), so a single-day query (e.g. "today") needs an exclusive
+  # end date to still capture that day's bucket.
+  def analytics_end_date(from, to)
+    to > from ? to : from + 1.day
+  end
 
   def api_url
     value = ENV.fetch('BOTPRESS_API_URL', '').delete_suffix('/')
