@@ -44,9 +44,7 @@ class CrmAutomationRules::ActionService
 
   def execute_action(action)
     action_name = action[:action_name].to_s
-    unless SUPPORTED_ACTIONS.include?(action_name)
-      raise ArgumentError, "Unsupported CRM automation action #{action_name}"
-    end
+    raise ArgumentError, "Unsupported CRM automation action #{action_name}" unless SUPPORTED_ACTIONS.include?(action_name)
 
     send(action_name, action[:action_params])
   end
@@ -111,14 +109,6 @@ class CrmAutomationRules::ActionService
     ensure_message_content_valid!(message_params)
     builder_params = ActionController::Parameters.new(message_params)
     Messages::MessageBuilder.new(nil, conversation, builder_params).perform
-  end
-
-  def send_email_to_assignee(_params)
-    Rails.logger.info "CrmAutomationRules: send_email_to_assignee called for deal #{@deal.id} — not implemented"
-  end
-
-  def add_note(_params)
-    Rails.logger.info "CrmAutomationRules: add_note called for deal #{@deal.id} — not implemented"
   end
 
   def update_custom_attribute(field, value)

@@ -2,39 +2,46 @@ export const TRIGGERS = [
   {
     id: 'deal_created',
     labelKey: 'CRM.AUTOMATIONS.TRIGGERS.DEAL_CREATED',
+    descriptionKey: 'CRM.AUTOMATIONS.TRIGGERS.DEAL_CREATED_DESCRIPTION',
     icon: 'i-lucide-plus-circle',
   },
   {
     id: 'deal_entered_stage',
     labelKey: 'CRM.AUTOMATIONS.TRIGGERS.DEAL_ENTERED_STAGE',
+    descriptionKey: 'CRM.AUTOMATIONS.TRIGGERS.DEAL_ENTERED_STAGE_DESCRIPTION',
     icon: 'i-lucide-log-in',
     needsStage: true,
   },
   {
     id: 'deal_stage_changed',
     labelKey: 'CRM.AUTOMATIONS.TRIGGERS.DEAL_STAGE_CHANGED',
+    descriptionKey: 'CRM.AUTOMATIONS.TRIGGERS.DEAL_STAGE_CHANGED_DESCRIPTION',
     icon: 'i-lucide-arrow-right-left',
-    needsStage: true,
   },
   {
     id: 'deal_won',
     labelKey: 'CRM.AUTOMATIONS.TRIGGERS.DEAL_WON',
+    descriptionKey: 'CRM.AUTOMATIONS.TRIGGERS.DEAL_WON_DESCRIPTION',
     icon: 'i-lucide-trophy',
   },
   {
     id: 'deal_lost',
     labelKey: 'CRM.AUTOMATIONS.TRIGGERS.DEAL_LOST',
+    descriptionKey: 'CRM.AUTOMATIONS.TRIGGERS.DEAL_LOST_DESCRIPTION',
     icon: 'i-lucide-circle-x',
   },
   {
     id: 'deal_stagnant',
     labelKey: 'CRM.AUTOMATIONS.TRIGGERS.DEAL_STAGNANT',
+    descriptionKey: 'CRM.AUTOMATIONS.TRIGGERS.DEAL_STAGNANT_DESCRIPTION',
     icon: 'i-lucide-clock',
     needsDays: true,
   },
   {
     id: 'deal_close_date_approaching',
     labelKey: 'CRM.AUTOMATIONS.TRIGGERS.CLOSE_DATE_APPROACHING',
+    descriptionKey:
+      'CRM.AUTOMATIONS.TRIGGERS.CLOSE_DATE_APPROACHING_DESCRIPTION',
     icon: 'i-lucide-calendar-clock',
     needsDays: true,
   },

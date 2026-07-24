@@ -19,16 +19,31 @@ RSpec.describe CrmAutomationRules::Processor do
     described_class.run(trigger_type: 'deal_entered_stage', deal: deal)
   end
 
-  it 'does not process the same rule and deal inside the safety window' do
+  it 'does not reprocess the same rule and deal when it already succeeded for the current deal state' do
     rule = create(
       :crm_automation_rule,
       account: deal.account,
       crm_pipeline: deal.crm_pipeline,
       trigger_type: 'deal_entered_stage'
     )
-    create(:crm_automation_execution, crm_automation_rule: rule, crm_deal: deal, executed_at: 1.minute.ago)
+    create(:crm_automation_execution, crm_automation_rule: rule, crm_deal: deal, executed_at: Time.current)
 
     expect(CrmAutomationRules::ActionService).not_to receive(:new)
+
+    described_class.run(trigger_type: 'deal_entered_stage', deal: deal)
+  end
+
+  it 'reprocesses the same rule and deal once the deal changes again after a successful execution' do
+    rule = create(
+      :crm_automation_rule,
+      account: deal.account,
+      crm_pipeline: deal.crm_pipeline,
+      trigger_type: 'deal_entered_stage'
+    )
+    create(:crm_automation_execution, crm_automation_rule: rule, crm_deal: deal, executed_at: Time.current)
+    deal.update!(name: 'Updated deal name')
+
+    expect(CrmAutomationRules::ActionService).to receive(:new).with(rule, deal).and_call_original
 
     described_class.run(trigger_type: 'deal_entered_stage', deal: deal)
   end

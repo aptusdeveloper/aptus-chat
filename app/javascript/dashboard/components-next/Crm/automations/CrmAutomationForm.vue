@@ -5,6 +5,12 @@ import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useStore, useMapGetter } from 'dashboard/composables/store';
 import Button from 'dashboard/components-next/button/Button.vue';
+import CardLayout from 'dashboard/components-next/CardLayout.vue';
+import RadioCard from 'dashboard/components-next/radioCard/RadioCard.vue';
+import FilterSelect from 'dashboard/components-next/filter/inputs/FilterSelect.vue';
+import Switch from 'dashboard/components-next/switch/Switch.vue';
+import Banner from 'dashboard/components-next/banner/Banner.vue';
+import Input from 'dashboard/components-next/input/Input.vue';
 import { useAlert } from 'dashboard/composables';
 import {
   ACTIONS,
@@ -107,13 +113,131 @@ const selectedTrigger = computed(() =>
   TRIGGERS.find(trigger => trigger.id === form.trigger_type)
 );
 
-const operatorOptions = computed(() =>
-  OPERATORS.map(operator => ({ ...operator, label: t(operator.labelKey) }))
+function conditionAttribute(condition) {
+  return conditionAttributes.value.find(
+    attribute => attribute.id === condition.attribute_key
+  );
+}
+
+const pipelineOptions = computed(() => [
+  { value: '', label: t('CRM.AUTOMATIONS.ALL_PIPELINES') },
+  ...pipelines.value.map(pipeline => ({
+    value: pipeline.id,
+    label: pipeline.name,
+  })),
+]);
+
+const pipelineSelectOptions = computed(() =>
+  pipelines.value.map(pipeline => ({
+    value: pipeline.id,
+    label: pipeline.name,
+  }))
 );
 
-const actionOptions = computed(() =>
-  ACTIONS.map(action => ({ ...action, label: t(action.labelKey) }))
+const stageSelectOptions = computed(() =>
+  stageOptions.value.map(stage => ({ value: stage.id, label: stage.name }))
 );
+
+const agentSelectOptions = computed(() =>
+  agents.value.map(agent => ({ value: agent.id, label: agent.name }))
+);
+
+const assignAgentSelectOptions = computed(() => [
+  { value: '', label: t('CRM.AUTOMATIONS.ACTIONS.UNASSIGNED') },
+  ...agentSelectOptions.value,
+]);
+
+const queryOperatorSelectOptions = computed(() => [
+  { value: 'AND', label: t('CRM.AUTOMATIONS.CONDITIONS.AND') },
+  { value: 'OR', label: t('CRM.AUTOMATIONS.CONDITIONS.OR') },
+]);
+
+const conditionAttributeSelectOptions = computed(() =>
+  conditionAttributes.value.map(attribute => ({
+    value: attribute.id,
+    label: attribute.label,
+  }))
+);
+
+const fieldSelectOptions = computed(() =>
+  fieldOptions.value.map(field => ({ value: field.id, label: field.label }))
+);
+
+function conditionValueSelectOptions(condition) {
+  const attribute = conditionAttribute(condition);
+  if (attribute?.input === 'stage') return stageSelectOptions.value;
+  if (attribute?.input === 'agent') return agentSelectOptions.value;
+  if (attribute?.input === 'list') {
+    return (attribute.values || []).map(value => ({
+      value,
+      label: value,
+    }));
+  }
+  return [];
+}
+
+function conditionValueUsesSelect(condition) {
+  const input = conditionAttribute(condition)?.input;
+  return input === 'stage' || input === 'agent' || input === 'list';
+}
+
+function conditionOperatorHidesValue(condition) {
+  return Boolean(
+    OPERATORS.find(operator => operator.id === condition.filter_operator)
+      ?.hidesValue
+  );
+}
+
+const OPERATOR_IDS_BY_INPUT = {
+  stage: ['equal_to', 'not_equal_to', 'is_present', 'is_not_present'],
+  agent: ['equal_to', 'not_equal_to', 'is_present', 'is_not_present'],
+  list: ['equal_to', 'not_equal_to', 'is_present', 'is_not_present'],
+  checkbox: ['equal_to', 'not_equal_to', 'is_present', 'is_not_present'],
+  number: [
+    'equal_to',
+    'not_equal_to',
+    'greater_than',
+    'less_than',
+    'gte',
+    'lte',
+    'is_present',
+    'is_not_present',
+  ],
+  date: [
+    'equal_to',
+    'not_equal_to',
+    'days_before',
+    'is_today',
+    'is_past',
+    'is_future',
+    'is_present',
+    'is_not_present',
+  ],
+};
+const DEFAULT_OPERATOR_IDS = [
+  'equal_to',
+  'not_equal_to',
+  'contains',
+  'is_present',
+  'is_not_present',
+];
+
+function operatorOptionsFor(condition) {
+  const allowedIds =
+    OPERATOR_IDS_BY_INPUT[conditionAttribute(condition)?.input] ||
+    DEFAULT_OPERATOR_IDS;
+  return OPERATORS.filter(operator => allowedIds.includes(operator.id)).map(
+    operator => ({ value: operator.id, label: t(operator.labelKey) })
+  );
+}
+
+const actionTypeSelectOptions = computed(() =>
+  ACTIONS.map(action => ({ value: action.id, label: t(action.labelKey) }))
+);
+
+function actionMeta(action) {
+  return ACTIONS.find(item => item.id === action.action_name);
+}
 
 const messageKindOptions = computed(() =>
   MESSAGE_KINDS.map(kind => ({ ...kind, label: t(kind.labelKey) }))
@@ -135,7 +259,7 @@ const triggerNeedsStage = computed(() => selectedTrigger.value?.needsStage);
 const triggerNeedsDays = computed(() => selectedTrigger.value?.needsDays);
 
 const createCondition = () => ({
-  attribute_key: 'crm_stage_id',
+  attribute_key: triggerNeedsStage.value ? 'amount' : 'crm_stage_id',
   filter_operator: 'equal_to',
   values: [''],
   query_operator: 'AND',
@@ -183,12 +307,6 @@ function resetForm() {
     conditions: [],
     actions: [createAction()],
   });
-}
-
-function conditionAttribute(condition) {
-  return conditionAttributes.value.find(
-    attribute => attribute.id === condition.attribute_key
-  );
 }
 
 function updateConditionAttribute(condition) {
@@ -302,6 +420,37 @@ function validateActions() {
 
   if (invalidButtonsAction) {
     error.value = t('CRM.AUTOMATIONS.MESSAGE.BUTTON_REQUIRED');
+    return false;
+  }
+
+  const missingStage = form.actions.find(
+    action =>
+      action.action_name === 'change_stage' && !action.action_params.stage_id
+  );
+
+  if (missingStage) {
+    error.value = t('CRM.AUTOMATIONS.FORM.STAGE_REQUIRED');
+    return false;
+  }
+
+  const missingPipeline = form.actions.find(
+    action =>
+      action.action_name === 'change_pipeline' &&
+      !action.action_params.pipeline_id
+  );
+
+  if (missingPipeline) {
+    error.value = t('CRM.AUTOMATIONS.FORM.PIPELINE_REQUIRED');
+    return false;
+  }
+
+  const missingWebhookUrl = form.actions.find(
+    action =>
+      action.action_name === 'send_webhook_event' && !action.action_params.url
+  );
+
+  if (missingWebhookUrl) {
+    error.value = t('CRM.AUTOMATIONS.FORM.WEBHOOK_URL_REQUIRED');
     return false;
   }
 
@@ -596,10 +745,14 @@ onMounted(async () => {
         </div>
       </div>
 
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-3">
         <label class="inline-flex items-center gap-2 text-sm text-n-slate-11">
-          <input v-model="form.active" type="checkbox" class="rounded" />
-          {{ t('CRM.AUTOMATIONS.STATUS.ACTIVE') }}
+          <Switch v-model="form.active" />
+          {{
+            form.active
+              ? t('CRM.AUTOMATIONS.STATUS.ACTIVE')
+              : t('CRM.AUTOMATIONS.STATUS.INACTIVE')
+          }}
         </label>
         <Button
           type="submit"
@@ -612,291 +765,185 @@ onMounted(async () => {
 
     <div class="flex-1 overflow-auto p-4">
       <div class="mx-auto flex max-w-5xl flex-col gap-4">
-        <p
-          v-if="error"
-          class="rounded-lg border border-n-ruby-8 bg-n-ruby-9/10 px-3 py-2 text-sm text-n-ruby-11"
-        >
+        <Banner v-if="error" color="ruby">
           {{ error }}
-        </p>
+        </Banner>
 
-        <section
-          class="rounded-lg border border-n-weak bg-white p-4 dark:bg-n-solid-2"
-        >
-          <div class="mb-4 flex items-center gap-2">
+        <CardLayout>
+          <div class="flex items-center gap-2">
             <i class="i-lucide-badge-info w-4 h-4 text-n-slate-9" />
             <h3 class="text-sm font-semibold text-n-slate-12">
               {{ t('CRM.AUTOMATIONS.FORM.SECTIONS.IDENTITY') }}
             </h3>
           </div>
           <div class="grid gap-3 md:grid-cols-[1fr_16rem]">
+            <Input
+              v-model="form.name"
+              :label="t('CRM.AUTOMATIONS.FORM.NAME')"
+            />
             <label class="block">
-              <span class="mb-1 block text-xs text-n-slate-9">
-                {{ t('CRM.AUTOMATIONS.FORM.NAME') }}
-              </span>
-              <input
-                v-model="form.name"
-                type="text"
-                class="w-full rounded-lg border border-n-weak bg-white px-3 py-2 text-sm text-n-slate-12 outline-none focus:ring-1 focus:ring-woot-500 dark:bg-n-solid-3"
-              />
-            </label>
-            <label class="block">
-              <span class="mb-1 block text-xs text-n-slate-9">
+              <span class="mb-1 block text-xs text-n-slate-11">
                 {{ t('CRM.AUTOMATIONS.FORM.PIPELINE') }}
               </span>
-              <select
+              <FilterSelect
                 v-model="form.crm_pipeline_id"
-                class="w-full rounded-lg border border-n-weak bg-white px-3 py-2 text-sm text-n-slate-12 outline-none focus:ring-1 focus:ring-woot-500 dark:bg-n-solid-3"
-              >
-                <option value="">
-                  {{ t('CRM.AUTOMATIONS.ALL_PIPELINES') }}
-                </option>
-                <option
-                  v-for="pipeline in pipelines"
-                  :key="pipeline.id"
-                  :value="pipeline.id"
-                >
-                  {{ pipeline.name }}
-                </option>
-              </select>
+                :options="pipelineOptions"
+              />
             </label>
           </div>
-        </section>
+        </CardLayout>
 
-        <section
-          class="rounded-lg border border-n-weak bg-white p-4 dark:bg-n-solid-2"
-        >
-          <div class="mb-4 flex items-center gap-2">
+        <CardLayout>
+          <div class="flex items-center gap-2">
             <i class="i-lucide-zap w-4 h-4 text-n-slate-9" />
             <h3 class="text-sm font-semibold text-n-slate-12">
               {{ t('CRM.AUTOMATIONS.FORM.SECTIONS.TRIGGER') }}
             </h3>
           </div>
-          <div class="grid gap-3 md:grid-cols-[1fr_16rem]">
-            <label class="block">
-              <span class="mb-1 block text-xs text-n-slate-9">
-                {{ t('CRM.AUTOMATIONS.FORM.TRIGGER') }}
-              </span>
-              <select
-                v-model="form.trigger_type"
-                class="w-full rounded-lg border border-n-weak bg-white px-3 py-2 text-sm text-n-slate-12 outline-none focus:ring-1 focus:ring-woot-500 dark:bg-n-solid-3"
-              >
-                <option
-                  v-for="trigger in TRIGGERS"
-                  :key="trigger.id"
-                  :value="trigger.id"
-                >
-                  {{ t(trigger.labelKey) }}
-                </option>
-              </select>
-            </label>
 
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <RadioCard
+              v-for="trigger in TRIGGERS"
+              :id="trigger.id"
+              :key="trigger.id"
+              :is-active="form.trigger_type === trigger.id"
+              :label="t(trigger.labelKey)"
+              :description="t(trigger.descriptionKey)"
+              @select="value => (form.trigger_type = value)"
+            />
+          </div>
+
+          <div
+            v-if="triggerNeedsStage || triggerNeedsDays"
+            class="grid gap-3 md:grid-cols-[16rem_16rem]"
+          >
             <label v-if="triggerNeedsStage" class="block">
-              <span class="mb-1 block text-xs text-n-slate-9">
+              <span class="mb-1 block text-xs text-n-slate-11">
                 {{ t('CRM.AUTOMATIONS.FORM.STAGE') }}
               </span>
-              <select
+              <FilterSelect
                 v-model="form.trigger_stage_id"
-                class="w-full rounded-lg border border-n-weak bg-white px-3 py-2 text-sm text-n-slate-12 outline-none focus:ring-1 focus:ring-woot-500 dark:bg-n-solid-3"
-              >
-                <option value="">
-                  {{ t('CRM.AUTOMATIONS.FORM.SELECT_STAGE') }}
-                </option>
-                <option
-                  v-for="stage in stageOptions"
-                  :key="stage.id"
-                  :value="stage.id"
-                >
-                  {{ stage.name }}
-                </option>
-              </select>
-            </label>
-
-            <label v-if="triggerNeedsDays" class="block">
-              <span class="mb-1 block text-xs text-n-slate-9">
-                {{ t('CRM.AUTOMATIONS.FORM.DAYS') }}
-              </span>
-              <input
-                v-model.number="form.trigger_days"
-                min="1"
-                type="number"
-                class="w-full rounded-lg border border-n-weak bg-white px-3 py-2 text-sm text-n-slate-12 outline-none focus:ring-1 focus:ring-woot-500 dark:bg-n-solid-3"
+                :options="stageSelectOptions"
+                :label="
+                  !form.trigger_stage_id
+                    ? t('CRM.AUTOMATIONS.FORM.SELECT_STAGE')
+                    : null
+                "
               />
             </label>
-          </div>
-        </section>
 
-        <section
-          class="rounded-lg border border-n-weak bg-white p-4 dark:bg-n-solid-2"
-        >
-          <div class="mb-4 flex items-center justify-between gap-3">
-            <div class="flex items-center gap-2">
-              <i class="i-lucide-filter w-4 h-4 text-n-slate-9" />
-              <h3 class="text-sm font-semibold text-n-slate-12">
-                {{ t('CRM.AUTOMATIONS.FORM.SECTIONS.CONDITIONS') }}
-              </h3>
-            </div>
-            <Button
-              faded
-              slate
-              sm
-              type="button"
-              icon="i-lucide-plus"
-              :label="t('CRM.AUTOMATIONS.FORM.ADD_CONDITION')"
-              @click="addCondition"
+            <Input
+              v-if="triggerNeedsDays"
+              v-model.number="form.trigger_days"
+              type="number"
+              min="1"
+              :label="t('CRM.AUTOMATIONS.FORM.DAYS')"
             />
           </div>
+        </CardLayout>
 
-          <div v-if="!form.conditions.length" class="text-sm text-n-slate-10">
-            {{ t('CRM.AUTOMATIONS.FORM.NO_CONDITIONS') }}
+        <CardLayout>
+          <div class="flex items-center gap-2">
+            <i class="i-lucide-filter w-4 h-4 text-n-slate-9" />
+            <h3 class="text-sm font-semibold text-n-slate-12">
+              {{ t('CRM.AUTOMATIONS.FORM.SECTIONS.CONDITIONS') }}
+            </h3>
           </div>
 
-          <div v-else class="flex flex-col gap-2">
-            <div
+          <ul
+            class="grid list-none gap-3 rounded-xl p-3 outline outline-1 -outline-offset-1 outline-n-weak dark:outline-n-strong"
+          >
+            <li
               v-for="(condition, index) in form.conditions"
               :key="index"
-              class="grid gap-2 rounded-lg border border-n-weak p-3 md:grid-cols-[6rem_1fr_11rem_1fr_2rem]"
+              class="flex flex-wrap items-center gap-2"
             >
-              <select
+              <FilterSelect
+                v-if="index > 0"
                 v-model="condition.query_operator"
-                class="rounded-lg border border-n-weak bg-white px-2 py-2 text-sm text-n-slate-12 outline-none focus:ring-1 focus:ring-woot-500 dark:bg-n-solid-3"
-              >
-                <option value="AND">
-                  {{ t('CRM.AUTOMATIONS.CONDITIONS.AND') }}
-                </option>
-                <option value="OR">
-                  {{ t('CRM.AUTOMATIONS.CONDITIONS.OR') }}
-                </option>
-              </select>
-              <select
-                v-model="condition.attribute_key"
-                class="rounded-lg border border-n-weak bg-white px-2 py-2 text-sm text-n-slate-12 outline-none focus:ring-1 focus:ring-woot-500 dark:bg-n-solid-3"
-                @change="updateConditionAttribute(condition)"
-              >
-                <option
-                  v-for="attribute in conditionAttributes"
-                  :key="attribute.id"
-                  :value="attribute.id"
-                >
-                  {{ attribute.label }}
-                </option>
-              </select>
-              <select
-                v-model="condition.filter_operator"
-                class="rounded-lg border border-n-weak bg-white px-2 py-2 text-sm text-n-slate-12 outline-none focus:ring-1 focus:ring-woot-500 dark:bg-n-solid-3"
-              >
-                <option
-                  v-for="operator in operatorOptions"
-                  :key="operator.id"
-                  :value="operator.id"
-                >
-                  {{ operator.label }}
-                </option>
-              </select>
-              <select
-                v-if="conditionAttribute(condition)?.input === 'stage'"
-                v-model="condition.values[0]"
-                class="rounded-lg border border-n-weak bg-white px-2 py-2 text-sm text-n-slate-12 outline-none focus:ring-1 focus:ring-woot-500 dark:bg-n-solid-3"
-              >
-                <option
-                  v-for="stage in stageOptions"
-                  :key="stage.id"
-                  :value="stage.id"
-                >
-                  {{ stage.name }}
-                </option>
-              </select>
-              <select
-                v-else-if="conditionAttribute(condition)?.input === 'agent'"
-                v-model="condition.values[0]"
-                class="rounded-lg border border-n-weak bg-white px-2 py-2 text-sm text-n-slate-12 outline-none focus:ring-1 focus:ring-woot-500 dark:bg-n-solid-3"
-              >
-                <option
-                  v-for="agent in agents"
-                  :key="agent.id"
-                  :value="agent.id"
-                >
-                  {{ agent.name }}
-                </option>
-              </select>
-              <select
-                v-else-if="conditionAttribute(condition)?.input === 'list'"
-                v-model="condition.values[0]"
-                class="rounded-lg border border-n-weak bg-white px-2 py-2 text-sm text-n-slate-12 outline-none focus:ring-1 focus:ring-woot-500 dark:bg-n-solid-3"
-              >
-                <option
-                  v-for="value in conditionAttribute(condition)?.values"
-                  :key="value"
-                  :value="value"
-                >
-                  {{ value }}
-                </option>
-              </select>
-              <input
-                v-else
-                v-model="condition.values[0]"
-                :type="conditionInputType(condition)"
-                class="rounded-lg border border-n-weak bg-white px-2 py-2 text-sm text-n-slate-12 outline-none focus:ring-1 focus:ring-woot-500 dark:bg-n-solid-3"
+                variant="faded"
+                hide-icon
+                :options="queryOperatorSelectOptions"
               />
+              <FilterSelect
+                v-model="condition.attribute_key"
+                variant="faded"
+                :options="conditionAttributeSelectOptions"
+                @update:model-value="updateConditionAttribute(condition)"
+              />
+              <FilterSelect
+                v-model="condition.filter_operator"
+                variant="ghost"
+                :options="operatorOptionsFor(condition)"
+              />
+              <template v-if="!conditionOperatorHidesValue(condition)">
+                <FilterSelect
+                  v-if="conditionValueUsesSelect(condition)"
+                  v-model="condition.values[0]"
+                  variant="faded"
+                  :options="conditionValueSelectOptions(condition)"
+                />
+                <Input
+                  v-else
+                  v-model="condition.values[0]"
+                  :type="conditionInputType(condition)"
+                  size="sm"
+                  class="min-w-40 [&>input]:h-8"
+                />
+              </template>
               <Button
-                ghost
-                ruby
                 sm
+                solid
+                slate
                 type="button"
-                icon="i-lucide-trash-2"
+                icon="i-lucide-trash"
+                class="flex-shrink-0"
                 @click="removeCondition(index)"
               />
-            </div>
-          </div>
-        </section>
+            </li>
+            <li>
+              <Button
+                icon="i-lucide-plus"
+                blue
+                faded
+                sm
+                type="button"
+                :label="t('CRM.AUTOMATIONS.FORM.ADD_CONDITION')"
+                @click="addCondition"
+              />
+            </li>
+          </ul>
+        </CardLayout>
 
-        <section
-          class="rounded-lg border border-n-weak bg-white p-4 dark:bg-n-solid-2"
-        >
-          <div class="mb-4 flex items-center justify-between gap-3">
-            <div class="flex items-center gap-2">
-              <i class="i-lucide-workflow w-4 h-4 text-n-slate-9" />
-              <h3 class="text-sm font-semibold text-n-slate-12">
-                {{ t('CRM.AUTOMATIONS.FORM.SECTIONS.ACTIONS') }}
-              </h3>
-            </div>
-            <Button
-              faded
-              slate
-              sm
-              type="button"
-              icon="i-lucide-plus"
-              :label="t('CRM.AUTOMATIONS.FORM.ADD_ACTION')"
-              @click="addAction"
-            />
+        <CardLayout>
+          <div class="flex items-center gap-2">
+            <i class="i-lucide-workflow w-4 h-4 text-n-slate-9" />
+            <h3 class="text-sm font-semibold text-n-slate-12">
+              {{ t('CRM.AUTOMATIONS.FORM.SECTIONS.ACTIONS') }}
+            </h3>
           </div>
 
           <div class="flex flex-col gap-3">
-            <div
-              v-for="(action, index) in form.actions"
-              :key="index"
-              class="rounded-lg border border-n-weak p-3"
-            >
-              <div class="mb-3 flex items-center gap-2">
-                <select
+            <CardLayout v-for="(action, index) in form.actions" :key="index">
+              <div class="flex items-center gap-2">
+                <i
+                  v-if="actionMeta(action)"
+                  class="h-4 w-4 flex-shrink-0 text-n-slate-9"
+                  :class="actionMeta(action).icon"
+                />
+                <FilterSelect
                   v-model="action.action_name"
-                  class="min-w-64 rounded-lg border border-n-weak bg-white px-3 py-2 text-sm text-n-slate-12 outline-none focus:ring-1 focus:ring-woot-500 dark:bg-n-solid-3"
-                  @change="updateActionType(action)"
-                >
-                  <option
-                    v-for="item in actionOptions"
-                    :key="item.id"
-                    :value="item.id"
-                  >
-                    {{ item.label }}
-                  </option>
-                </select>
+                  variant="faded"
+                  :options="actionTypeSelectOptions"
+                  @update:model-value="updateActionType(action)"
+                />
                 <Button
-                  class="ml-auto"
-                  ghost
-                  ruby
+                  class="ml-auto flex-shrink-0"
                   sm
+                  solid
+                  slate
                   type="button"
-                  icon="i-lucide-trash-2"
+                  icon="i-lucide-trash"
                   @click="removeAction(index)"
                 />
               </div>
@@ -906,27 +953,25 @@ onMounted(async () => {
                 class="grid gap-3"
               >
                 <div class="flex flex-wrap gap-2">
-                  <button
+                  <Button
                     v-for="kind in messageKindOptions"
                     :key="kind.id"
                     type="button"
-                    class="inline-flex h-8 items-center gap-2 rounded-lg px-3 text-sm font-medium transition-colors"
-                    :class="
-                      action.action_params.message_kind === kind.id
-                        ? 'bg-n-brand/10 text-n-blue-11'
-                        : 'bg-n-alpha-2 text-n-slate-11 hover:bg-n-alpha-3'
-                    "
+                    sm
+                    :solid="action.action_params.message_kind === kind.id"
+                    :blue="action.action_params.message_kind === kind.id"
+                    :faded="action.action_params.message_kind !== kind.id"
+                    :slate="action.action_params.message_kind !== kind.id"
+                    :icon="kind.icon"
+                    :label="kind.label"
                     @click="setLeadMessageKind(action, kind.id)"
-                  >
-                    <i class="w-4 h-4" :class="[kind.icon]" />
-                    {{ kind.label }}
-                  </button>
+                  />
                 </div>
 
                 <textarea
                   v-model="action.action_params.content"
                   rows="4"
-                  class="w-full rounded-lg border border-n-weak bg-white px-3 py-2 text-sm text-n-slate-12 outline-none focus:ring-1 focus:ring-woot-500 dark:bg-n-solid-3"
+                  class="w-full rounded-lg bg-n-alpha-black2 px-3 py-2 text-sm text-n-slate-12 outline outline-1 -outline-offset-1 outline-n-weak focus:outline-n-brand dark:outline-n-strong"
                 />
 
                 <div
@@ -962,46 +1007,42 @@ onMounted(async () => {
                     v-for="(button, buttonIndex) in action.action_params
                       .buttons"
                     :key="buttonIndex"
-                    class="grid gap-2 md:grid-cols-[1fr_1fr_2rem]"
+                    class="grid items-end gap-2 md:grid-cols-[1fr_1fr_2rem]"
                   >
-                    <input
-                      v-model="button.title"
-                      type="text"
-                      class="rounded-lg border border-n-weak bg-white px-3 py-2 text-sm text-n-slate-12 outline-none focus:ring-1 focus:ring-woot-500 dark:bg-n-solid-3"
-                    />
-                    <input
-                      v-model="button.value"
-                      type="text"
-                      class="rounded-lg border border-n-weak bg-white px-3 py-2 text-sm text-n-slate-12 outline-none focus:ring-1 focus:ring-woot-500 dark:bg-n-solid-3"
-                    />
+                    <Input v-model="button.title" size="sm" />
+                    <Input v-model="button.value" size="sm" />
                     <Button
-                      ghost
-                      ruby
                       sm
+                      solid
+                      slate
                       type="button"
-                      icon="i-lucide-trash-2"
+                      icon="i-lucide-trash"
                       @click="removeButton(action, buttonIndex)"
                     />
                   </div>
-                  <Button
-                    faded
-                    slate
-                    sm
-                    type="button"
-                    icon="i-lucide-plus"
-                    :label="t('CRM.AUTOMATIONS.MESSAGE.ADD_BUTTON')"
-                    @click="addButton(action)"
-                  />
+                  <div>
+                    <Button
+                      faded
+                      slate
+                      sm
+                      type="button"
+                      icon="i-lucide-plus"
+                      :label="t('CRM.AUTOMATIONS.MESSAGE.ADD_BUTTON')"
+                      @click="addButton(action)"
+                    />
+                  </div>
                 </div>
 
                 <textarea
                   v-if="action.action_params.message_kind === 'template'"
                   v-model="action.action_params.template_json"
                   rows="7"
-                  class="w-full rounded-lg border border-n-weak bg-white px-3 py-2 font-mono text-xs text-n-slate-12 outline-none focus:ring-1 focus:ring-woot-500 dark:bg-n-solid-3"
+                  class="w-full rounded-lg bg-n-alpha-black2 px-3 py-2 font-mono text-xs text-n-slate-12 outline outline-1 -outline-offset-1 outline-n-weak focus:outline-n-brand dark:outline-n-strong"
                 />
 
-                <div class="rounded-lg border border-n-weak bg-n-alpha-1 p-3">
+                <div
+                  class="rounded-lg bg-n-alpha-1 p-3 outline outline-1 -outline-offset-1 outline-n-weak dark:outline-n-strong"
+                >
                   <p class="whitespace-pre-wrap text-sm text-n-slate-12">
                     {{
                       action.action_params.content ||
@@ -1015,7 +1056,7 @@ onMounted(async () => {
                     <span
                       v-for="button in action.action_params.buttons"
                       :key="button.value"
-                      class="rounded-md bg-white px-2 py-1 text-xs text-n-slate-11 ring-1 ring-n-weak dark:bg-n-solid-3"
+                      class="rounded-md bg-n-alpha-2 px-2 py-1 text-xs text-n-slate-11"
                     >
                       {{ button.title }}
                     </span>
@@ -1023,83 +1064,56 @@ onMounted(async () => {
                 </div>
               </div>
 
-              <select
+              <FilterSelect
                 v-else-if="action.action_name === 'change_stage'"
                 v-model="action.action_params.stage_id"
-                class="w-full rounded-lg border border-n-weak bg-white px-3 py-2 text-sm text-n-slate-12 outline-none focus:ring-1 focus:ring-woot-500 dark:bg-n-solid-3"
-              >
-                <option
-                  v-for="stage in stageOptions"
-                  :key="stage.id"
-                  :value="stage.id"
-                >
-                  {{ stage.name }}
-                </option>
-              </select>
+                :options="stageSelectOptions"
+              />
 
-              <select
+              <FilterSelect
                 v-else-if="action.action_name === 'change_pipeline'"
                 v-model="action.action_params.pipeline_id"
-                class="w-full rounded-lg border border-n-weak bg-white px-3 py-2 text-sm text-n-slate-12 outline-none focus:ring-1 focus:ring-woot-500 dark:bg-n-solid-3"
-              >
-                <option
-                  v-for="pipeline in pipelines"
-                  :key="pipeline.id"
-                  :value="pipeline.id"
-                >
-                  {{ pipeline.name }}
-                </option>
-              </select>
+                :options="pipelineSelectOptions"
+              />
 
-              <select
+              <FilterSelect
                 v-else-if="action.action_name === 'assign_agent'"
                 v-model="action.action_params.agent_id"
-                class="w-full rounded-lg border border-n-weak bg-white px-3 py-2 text-sm text-n-slate-12 outline-none focus:ring-1 focus:ring-woot-500 dark:bg-n-solid-3"
-              >
-                <option value="">
-                  {{ t('CRM.AUTOMATIONS.ACTIONS.UNASSIGNED') }}
-                </option>
-                <option
-                  v-for="agent in agents"
-                  :key="agent.id"
-                  :value="agent.id"
-                >
-                  {{ agent.name }}
-                </option>
-              </select>
+                :options="assignAgentSelectOptions"
+              />
 
               <div
                 v-else-if="action.action_name === 'update_field'"
                 class="grid gap-2 md:grid-cols-[1fr_1fr]"
               >
-                <select
+                <FilterSelect
                   v-model="action.action_params.field"
-                  class="rounded-lg border border-n-weak bg-white px-3 py-2 text-sm text-n-slate-12 outline-none focus:ring-1 focus:ring-woot-500 dark:bg-n-solid-3"
-                >
-                  <option
-                    v-for="field in fieldOptions"
-                    :key="field.id"
-                    :value="field.id"
-                  >
-                    {{ field.label }}
-                  </option>
-                </select>
-                <input
-                  v-model="action.action_params.value"
-                  type="text"
-                  class="rounded-lg border border-n-weak bg-white px-3 py-2 text-sm text-n-slate-12 outline-none focus:ring-1 focus:ring-woot-500 dark:bg-n-solid-3"
+                  :options="fieldSelectOptions"
                 />
+                <Input v-model="action.action_params.value" size="sm" />
               </div>
 
-              <input
+              <Input
                 v-else-if="action.action_name === 'send_webhook_event'"
                 v-model="action.action_params.url"
                 type="url"
-                class="w-full rounded-lg border border-n-weak bg-white px-3 py-2 text-sm text-n-slate-12 outline-none focus:ring-1 focus:ring-woot-500 dark:bg-n-solid-3"
+                size="sm"
+              />
+            </CardLayout>
+
+            <div>
+              <Button
+                icon="i-lucide-plus"
+                blue
+                faded
+                sm
+                type="button"
+                :label="t('CRM.AUTOMATIONS.FORM.ADD_ACTION')"
+                @click="addAction"
               />
             </div>
           </div>
-        </section>
+        </CardLayout>
       </div>
     </div>
   </form>
