@@ -984,7 +984,6 @@
       "SUBTITLE": "Periodo padrao: ultimos 30 dias.",
       "LOADING": "Carregando desempenho...",
       "HISTORY": "Historico de uso",
-      "TOTAL_MESSAGES": "Mensagens totais",
       "EMPTY_HISTORY": "Ainda sem historico no periodo.",
       "CHANNELS": "Canais conectados",
       "CONNECTED": "Conectado",
@@ -999,6 +998,12 @@
         "TO": "Ate",
         "CANCEL": "Cancelar",
         "APPLY": "Aplicar"
+      },
+      "CHART": {
+        "MESSAGES": "Mensagens",
+        "SESSIONS": "Sessoes",
+        "USERS": "Usuarios",
+        "COST": "Custo"
       }
     },
     "TEST": {

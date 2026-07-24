@@ -24,6 +24,28 @@ export const formatDate = value => {
   return date.toLocaleDateString('pt-BR');
 };
 
+export const formatShortDate = value => {
+  if (!value) return '';
+  const date = new Date(`${value}T00:00:00`);
+  return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+};
+
+export const formatWeekday = value => {
+  if (!value) return '';
+  const date = new Date(`${value}T00:00:00`);
+  const label = date.toLocaleDateString('pt-BR', { weekday: 'short' });
+  return label.charAt(0).toUpperCase() + label.slice(1).replace('.', '');
+};
+
+export const formatHour = value => {
+  if (!value) return '';
+  const date = new Date(value);
+  return date.toLocaleTimeString('pt-BR', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};
+
 export const formatMonthLabel = month => {
   if (!month) return '-';
   const date = new Date(`${month}-01T00:00:00`);

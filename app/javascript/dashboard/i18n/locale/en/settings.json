@@ -984,7 +984,6 @@
       "SUBTITLE": "Default period is the last 30 days.",
       "LOADING": "Loading performance...",
       "HISTORY": "Usage history",
-      "TOTAL_MESSAGES": "Total messages",
       "EMPTY_HISTORY": "No history in this period yet.",
       "CHANNELS": "Connected channels",
       "CONNECTED": "Connected",
@@ -999,6 +998,12 @@
         "TO": "To",
         "CANCEL": "Cancel",
         "APPLY": "Apply"
+      },
+      "CHART": {
+        "MESSAGES": "Messages",
+        "SESSIONS": "Sessions",
+        "USERS": "Users",
+        "COST": "Cost"
       }
     },
     "TEST": {
