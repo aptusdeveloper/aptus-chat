@@ -4,17 +4,33 @@ import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import AptusHubAPI from 'dashboard/api/aptusHub';
 import {
-  currentMonthRange,
   formatCurrency,
+  formatDate,
   formatNumber,
   hubErrorMessage,
+  presetDayRange,
 } from './utils';
 
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
-const range = currentMonthRange();
-const filters = ref({ ...range });
+
+const PRESETS = [
+  { key: 'today', days: 1, labelKey: 'HUB.PERFORMANCE.FILTER.TODAY' },
+  { key: 'last_7d', days: 7, labelKey: 'HUB.PERFORMANCE.FILTER.LAST_7_DAYS' },
+  {
+    key: 'last_30d',
+    days: 30,
+    labelKey: 'HUB.PERFORMANCE.FILTER.LAST_30_DAYS',
+  },
+];
+
+const presets = computed(() =>
+  PRESETS.map(preset => ({ ...preset, label: t(preset.labelKey) }))
+);
+
+const activePreset = ref('last_30d');
+const filters = ref(presetDayRange(30));
 const data = ref(null);
 const isLoading = ref(false);
 const error = ref('');
@@ -110,33 +126,128 @@ async function loadPerformance() {
   }
 }
 
+function selectPreset(preset) {
+  activePreset.value = preset.key;
+  filters.value = presetDayRange(preset.days);
+  loadPerformance();
+}
+
+function selectCustom() {
+  activePreset.value = 'custom';
+}
+
 onMounted(loadPerformance);
 </script>
 
 <template>
   <div class="flex-1 overflow-y-auto p-4">
-    <div class="flex flex-wrap items-center gap-3 mb-4">
-      <div class="mr-auto min-w-0">
-        <h2 class="text-lg font-semibold text-n-slate-12">
-          {{ t('HUB.PERFORMANCE.TITLE') }}
-        </h2>
-        <p class="text-sm text-n-slate-10">
-          {{ t('HUB.PERFORMANCE.SUBTITLE') }}
-        </p>
+    <div class="mb-4">
+      <h2 class="text-lg font-semibold text-n-slate-12">
+        {{ t('HUB.PERFORMANCE.TITLE') }}
+      </h2>
+      <p class="text-sm text-n-slate-10">
+        {{ t('HUB.PERFORMANCE.SUBTITLE') }}
+      </p>
+    </div>
+
+    <section
+      v-if="data"
+      class="mb-4 rounded-lg border border-n-weak bg-white dark:bg-n-solid-2 p-4"
+    >
+      <div class="flex flex-wrap items-center gap-3">
+        <div
+          class="grid place-content-center size-10 rounded-lg bg-n-alpha-2 shrink-0"
+        >
+          <i class="i-lucide-bot w-5 h-5 text-n-slate-11" />
+        </div>
+        <div class="min-w-0 mr-auto">
+          <h3 class="text-base font-semibold text-n-slate-12 truncate">
+            {{ data.bot.name }}
+          </h3>
+          <p class="text-xs text-n-slate-9 truncate">{{ data.bot.id }}</p>
+        </div>
+        <span
+          v-if="data.bot.ai_model"
+          class="inline-flex items-center h-7 px-2 rounded-md text-xs font-medium bg-n-slate-3 text-n-slate-11"
+        >
+          {{ data.bot.ai_model }}
+        </span>
+        <span
+          class="inline-flex items-center h-7 px-2 rounded-md text-xs font-medium bg-n-teal-3 text-n-teal-11"
+        >
+          {{ statusLabel }}
+        </span>
+        <button
+          class="inline-flex items-center gap-2 h-8 px-3 rounded-lg text-sm font-medium text-n-slate-11 border border-n-weak hover:bg-n-alpha-2"
+          @click="openTester"
+        >
+          <i class="i-lucide-square-play w-4 h-4" />
+          {{ t('HUB.NAV.TEST') }}
+        </button>
+      </div>
+    </section>
+
+    <div class="mb-4 flex flex-wrap items-center gap-3">
+      <div
+        class="inline-flex items-center gap-1 rounded-lg border border-n-weak bg-n-solid-1 p-1"
+      >
+        <button
+          v-for="preset in presets"
+          :key="preset.key"
+          type="button"
+          class="h-8 px-3 rounded-md text-sm font-medium transition-colors"
+          :class="
+            activePreset === preset.key
+              ? 'bg-n-solid-3 text-n-slate-12 shadow-sm'
+              : 'text-n-slate-10 hover:text-n-slate-12'
+          "
+          @click="selectPreset(preset)"
+        >
+          {{ preset.label }}
+        </button>
+        <button
+          type="button"
+          class="h-8 px-3 rounded-md text-sm font-medium transition-colors"
+          :class="
+            activePreset === 'custom'
+              ? 'bg-n-solid-3 text-n-slate-12 shadow-sm'
+              : 'text-n-slate-10 hover:text-n-slate-12'
+          "
+          @click="selectCustom"
+        >
+          {{ t('HUB.PERFORMANCE.FILTER.CUSTOM') }}
+        </button>
       </div>
 
-      <input
-        v-model="filters.from"
-        type="date"
-        class="h-9 rounded-lg border border-n-weak bg-n-background px-3 text-sm text-n-slate-12"
-      />
-      <input
-        v-model="filters.to"
-        type="date"
-        class="h-9 rounded-lg border border-n-weak bg-n-background px-3 text-sm text-n-slate-12"
-      />
+      <template v-if="activePreset === 'custom'">
+        <input
+          v-model="filters.from"
+          type="date"
+          class="h-9 rounded-lg border border-n-weak bg-n-background px-3 text-sm text-n-slate-12"
+        />
+        <span class="text-sm text-n-slate-9">
+          {{ t('HUB.PERFORMANCE.FILTER.TO') }}
+        </span>
+        <input
+          v-model="filters.to"
+          type="date"
+          class="h-9 rounded-lg border border-n-weak bg-n-background px-3 text-sm text-n-slate-12"
+        />
+        <button
+          class="inline-flex items-center h-9 px-3 rounded-lg text-sm font-medium bg-n-brand text-white hover:opacity-90 disabled:opacity-60"
+          :disabled="isLoading"
+          @click="loadPerformance"
+        >
+          {{ t('HUB.PERFORMANCE.FILTER.APPLY') }}
+        </button>
+      </template>
+      <span v-else class="text-xs text-n-slate-9">
+        {{ formatDate(filters.from) }} – {{ formatDate(filters.to) }}
+      </span>
+
       <button
-        class="inline-flex items-center gap-2 h-9 px-3 rounded-lg text-sm font-medium bg-n-brand text-white hover:opacity-90 disabled:opacity-60"
+        v-if="activePreset !== 'custom'"
+        class="inline-flex items-center gap-2 h-9 px-3 rounded-lg text-sm font-medium text-n-slate-11 border border-n-weak hover:bg-n-alpha-2 ml-auto disabled:opacity-60"
         :disabled="isLoading"
         @click="loadPerformance"
       >
@@ -157,49 +268,13 @@ onMounted(loadPerformance);
 
     <div
       v-if="isLoading"
-      class="flex items-center gap-2 text-sm text-n-slate-10"
+      class="mb-4 flex items-center gap-2 text-sm text-n-slate-10"
     >
       <i class="i-lucide-loader-2 w-4 h-4 animate-spin" />
       {{ t('HUB.PERFORMANCE.LOADING') }}
     </div>
 
     <template v-else-if="data">
-      <section
-        class="mb-4 rounded-lg border border-n-weak bg-white dark:bg-n-solid-2 p-4"
-      >
-        <div class="flex flex-wrap items-center gap-3">
-          <div
-            class="grid place-content-center size-10 rounded-lg bg-n-alpha-2 shrink-0"
-          >
-            <i class="i-lucide-bot w-5 h-5 text-n-slate-11" />
-          </div>
-          <div class="min-w-0 mr-auto">
-            <h3 class="text-base font-semibold text-n-slate-12 truncate">
-              {{ data.bot.name }}
-            </h3>
-            <p class="text-xs text-n-slate-9 truncate">{{ data.bot.id }}</p>
-          </div>
-          <span
-            v-if="data.bot.ai_model"
-            class="inline-flex items-center h-7 px-2 rounded-md text-xs font-medium bg-n-slate-3 text-n-slate-11"
-          >
-            {{ data.bot.ai_model }}
-          </span>
-          <span
-            class="inline-flex items-center h-7 px-2 rounded-md text-xs font-medium bg-n-teal-3 text-n-teal-11"
-          >
-            {{ statusLabel }}
-          </span>
-          <button
-            class="inline-flex items-center gap-2 h-8 px-3 rounded-lg text-sm font-medium text-n-slate-11 border border-n-weak hover:bg-n-alpha-2"
-            @click="openTester"
-          >
-            <i class="i-lucide-square-play w-4 h-4" />
-            {{ t('HUB.NAV.TEST') }}
-          </button>
-        </div>
-      </section>
-
       <section
         class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 mb-4"
       >

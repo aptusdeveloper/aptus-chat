@@ -3,12 +3,11 @@ export const localDateISO = date => {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 };
 
-export const currentMonthRange = () => {
+export const presetDayRange = days => {
   const today = new Date();
-  return {
-    from: localDateISO(new Date(today.getFullYear(), today.getMonth(), 1)),
-    to: localDateISO(today),
-  };
+  const from = new Date(today);
+  from.setDate(from.getDate() - (days - 1));
+  return { from: localDateISO(from), to: localDateISO(today) };
 };
 
 export const formatNumber = value => Number(value || 0).toLocaleString('pt-BR');

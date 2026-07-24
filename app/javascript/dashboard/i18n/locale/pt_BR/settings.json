@@ -981,7 +981,7 @@
     },
     "PERFORMANCE": {
       "TITLE": "Desempenho",
-      "SUBTITLE": "Periodo padrao do mes atual.",
+      "SUBTITLE": "Periodo padrao: ultimos 30 dias.",
       "LOADING": "Carregando desempenho...",
       "HISTORY": "Historico de uso",
       "TOTAL_MESSAGES": "Mensagens totais",
@@ -989,7 +989,15 @@
       "CHANNELS": "Canais conectados",
       "CONNECTED": "Conectado",
       "NO_CHANNELS": "Nenhum canal conectado nesta conta.",
-      "USERS_BREAKDOWN": "{new} novos • {returning} recorrentes"
+      "USERS_BREAKDOWN": "{new} novos • {returning} recorrentes",
+      "FILTER": {
+        "TODAY": "Hoje",
+        "LAST_7_DAYS": "Ultimos 7 dias",
+        "LAST_30_DAYS": "Ultimos 30 dias",
+        "CUSTOM": "Personalizado",
+        "TO": "ate",
+        "APPLY": "Aplicar"
+      }
     },
     "TEST": {
       "TITLE": "Testar",

@@ -981,7 +981,7 @@
     },
     "PERFORMANCE": {
       "TITLE": "Performance",
-      "SUBTITLE": "Default period is the current month.",
+      "SUBTITLE": "Default period is the last 30 days.",
       "LOADING": "Loading performance...",
       "HISTORY": "Usage history",
       "TOTAL_MESSAGES": "Total messages",
@@ -989,7 +989,15 @@
       "CHANNELS": "Connected channels",
       "CONNECTED": "Connected",
       "NO_CHANNELS": "No channel connected to this account.",
-      "USERS_BREAKDOWN": "{new} new • {returning} returning"
+      "USERS_BREAKDOWN": "{new} new • {returning} returning",
+      "FILTER": {
+        "TODAY": "Today",
+        "LAST_7_DAYS": "Last 7 days",
+        "LAST_30_DAYS": "Last 30 days",
+        "CUSTOM": "Custom",
+        "TO": "to",
+        "APPLY": "Apply"
+      }
     },
     "TEST": {
       "TITLE": "Test",
