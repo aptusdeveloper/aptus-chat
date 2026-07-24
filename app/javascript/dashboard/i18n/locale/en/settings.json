@@ -321,6 +321,8 @@
     "CONTACTS": "Contacts",
     "ACTIVE": "Active",
     "CRM": "CRM",
+    "CRM_FUNNEL": "Funnel",
+    "CRM_AUTOMATIONS": "Automations",
     "HUB": "Hub",
     "HUB_PERFORMANCE": "Performance",
     "HUB_TEST": "Test",

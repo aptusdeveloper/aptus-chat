@@ -345,6 +345,8 @@
     "LABELS": "Etiquetas",
     "CUSTOM_ATTRIBUTES": "Atributos Personalizados",
     "CRM": "CRM",
+    "CRM_FUNNEL": "Funil",
+    "CRM_AUTOMATIONS": "Automacoes",
     "HUB": "Hub",
     "HUB_PERFORMANCE": "Desempenho",
     "HUB_TEST": "Testar",

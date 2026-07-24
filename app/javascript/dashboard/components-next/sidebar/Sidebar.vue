@@ -525,13 +525,25 @@ const menuItems = computed(() => {
     {
       name: 'CRM',
       label: t('SIDEBAR.CRM'),
-      icon: 'i-lucide-kanban',
-      to: accountScopedRoute('crm_kanban'),
-      activeOn: [
-        'crm_kanban',
-        'crm_automations',
-        'crm_automation_new',
-        'crm_automation_edit',
+      icon: 'i-lucide-handshake',
+      children: [
+        {
+          name: 'CRM Funil',
+          label: t('SIDEBAR.CRM_FUNNEL'),
+          icon: 'i-lucide-kanban',
+          to: accountScopedRoute('crm_kanban'),
+        },
+        {
+          name: 'CRM Automacoes',
+          label: t('SIDEBAR.CRM_AUTOMATIONS'),
+          icon: 'i-lucide-workflow',
+          to: accountScopedRoute('crm_automations'),
+          activeOn: [
+            'crm_automations',
+            'crm_automation_new',
+            'crm_automation_edit',
+          ],
+        },
       ],
     },
     ...(hasAptusHub.value
@@ -558,6 +570,7 @@ const menuItems = computed(() => {
                 label: t('SIDEBAR.HUB_PAYMENTS'),
                 icon: 'i-lucide-credit-card',
                 to: accountScopedRoute('hub_payments'),
+                activeOn: ['hub_payment_details'],
               },
             ],
           },
