@@ -933,7 +933,7 @@
           }
         },
         "USERS": {
-          "LABEL": "Agentes atribuídos",
+          "LABEL": "Agentes responsáveis",
           "DESCRIPTION": "Adicione os agentes aos quais esta política será aplicada.",
           "ADD_BUTTON": "Adicionar agente",
           "DROPDOWN": {
@@ -1058,8 +1058,21 @@
     "PROBABILITY": "Probabilidade",
     "ASSIGNEE": "Responsável",
     "CONTACT": "Contato",
+    "CONTACT_ASSIGNEE": "Agente responsável",
+    "CONTACT_ASSIGNEES": "Agentes responsáveis",
+    "CONTACT_TEAM": "Time responsável",
+    "INBOX": "Caixa de Entrada",
+    "GO_TO_CONVERSATION": "Ir para Conversa",
+    "VIEW_CONTACT": "Visualizar Contato",
     "DELETE": "Excluir",
+    "DELETE_LEAD": "Excluir lead",
+    "DELETE_LEAD_AND_CONTACT": "Excluir lead e contato",
+    "DELETE_DIALOG_TITLE": "Excluir lead",
+    "DELETE_DIALOG_DESCRIPTION": "Esta ação é irreversível. Você pode excluir apenas o lead ou excluir o lead junto com o contato vinculado.",
+    "CONFIRM": "Confirmar",
     "CANCEL": "Cancelar",
+    "EDIT_SUCCESS": "Lead atualizado com sucesso",
+    "EDIT_ERROR": "Não foi possível atualizar o lead. Tente novamente.",
     "DELETING": "Excluindo...",
     "CONFIRM_DELETE": "Confirmar",
     "LOADING": "Carregando...",
@@ -1068,7 +1081,7 @@
     "WON": "Ganho",
     "LOST": "Perdido",
     "CUSTOM_FIELDS": {
-      "TITLE": "Campos Personalizados",
+      "TITLE": "Atributo personalizado",
       "ADD_FIELD": "Adicionar campo personalizado",
       "UPDATE_SUCCESS": "Campo personalizado atualizado com sucesso",
       "UPDATE_ERROR": "Não foi possível atualizar o campo personalizado. Tente novamente."
@@ -1131,18 +1144,18 @@
         }
       },
       "TRIGGERS": {
-        "DEAL_CREATED": "Negócio criado",
-        "DEAL_CREATED_DESCRIPTION": "Dispara assim que um novo negócio é criado no funil.",
-        "DEAL_ENTERED_STAGE": "Negócio entrou em uma etapa",
-        "DEAL_ENTERED_STAGE_DESCRIPTION": "Dispara quando o negócio entra na etapa selecionada abaixo.",
-        "DEAL_STAGE_CHANGED": "Negócio mudou de etapa",
-        "DEAL_STAGE_CHANGED_DESCRIPTION": "Dispara sempre que o negócio muda de etapa, para qualquer etapa.",
-        "DEAL_WON": "Negócio ganho",
-        "DEAL_WON_DESCRIPTION": "Dispara quando o negócio é marcado como ganho.",
-        "DEAL_LOST": "Negócio perdido",
-        "DEAL_LOST_DESCRIPTION": "Dispara quando o negócio é marcado como perdido.",
+        "DEAL_CREATED": "Lead criado",
+        "DEAL_CREATED_DESCRIPTION": "Dispara assim que um novo lead é criado no funil.",
+        "DEAL_ENTERED_STAGE": "Lead entrou em uma etapa",
+        "DEAL_ENTERED_STAGE_DESCRIPTION": "Dispara quando o lead entra na etapa selecionada abaixo.",
+        "DEAL_STAGE_CHANGED": "Lead mudou de etapa",
+        "DEAL_STAGE_CHANGED_DESCRIPTION": "Dispara sempre que o lead muda de etapa, para qualquer etapa.",
+        "DEAL_WON": "Lead ganho",
+        "DEAL_WON_DESCRIPTION": "Dispara quando o lead é marcado como ganho.",
+        "DEAL_LOST": "Lead perdido",
+        "DEAL_LOST_DESCRIPTION": "Dispara quando o lead é marcado como perdido.",
         "DEAL_STAGNANT": "Parado na etapa por X dias",
-        "DEAL_STAGNANT_DESCRIPTION": "Dispara quando o negócio fica parado na etapa atual pelo número de dias definido abaixo.",
+        "DEAL_STAGNANT_DESCRIPTION": "Dispara quando o lead fica parado na etapa atual pelo número de dias definido abaixo.",
         "CLOSE_DATE_APPROACHING": "Data de fechamento em X dias",
         "CLOSE_DATE_APPROACHING_DESCRIPTION": "Dispara quando a data de fechamento prevista está próxima, dentro do número de dias definido abaixo."
       },
@@ -1207,7 +1220,7 @@
           "CHANGE_STAGE": "Mover para outra etapa",
           "CHANGE_PIPELINE": "Mover para outro funil",
           "ASSIGN_AGENT": "Atribuir responsável",
-          "UPDATE_FIELD": "Atualizar campo do negócio",
+          "UPDATE_FIELD": "Atualizar campo do lead",
           "SEND_WEBHOOK": "Enviar webhook"
         }
       },

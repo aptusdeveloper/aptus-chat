@@ -187,7 +187,7 @@
       "COPY_LINK_SUCCESS": "Link da conversa copiado",
       "API": {
         "AGENT_ASSIGNMENT": {
-          "SUCCESFUL": "ID da conversa {conversationId} atribuído para \"{agentName}\"",
+          "SUCCESFUL": "Agente responsável da conversa {conversationId} definido como \"{agentName}\"",
           "FAILED": "Não foi possível atribuir agente. Por favor, tente novamente."
         },
         "LABEL_ASSIGNMENT": {
@@ -199,7 +199,7 @@
           "FAILED": "Não foi possível remover a etiqueta. Por favor, tente novamente."
         },
         "TEAM_ASSIGNMENT": {
-          "SUCCESFUL": "Time {team} atribuído para o id de conversa {conversationId}",
+          "SUCCESFUL": "Time responsável da conversa {conversationId} definido como {team}",
           "FAILED": "Não foi possível atribuir time. Por favor, tente novamente."
         }
       }
@@ -270,7 +270,7 @@
     "VISIBLE_TO_AGENTS": "Mensagem Privada: Apenas visível para você e seu time",
     "CHANGE_STATUS": "Estado da conversa mudou",
     "CHANGE_STATUS_FAILED": "Mudança de status da conversa falhou",
-    "CHANGE_AGENT": "Novo agente atribuído",
+    "CHANGE_AGENT": "Novo agente responsável",
     "CHANGE_AGENT_FAILED": "Falha ao atribuir outro agente",
     "ASSIGN_LABEL_SUCCESFUL": "Etiqueta atribuída com sucesso",
     "ASSIGN_LABEL_FAILED": "Falha ao atribuir etiqueta",
@@ -392,9 +392,9 @@
     }
   },
   "CONVERSATION_SIDEBAR": {
-    "ASSIGNEE_LABEL": "Agente atribuído",
+    "ASSIGNEE_LABEL": "Agente responsável",
     "SELF_ASSIGN": "Atribuir a mim",
-    "TEAM_LABEL": "Time atribuído",
+    "TEAM_LABEL": "Time responsável",
     "SELECT": {
       "PLACEHOLDER": "Nenhuma"
     },

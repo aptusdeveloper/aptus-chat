@@ -465,7 +465,7 @@
       },
       "UNKNOWN_CUSTOMER": "Cliente desconhecido"
     },
-    "NO_AGENT": "Nenhum agente atribuído",
+    "NO_AGENT": "Nenhum agente responsável",
     "NO_FEEDBACK": "Nenhum comentário fornecido",
     "METRIC": {
       "TOTAL_RESPONSES": {

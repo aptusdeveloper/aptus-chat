@@ -7,6 +7,14 @@ RSpec.describe Team do
     it { is_expected.to have_many(:team_members) }
   end
 
+  describe 'name persistence' do
+    it 'keeps the exact characters provided by the user' do
+      team = FactoryBot.create(:team, name: 'Vendas')
+
+      expect(team.reload.name).to eq('Vendas')
+    end
+  end
+
   describe '#add_members' do
     let(:team) { FactoryBot.create(:team) }
 

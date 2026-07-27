@@ -321,7 +321,7 @@
             "REQUIRED_ERROR": "Equipa obrigatória"
           },
           "ASSIGNEE": {
-            "LABEL": "Atribuído",
+            "LABEL": "Responsável",
             "PLACEHOLDER": "Selecionar responsável",
             "SEARCH": "Procurar responsável"
           },
@@ -356,7 +356,7 @@
       "ISSUE": {
         "STATUS": "Estado",
         "PRIORITY": "Prioridade",
-        "ASSIGNEE": "Atribuído",
+        "ASSIGNEE": "Responsável",
         "LABELS": "Etiquetas",
         "CREATED_AT": "Created at {createdAt}"
       },
@@ -426,7 +426,7 @@
         },
         "HIGH_PRIORITY": {
           "LABEL": "Conversas de alta prioridade",
-          "CONTENT": "Dê-me um resumo de todas as conversas abertas de alta prioridade. Inclua o ID da conversa, nome do cliente (se disponível), conteúdo da última mensagem e agente atribuído. Agrupe por estado, se relevante."
+          "CONTENT": "Dê-me um resumo de todas as conversas abertas de alta prioridade. Inclua o ID da conversa, nome do cliente (se disponível), conteúdo da última mensagem e agente responsável. Agrupe por estado, se relevante."
         },
         "LIST_CONTACTS": {
           "LABEL": "Listar contactos",

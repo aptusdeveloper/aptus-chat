@@ -141,8 +141,8 @@
     "ACTIONS": {
       "ASSIGN_AGENT": "Atribuir ao Agente",
       "ASSIGN_TEAM": "Atribuir um Time",
-      "REMOVE_ASSIGNED_AGENT": "Remove Assigned Agent",
-      "REMOVE_ASSIGNED_TEAM": "Remover Time Atribuído",
+      "REMOVE_ASSIGNED_AGENT": "Remover Agente Responsável",
+      "REMOVE_ASSIGNED_TEAM": "Remover Time Responsável",
       "ADD_LABEL": "Adicionar uma Etiqueta",
       "REMOVE_LABEL": "Remover uma Etiqueta",
       "SEND_EMAIL_TO_TEAM": "Enviar um e-mail para o Time",
@@ -184,7 +184,7 @@
       "COUNTRY_NAME": "País/região",
       "COMPANY_NAME": "Empresa",
       "REFERER_LINK": "Link de origem",
-      "ASSIGNEE_NAME": "Agente atribuído",
+      "ASSIGNEE_NAME": "Agente responsável",
       "TEAM_NAME": "Time",
       "PRIORITY": "Prioridade",
       "LABELS": "Etiquetas"

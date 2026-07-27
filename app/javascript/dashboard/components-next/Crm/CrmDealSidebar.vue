@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import {
   useStore,
@@ -7,9 +8,14 @@ import {
   useMapGetter,
 } from 'dashboard/composables/store';
 import { useAlert } from 'dashboard/composables';
-import { convertToAttributeSlug } from 'dashboard/helper/commons.js';
+import Button from 'dashboard/components-next/button/Button.vue';
+import Avatar from 'dashboard/components-next/avatar/Avatar.vue';
+import Icon from 'dashboard/components-next/icon/Icon.vue';
+import ChannelIcon from 'dashboard/components-next/icon/ChannelIcon.vue';
+import DropdownMenu from 'dashboard/components-next/dropdown-menu/DropdownMenu.vue';
+import EmojiIcon from 'dashboard/components-next/emoji-icon-picker/EmojiIcon.vue';
+import Dialog from 'dashboard/components-next/dialog/Dialog.vue';
 import CrmStageProgressBar from './components/CrmStageProgressBar.vue';
-import CustomAttribute from 'dashboard/components/CustomAttribute.vue';
 
 const props = defineProps({
   deal: {
@@ -27,27 +33,16 @@ const stages = computed(() => activePipeline.value?.stages ?? []);
 const store = useStore();
 const getters = useStoreGetters();
 const { t } = useI18n();
-const isDeleting = ref(false);
-const confirmDelete = ref(false);
-const customFieldMode = ref(null);
-const editingCustomFieldId = ref(null);
-const isSavingCustomField = ref(false);
-const customFieldForm = ref({
-  name: '',
-  type: 'text',
-  options: '',
-});
-
-const customFieldTypes = [
-  { id: 'text', labelKey: 'ATTRIBUTES_MGMT.ATTRIBUTE_TYPES.TEXT' },
-  { id: 'number', labelKey: 'ATTRIBUTES_MGMT.ATTRIBUTE_TYPES.NUMBER' },
-  { id: 'currency', labelKey: 'ATTRIBUTES_MGMT.ATTRIBUTE_TYPES.CURRENCY' },
-  { id: 'percent', labelKey: 'ATTRIBUTES_MGMT.ATTRIBUTE_TYPES.PERCENT' },
-  { id: 'date', labelKey: 'ATTRIBUTES_MGMT.ATTRIBUTE_TYPES.DATE' },
-  { id: 'list', labelKey: 'ATTRIBUTES_MGMT.ATTRIBUTE_TYPES.LIST' },
-  { id: 'checkbox', labelKey: 'ATTRIBUTES_MGMT.ATTRIBUTE_TYPES.CHECKBOX' },
-  { id: 'link', labelKey: 'ATTRIBUTES_MGMT.ATTRIBUTE_TYPES.LINK' },
-];
+const route = useRoute();
+const router = useRouter();
+const deleteDialogRef = ref(null);
+const draftStageId = ref(null);
+const draftCustomAttributes = ref({});
+const isSavingEdit = ref(false);
+const isDeletingLead = ref(false);
+const isDeletingLeadAndContact = ref(false);
+const showActionsDropdown = ref(false);
+const showStageDropdown = ref(false);
 
 onMounted(() => {
   store.dispatch('attributes/get');
@@ -65,8 +60,12 @@ function hexToRgba(hex, alpha) {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
+const selectedStageId = computed(() =>
+  isEditing.value ? draftStageId.value : props.deal.crm_stage_id
+);
+
 const currentStage = computed(
-  () => stages.value.find(stage => stage.id === props.deal.crm_stage_id) ?? null
+  () => stages.value.find(stage => stage.id === selectedStageId.value) ?? null
 );
 
 const headerStyle = computed(() => {
@@ -74,72 +73,92 @@ const headerStyle = computed(() => {
   return tint ? { backgroundColor: tint } : {};
 });
 
-const editableName = ref(props.deal.name);
+const displayName = computed(() => props.deal.contact?.name || props.deal.name);
 
-watch(
-  () => props.deal.name,
-  value => {
-    if (!isEditing.value) {
-      editableName.value = value;
-    }
-  }
+const contactResponsible = computed(() => props.deal.contact_responsible ?? null);
+
+const contactResponsibleLabel = computed(() =>
+  contactResponsible.value?.type === 'team'
+    ? t('CRM.CONTACT_TEAM')
+    : t('CRM.CONTACT_ASSIGNEE')
 );
+
+const contactResponsibleName = computed(
+  () => contactResponsible.value?.name ?? ''
+);
+
+const latestConversation = computed(
+  () => props.deal.latest_contact_conversation ?? null
+);
+
+const latestConversationInbox = computed(
+  () => latestConversation.value?.inbox ?? null
+);
+
+const canOpenConversation = computed(() => Boolean(latestConversation.value?.id));
+
+const canOpenContact = computed(() => Boolean(props.deal.contact?.id));
+
+const actionMenuItems = computed(() => [
+  ...(canOpenConversation.value
+    ? [
+        {
+          label: t('CRM.GO_TO_CONVERSATION'),
+          action: 'conversation',
+          value: 'conversation',
+          icon: 'i-lucide-message-circle',
+        },
+      ]
+    : []),
+  ...(canOpenContact.value
+    ? [
+        {
+          label: t('CRM.VIEW_CONTACT'),
+          action: 'contact',
+          value: 'contact',
+          icon: 'i-lucide-contact',
+        },
+      ]
+    : []),
+  {
+    label: t('CRM.FORM.EDIT_DEAL'),
+    action: 'edit',
+    value: 'edit',
+    icon: 'i-lucide-pencil',
+  },
+]);
+
+const displayedCustomAttributes = computed(() =>
+  isEditing.value ? draftCustomAttributes.value : props.deal.custom_attributes || {}
+);
+
+const hasDraftChanges = computed(() => {
+  const originalStageId = props.deal.crm_stage_id;
+  const originalAttributes = props.deal.custom_attributes || {};
+
+  return (
+    draftStageId.value !== originalStageId ||
+    JSON.stringify(draftCustomAttributes.value) !==
+      JSON.stringify(originalAttributes)
+  );
+});
 
 watch(isEditing, value => {
   if (!value) {
-    confirmDelete.value = false;
+    showStageDropdown.value = false;
+    resetDraftState();
   }
 });
 
-async function saveName() {
-  const trimmed = editableName.value.trim();
-  if (!trimmed || trimmed === props.deal.name) {
-    editableName.value = props.deal.name;
-    return;
+watch(
+  () => props.deal.id,
+  () => {
+    isEditing.value = false;
+    showActionsDropdown.value = false;
+    showStageDropdown.value = false;
+    resetDraftState();
   }
-  try {
-    await store.dispatch('crmDeals/updateDeal', {
-      id: props.deal.id,
-      name: trimmed,
-    });
-  } catch (error) {
-    editableName.value = props.deal.name;
-  }
-}
-
-// Same luminance-based pick as CrmStageProgressBar, duplicated locally since
-// that helper isn't exported and the stage select needs it for its options.
-function readableTextColor(hex) {
-  if (!hex) return '#0B1C2C';
-  const value = hex.replace('#', '');
-  const r = parseInt(value.substring(0, 2), 16);
-  const g = parseInt(value.substring(2, 4), 16);
-  const b = parseInt(value.substring(4, 6), 16);
-  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-  return luminance > 0.6 ? '#0B1C2C' : '#FFFFFF';
-}
-
-const stageSelectStyle = computed(() => {
-  if (!currentStage.value?.color) return {};
-  return {
-    backgroundColor: currentStage.value.color,
-    color: readableTextColor(currentStage.value.color),
-  };
-});
-
-async function updateStage(event) {
-  const stageId = event.target.value;
-  try {
-    await store.dispatch('crmDeals/updateDeal', {
-      id: props.deal.id,
-      crm_stage_id: stageId,
-    });
-  } catch (error) {
-    // The select reverts once `deal.crm_stage_id` refreshes from the store.
-  }
-}
-
-const dealCustomAttributes = computed(() => props.deal.custom_attributes || {});
+);
 
 const customAttributeDefinitions = computed(() =>
   getters['attributes/getDealAttributesByPipeline'].value(
@@ -150,83 +169,83 @@ const customAttributeDefinitions = computed(() =>
 const customFields = computed(() =>
   customAttributeDefinitions.value.map(definition => ({
     ...definition,
-    value: dealCustomAttributes.value[definition.attribute_key] ?? '',
+    value: displayedCustomAttributes.value[definition.attribute_key] ?? '',
   }))
 );
 
-const isCustomFieldList = computed(() => customFieldForm.value.type === 'list');
-
-function resetCustomFieldForm() {
-  customFieldMode.value = null;
-  editingCustomFieldId.value = null;
-  customFieldForm.value = {
-    name: '',
-    type: 'text',
-    options: '',
-  };
+function formatDateValue(value) {
+  if (!value) return '---';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString('pt-BR');
 }
 
-function startEditCustomField(field) {
-  customFieldMode.value = 'edit';
-  editingCustomFieldId.value = field.id;
-  customFieldForm.value = {
-    name: field.attribute_display_name,
-    type: field.attribute_display_type,
-    options: (field.attribute_values || []).join(', '),
-  };
-}
+function formatAttributeValue(field) {
+  const { attribute_display_type: type, value } = field;
 
-function customFieldValues() {
-  if (!isCustomFieldList.value) return [];
-
-  return customFieldForm.value.options
-    .split(',')
-    .map(option => option.trim())
-    .filter(Boolean);
-}
-
-async function saveCustomField() {
-  if (!customFieldForm.value.name.trim()) return;
-
-  const attributeValues = customFieldValues();
-  if (isCustomFieldList.value && !attributeValues.length) return;
-
-  isSavingCustomField.value = true;
-  try {
-    const payload = {
-      attribute_display_name: customFieldForm.value.name.trim(),
-      attribute_description: customFieldForm.value.name.trim(),
-      attribute_model: 'deal_attribute',
-      attribute_display_type: customFieldForm.value.type,
-      attribute_values: attributeValues,
-      crm_pipeline_id: props.deal.crm_pipeline_id,
-    };
-
-    if (customFieldMode.value === 'edit') {
-      await store.dispatch('attributes/update', {
-        id: editingCustomFieldId.value,
-        ...payload,
-      });
-    } else {
-      await store.dispatch('attributes/create', {
-        ...payload,
-        attribute_key: convertToAttributeSlug(customFieldForm.value.name),
-      });
-    }
-
-    resetCustomFieldForm();
-  } finally {
-    isSavingCustomField.value = false;
+  if (type === 'checkbox') {
+    return value === true || value === 'true'
+      ? t('CONTACT_PANEL.ATTRIBUTES.YES')
+      : t('CONTACT_PANEL.ATTRIBUTES.NO');
   }
+
+  if (value === null || value === undefined || value === '') {
+    return '---';
+  }
+
+  if (type === 'date') {
+    return formatDateValue(value);
+  }
+
+  return String(value);
 }
 
-async function deleteCustomField(field) {
-  isSavingCustomField.value = true;
-  try {
-    await store.dispatch('attributes/delete', field.id);
-  } finally {
-    isSavingCustomField.value = false;
+function getDraftAttributeValue(field) {
+  const value = draftCustomAttributes.value[field.attribute_key];
+
+  if (field.attribute_display_type === 'checkbox') {
+    return value === true || value === 'true';
   }
+
+  if (value === null || value === undefined) {
+    return '';
+  }
+
+  if (field.attribute_display_type === 'date') {
+    if (!value) return '';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '';
+    return date.toISOString().split('T')[0];
+  }
+
+  return value;
+}
+
+function normalizeAttributeValue(type, value) {
+  if (type === 'checkbox') {
+    return Boolean(value);
+  }
+
+  if (value === '' || value === null || value === undefined) {
+    return '';
+  }
+
+  if (['number', 'currency', 'percent'].includes(type)) {
+    const numericValue = Number(value);
+    return Number.isNaN(numericValue) ? value : numericValue;
+  }
+
+  return value;
+}
+
+function updateDraftAttribute(field, value) {
+  draftCustomAttributes.value = {
+    ...draftCustomAttributes.value,
+    [field.attribute_key]: normalizeAttributeValue(
+      field.attribute_display_type,
+      value
+    ),
+  };
 }
 
 async function persistCustomAttributes(updatedAttributes) {
@@ -237,9 +256,17 @@ async function persistCustomAttributes(updatedAttributes) {
 }
 
 async function handleAttributeUpdate(key, value) {
+  if (isEditing.value) {
+    draftCustomAttributes.value = {
+      ...draftCustomAttributes.value,
+      [key]: value,
+    };
+    return;
+  }
+
   try {
     await persistCustomAttributes({
-      ...dealCustomAttributes.value,
+      ...displayedCustomAttributes.value,
       [key]: value,
     });
     useAlert(t('CRM.CUSTOM_FIELDS.UPDATE_SUCCESS'));
@@ -249,8 +276,14 @@ async function handleAttributeUpdate(key, value) {
 }
 
 async function handleAttributeDelete(key) {
+  if (isEditing.value) {
+    const { [key]: _removed, ...rest } = draftCustomAttributes.value;
+    draftCustomAttributes.value = rest;
+    return;
+  }
+
   try {
-    const { [key]: _removed, ...rest } = dealCustomAttributes.value;
+    const { [key]: _removed, ...rest } = displayedCustomAttributes.value;
     await persistCustomAttributes(rest);
     useAlert(t('CRM.CUSTOM_FIELDS.UPDATE_SUCCESS'));
   } catch (error) {
@@ -258,19 +291,125 @@ async function handleAttributeDelete(key) {
   }
 }
 
-async function handleDelete() {
-  if (!confirmDelete.value) {
-    confirmDelete.value = true;
+function initializeDraftState() {
+  draftStageId.value = props.deal.crm_stage_id;
+  draftCustomAttributes.value = { ...(props.deal.custom_attributes || {}) };
+}
+
+function resetDraftState() {
+  draftStageId.value = null;
+  draftCustomAttributes.value = {};
+}
+
+function enterEditMode() {
+  initializeDraftState();
+  isEditing.value = true;
+}
+
+function cancelEditMode() {
+  isEditing.value = false;
+}
+
+function updateStage(stageId) {
+  draftStageId.value = stageId;
+  showStageDropdown.value = false;
+}
+
+async function confirmEditMode() {
+  if (!hasDraftChanges.value) {
+    isEditing.value = false;
     return;
   }
-  isDeleting.value = true;
+
+  isSavingEdit.value = true;
+  try {
+    await store.dispatch('crmDeals/updateDeal', {
+      id: props.deal.id,
+      crm_stage_id: draftStageId.value,
+      custom_attributes: draftCustomAttributes.value,
+    });
+    isEditing.value = false;
+    useAlert(t('CRM.EDIT_SUCCESS'));
+  } catch (error) {
+    useAlert(t('CRM.EDIT_ERROR'));
+  } finally {
+    isSavingEdit.value = false;
+  }
+}
+
+async function deleteLead() {
+  isDeletingLead.value = true;
   try {
     await store.dispatch('crmDeals/deleteDeal', props.deal.id);
+    deleteDialogRef.value?.close();
     emit('deleted', props.deal.id);
     emit('close');
   } finally {
-    isDeleting.value = false;
+    isDeletingLead.value = false;
   }
+}
+
+async function deleteLeadAndContact() {
+  isDeletingLeadAndContact.value = true;
+  try {
+    await store.dispatch('crmDeals/deleteDeal', props.deal.id);
+
+    if (props.deal.contact?.id) {
+      await store.dispatch('contacts/delete', props.deal.contact.id);
+    }
+
+    deleteDialogRef.value?.close();
+    emit('deleted', props.deal.id);
+    emit('close');
+  } finally {
+    isDeletingLeadAndContact.value = false;
+  }
+}
+
+function openConversation() {
+  if (!canOpenConversation.value) return;
+
+  router.push({
+    name: 'inbox_conversation',
+    params: {
+      accountId: route.params.accountId,
+      conversation_id: latestConversation.value.id,
+    },
+  });
+}
+
+function openContact() {
+  if (!canOpenContact.value) return;
+
+  router.push({
+    name: 'contacts_edit',
+    params: {
+      accountId: route.params.accountId,
+      contactId: props.deal.contact.id,
+    },
+  });
+}
+
+function handleActionClick({ action }) {
+  showActionsDropdown.value = false;
+
+  if (action === 'conversation') {
+    openConversation();
+    return;
+  }
+
+  if (action === 'contact') {
+    openContact();
+    return;
+  }
+
+  if (action === 'edit') {
+    enterEditMode();
+  }
+}
+
+function openDeleteDialog() {
+  deleteDialogRef.value?.open();
 }
 </script>
 
@@ -283,54 +422,86 @@ async function handleDelete() {
       :style="headerStyle"
     >
       <div class="flex items-center justify-between">
-        <input
-          v-if="isEditing"
-          v-model="editableName"
-          type="text"
-          class="text-sm font-semibold text-n-slate-12 truncate flex-1 mr-2 px-2 py-1 rounded-md border border-n-weak bg-white dark:bg-n-solid-3 focus:outline-none focus:ring-1 focus:ring-woot-500"
-          @blur="saveName"
-          @keyup.enter="$event.target.blur()"
-        />
-        <h2
-          v-else
-          class="text-sm font-semibold text-n-slate-12 truncate flex-1 mr-2"
-        >
-          {{ deal.name }}
-        </h2>
+        <div class="flex items-center gap-2 min-w-0 flex-1 mr-2">
+          <Avatar
+            :name="displayName"
+            :src="deal.contact?.thumbnail || ''"
+            :size="64"
+          />
+          <h2 class="text-sm font-semibold text-n-slate-12 truncate">
+            {{ displayName }}
+          </h2>
+        </div>
         <div class="flex items-center gap-1">
-          <button
-            class="p-1 rounded text-n-slate-9 hover:text-n-slate-12 hover:bg-n-alpha-2 transition-colors"
-            @click="isEditing = !isEditing"
-          >
-            <i class="i-lucide-pencil w-4 h-4" />
-          </button>
           <button
             class="p-1 rounded text-n-slate-9 hover:text-n-slate-12 hover:bg-n-alpha-2 transition-colors"
             @click="emit('close')"
           >
             <i class="i-lucide-x w-4 h-4" />
           </button>
+          <div
+            v-on-clickaway="() => (showActionsDropdown = false)"
+            class="relative flex items-center"
+          >
+            <button
+              v-tooltip="t('CONVERSATION.HEADER.MORE_ACTIONS')"
+              class="p-1 rounded-md text-n-slate-9 hover:text-n-slate-12 hover:bg-n-alpha-2 transition-colors"
+              :class="showActionsDropdown ? 'bg-n-alpha-2 text-n-slate-12' : ''"
+              @click="showActionsDropdown = !showActionsDropdown"
+            >
+              <i class="i-lucide-more-vertical w-4 h-4" />
+            </button>
+            <DropdownMenu
+              v-if="showActionsDropdown"
+              :menu-items="actionMenuItems"
+              class="mt-1 ltr:right-0 rtl:left-0 top-full"
+              @action="handleActionClick"
+            />
+          </div>
         </div>
       </div>
-      <select
-        v-if="isEditing"
-        :value="deal.crm_stage_id"
-        class="text-sm font-medium px-2 py-1 rounded-md border-none focus:outline-none focus:ring-2 focus:ring-woot-500 cursor-pointer w-fit"
-        :style="stageSelectStyle"
-        @change="updateStage"
-      >
-        <option
-          v-for="stage in stages"
-          :key="stage.id"
-          :value="stage.id"
-          :style="{
-            backgroundColor: stage.color,
-            color: readableTextColor(stage.color),
-          }"
+      <div v-if="isEditing" v-on-clickaway="() => (showStageDropdown = false)" class="relative w-full">
+        <button
+          type="button"
+          class="w-full flex items-center justify-between gap-3 px-2.5 py-2 rounded-lg border border-n-weak bg-white dark:bg-n-solid-3 text-n-slate-12 text-sm font-medium hover:bg-n-alpha-1 transition-colors"
+          @click="showStageDropdown = !showStageDropdown"
         >
-          {{ stage.name }}
-        </option>
-      </select>
+          <span class="flex items-center gap-2 min-w-0">
+            <span
+              class="size-2 rounded-full flex-shrink-0"
+              :style="{ backgroundColor: currentStage?.color || '#94A3B8' }"
+            />
+            <span class="truncate">{{ currentStage?.name }}</span>
+          </span>
+          <i
+            class="i-lucide-chevron-down w-4 h-4 flex-shrink-0 text-n-slate-10"
+          />
+        </button>
+
+        <div
+          v-if="showStageDropdown"
+          class="absolute top-full left-0 right-0 z-50 mt-1 p-2 rounded-xl bg-n-alpha-3 backdrop-blur-[100px] outline outline-1 outline-n-container shadow-lg"
+        >
+          <button
+            v-for="stage in stages"
+            :key="stage.id"
+            type="button"
+            class="w-full h-9 px-2 rounded-lg flex items-center gap-2 text-sm text-n-slate-12 hover:bg-n-alpha-1 transition-colors"
+            :class="
+              stage.id === selectedStageId
+                ? 'bg-n-alpha-1 dark:bg-n-solid-active'
+                : ''
+            "
+            @click="updateStage(stage.id)"
+          >
+            <span
+              class="size-2 rounded-full flex-shrink-0"
+              :style="{ backgroundColor: stage.color || '#94A3B8' }"
+            />
+            <span class="truncate">{{ stage.name }}</span>
+          </button>
+        </div>
+      </div>
       <CrmStageProgressBar
         v-else
         :stages="stages"
@@ -363,129 +534,201 @@ async function handleDelete() {
     </div>
 
     <div class="flex flex-col gap-4 p-4">
-      <div v-if="deal.assignee_id" class="pb-3">
-        <p class="text-xs text-n-slate-9 mb-1">{{ t('CRM.ASSIGNEE') }}</p>
-        <p class="text-sm text-n-slate-12">
-          {{ deal.assignee?.name ?? '-' }}
-        </p>
+      <div v-if="contactResponsible" class="pb-3">
+        <p class="text-xs text-n-slate-9 mb-1">{{ contactResponsibleLabel }}</p>
+        <div class="flex items-center gap-2 text-sm text-n-slate-12">
+          <Avatar
+            v-if="contactResponsible.type === 'agent'"
+            :name="contactResponsibleName"
+            :src="contactResponsible.thumbnail || ''"
+            :size="16"
+            rounded-full
+          />
+          <span
+            v-else
+            class="flex items-center justify-center size-4 rounded-md outline outline-1 outline-n-weak -outline-offset-1"
+          >
+            <EmojiIcon
+              v-if="contactResponsible.icon"
+              :value="contactResponsible.icon"
+              :color="contactResponsible.icon_color"
+              class="size-3"
+            />
+            <Icon
+              v-else
+              icon="i-lucide-users-round"
+              class="size-3 text-n-slate-11"
+            />
+          </span>
+          <span>{{ contactResponsibleName }}</span>
+        </div>
       </div>
 
-      <div class="flex flex-col -mx-4 border-t border-n-weak">
-        <div class="flex items-center justify-between px-4 pt-3 pb-1">
-          <p class="text-xs text-n-slate-9">
-            {{ t('CRM.CUSTOM_FIELDS.TITLE') }}
-          </p>
-        </div>
-
-        <div v-if="customFieldMode" class="px-4 py-3 border-b border-n-weak">
-          <input
-            v-model="customFieldForm.name"
-            type="text"
-            :placeholder="t('CRM.SETTINGS.CUSTOM_FIELD_NAME_PLACEHOLDER')"
-            class="w-full text-sm px-3 py-2 rounded-lg border border-n-weak bg-white dark:bg-n-solid-3 text-n-slate-12 placeholder-n-slate-9 focus:outline-none focus:ring-1 focus:ring-woot-500 mb-2"
+      <div v-if="latestConversationInbox" class="pb-3">
+        <p class="text-xs text-n-slate-9 mb-1">{{ t('CRM.INBOX') }}</p>
+        <div class="flex items-center gap-2 text-sm text-n-slate-12 min-w-0">
+          <ChannelIcon
+            :inbox="latestConversationInbox"
+            class="size-4 flex-shrink-0 text-n-slate-11"
           />
-          <select
-            v-model="customFieldForm.type"
-            class="w-full text-sm px-3 py-2 rounded-lg border border-n-weak bg-white dark:bg-n-solid-3 text-n-slate-12 focus:outline-none focus:ring-1 focus:ring-woot-500 mb-2"
-          >
-            <option
-              v-for="fieldType in customFieldTypes"
-              :key="fieldType.id"
-              :value="fieldType.id"
-            >
-              {{ t(fieldType.labelKey) }}
-            </option>
-          </select>
-          <input
-            v-if="isCustomFieldList"
-            v-model="customFieldForm.options"
-            type="text"
-            :placeholder="t('CRM.SETTINGS.CUSTOM_FIELD_OPTIONS_PLACEHOLDER')"
-            class="w-full text-sm px-3 py-2 rounded-lg border border-n-weak bg-white dark:bg-n-solid-3 text-n-slate-12 placeholder-n-slate-9 focus:outline-none focus:ring-1 focus:ring-woot-500 mb-2"
-          />
-          <div class="flex gap-2">
-            <button
-              class="flex-1 text-xs px-2 py-1.5 rounded-lg bg-n-alpha-2 text-n-slate-11 hover:bg-n-alpha-3 transition-colors"
-              @click="resetCustomFieldForm"
-            >
-              {{ t('CRM.CANCEL') }}
-            </button>
-            <button
-              :disabled="isSavingCustomField"
-              class="flex-1 text-xs px-2 py-1.5 rounded-lg bg-woot-500 text-white hover:bg-woot-600 disabled:opacity-50 transition-colors"
-              @click="saveCustomField"
-            >
-              {{ t('CRM.FORM.SAVE') }}
-            </button>
-          </div>
+          <span class="truncate">{{ latestConversationInbox.name }}</span>
         </div>
+      </div>
 
-        <div
-          v-for="field in customFields"
-          :key="field.id"
-          class="border-b border-n-weak last:border-b-0"
-        >
-          <div class="flex items-center justify-between px-4 pt-3">
-            <p class="m-0 text-sm font-medium text-n-slate-12 truncate">
-              {{ field.attribute_display_name }}
+        <div class="flex flex-col -mx-4 border-t border-n-weak">
+          <div class="flex items-center justify-between px-4 pt-3 pb-1">
+            <p class="text-xs text-n-slate-9">
+              {{ t('CRM.CUSTOM_FIELDS.TITLE') }}
             </p>
-            <div class="flex items-center gap-1">
-              <button
-                class="p-1 rounded text-n-slate-9 hover:text-n-slate-12 hover:bg-n-alpha-2 transition-colors"
-                @click="startEditCustomField(field)"
-              >
-                <i class="i-lucide-pencil w-3.5 h-3.5" />
-              </button>
-              <button
-                class="p-1 rounded text-n-slate-9 hover:text-red-500 hover:bg-n-alpha-2 transition-colors"
-                :disabled="isSavingCustomField"
-                @click="deleteCustomField(field)"
-              >
-                <i class="i-lucide-trash-2 w-3.5 h-3.5" />
-              </button>
+          </div>
+
+          <div
+            v-for="field in customFields"
+            :key="field.id"
+            class="border-b border-n-weak last:border-b-0 px-4 py-3"
+          >
+            <div class="flex items-start justify-between gap-3">
+              <p class="m-0 text-sm font-medium text-n-slate-12 shrink-0 max-w-[48%]">
+                {{ field.attribute_display_name }}
+              </p>
+              <div class="flex-1 min-w-0">
+                <template v-if="isEditing">
+                  <label
+                    v-if="field.attribute_display_type === 'checkbox'"
+                    class="flex justify-end"
+                  >
+                    <input
+                      :checked="getDraftAttributeValue(field)"
+                      type="checkbox"
+                      class="h-4 w-4 rounded border-n-weak bg-transparent"
+                      @change="
+                        updateDraftAttribute(field, $event.target.checked)
+                      "
+                    />
+                  </label>
+
+                  <select
+                    v-else-if="field.attribute_display_type === 'list'"
+                    :value="getDraftAttributeValue(field)"
+                    class="w-full h-9 rounded-lg border border-n-weak bg-white dark:bg-n-solid-3 px-2 text-sm text-right text-n-slate-12"
+                    @change="updateDraftAttribute(field, $event.target.value)"
+                  >
+                    <option value="">---</option>
+                    <option
+                      v-for="option in field.attribute_values || []"
+                      :key="option"
+                      :value="option"
+                    >
+                      {{ option }}
+                    </option>
+                  </select>
+
+                  <input
+                    v-else
+                    :value="getDraftAttributeValue(field)"
+                    :type="
+                      field.attribute_display_type === 'link'
+                        ? 'url'
+                        : field.attribute_display_type
+                    "
+                    class="w-full h-9 rounded-lg border border-n-weak bg-white dark:bg-n-solid-3 px-2 text-sm text-right text-n-slate-12"
+                    @input="updateDraftAttribute(field, $event.target.value)"
+                  />
+                </template>
+
+                <template v-else>
+                  <a
+                    v-if="
+                      field.attribute_display_type === 'link' &&
+                      field.value
+                    "
+                    :href="field.value"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="block text-sm text-right text-n-slate-12 break-all hover:underline"
+                  >
+                    {{ formatAttributeValue(field) }}
+                  </a>
+                  <p
+                    v-else
+                    class="m-0 text-sm text-right text-n-slate-11 break-words"
+                  >
+                    {{ formatAttributeValue(field) }}
+                  </p>
+                </template>
+              </div>
             </div>
           </div>
-          <CustomAttribute
-            :attribute-key="field.attribute_key"
-            :attribute-type="field.attribute_display_type"
-            :values="field.attribute_values"
-            :label="field.attribute_display_name"
-            :description="field.attribute_description"
-            :value="field.value"
-            hide-label
-            :attribute-regex="field.regex_pattern"
-            :regex-cue="field.regex_cue"
-            @update="handleAttributeUpdate"
-            @delete="handleAttributeDelete"
-          />
         </div>
-      </div>
     </div>
 
-    <div v-if="isEditing" class="mt-auto p-4 border-t border-n-weak flex gap-2">
-      <button
-        v-if="!confirmDelete"
-        class="flex-1 text-sm px-3 py-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40 transition-colors font-medium"
-        :disabled="isDeleting"
-        @click="handleDelete"
-      >
-        {{ t('CRM.DELETE') }}
-      </button>
-      <template v-else>
-        <button
-          class="flex-1 text-sm px-3 py-2 rounded-lg bg-n-alpha-2 text-n-slate-11 hover:bg-n-alpha-3 transition-colors font-medium"
-          @click="confirmDelete = false"
-        >
-          {{ t('CRM.CANCEL') }}
-        </button>
-        <button
-          class="flex-1 text-sm px-3 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors font-medium"
-          :disabled="isDeleting"
-          @click="handleDelete"
-        >
-          {{ isDeleting ? t('CRM.DELETING') : t('CRM.CONFIRM_DELETE') }}
-        </button>
-      </template>
+    <div v-if="isEditing" class="mt-auto p-4 border-t border-n-weak flex flex-col gap-2">
+      <div class="flex gap-2">
+        <Button
+          class="flex-1"
+          variant="faded"
+          color="slate"
+          :label="t('CRM.CANCEL')"
+          :disabled="isSavingEdit"
+          @click="cancelEditMode"
+        />
+        <Button
+          class="flex-1"
+          color="blue"
+          :label="t('CRM.CONFIRM')"
+          :is-loading="isSavingEdit"
+          :disabled="!hasDraftChanges || isSavingEdit"
+          @click="confirmEditMode"
+        />
+      </div>
+      <Button
+        class="w-full"
+        variant="faded"
+        color="ruby"
+        :label="t('CRM.DELETE')"
+        :disabled="isSavingEdit || isDeletingLead || isDeletingLeadAndContact"
+        @click="openDeleteDialog"
+      />
     </div>
+
+    <Dialog
+      ref="deleteDialogRef"
+      type="alert"
+      width="md"
+      :title="t('CRM.DELETE_DIALOG_TITLE')"
+      :description="t('CRM.DELETE_DIALOG_DESCRIPTION')"
+      :show-cancel-button="false"
+      :show-confirm-button="false"
+    >
+      <template #footer>
+        <div class="flex flex-col gap-3 w-full">
+          <Button
+            class="w-full"
+            variant="faded"
+            color="ruby"
+            :label="t('CRM.DELETE_LEAD')"
+            :is-loading="isDeletingLead"
+            :disabled="isDeletingLead || isDeletingLeadAndContact"
+            @click="deleteLead"
+          />
+          <Button
+            class="w-full"
+            color="ruby"
+            :label="t('CRM.DELETE_LEAD_AND_CONTACT')"
+            :is-loading="isDeletingLeadAndContact"
+            :disabled="isDeletingLead || isDeletingLeadAndContact"
+            @click="deleteLeadAndContact"
+          />
+          <Button
+            class="w-full"
+            variant="faded"
+            color="slate"
+            :label="t('CRM.CANCEL')"
+            :disabled="isDeletingLead || isDeletingLeadAndContact"
+            @click="deleteDialogRef?.close()"
+          />
+        </div>
+      </template>
+    </Dialog>
   </div>
 </template>

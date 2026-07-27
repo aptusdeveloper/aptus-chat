@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import Avatar from 'dashboard/components-next/avatar/Avatar.vue';
 
 const props = defineProps({
   deal: {
@@ -29,6 +30,10 @@ const closeDateLabel = computed(() => {
   if (!props.deal.close_date) return null;
   return new Date(props.deal.close_date).toLocaleDateString('pt-BR');
 });
+
+const displayName = computed(() => props.deal.contact?.name || props.deal.name);
+
+const contactThumbnail = computed(() => props.deal.contact?.thumbnail || '');
 </script>
 
 <template>
@@ -36,9 +41,17 @@ const closeDateLabel = computed(() => {
     class="bg-white dark:bg-n-solid-2 rounded-lg border border-n-weak p-3 cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md transition-shadow duration-150 select-none"
     @click="emit('click', deal)"
   >
-    <p class="text-sm font-medium text-n-slate-12 truncate mb-2">
-      {{ deal.name }}
-    </p>
+    <div class="flex items-center gap-2 mb-2 min-w-0">
+      <Avatar
+        :name="displayName"
+        :src="contactThumbnail"
+        :size="24"
+        rounded-full
+      />
+      <p class="text-sm font-medium text-n-slate-12 truncate mb-0">
+        {{ displayName }}
+      </p>
+    </div>
 
     <div class="flex items-center justify-between gap-2 flex-wrap">
       <span

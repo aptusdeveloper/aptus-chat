@@ -6,7 +6,7 @@ class Api::V1::Accounts::CrmDealsController < Api::V1::Accounts::BaseController
     deals = Current.account.crm_deals
     deals = deals.where(crm_pipeline_id: params[:pipeline_id]) if params[:pipeline_id].present?
     deals = deals.where(crm_stage_id: params[:stage_id]) if params[:stage_id].present?
-    @deals = deals.includes(:assignee, :contact).order(:position)
+    @deals = deals.includes(:assignee, contact: { conversations: [:assignee, :team, :inbox] }).order(:position)
   end
 
   def show; end
@@ -35,7 +35,7 @@ class Api::V1::Accounts::CrmDealsController < Api::V1::Accounts::BaseController
   private
 
   def fetch_deal
-    @deal = Current.account.crm_deals.find(params[:id])
+    @deal = Current.account.crm_deals.includes(:assignee, contact: { conversations: [:assignee, :team, :inbox] }).find(params[:id])
   end
 
   def deal_params

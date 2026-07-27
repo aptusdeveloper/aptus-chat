@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStore, useMapGetter } from 'dashboard/composables/store';
 import CrmKanbanColumn from './CrmKanbanColumn.vue';
@@ -53,6 +53,48 @@ watch(pipelines, newPipelines => {
 onMounted(async () => {
   await store.dispatch('crmDeals/fetchPipelines');
 });
+
+// Click-and-drag panning for the board's horizontal scroll, matching
+// Kommo's CRM board. Skips interactive elements and deal cards (identified
+// by `data-id`, set by CrmKanbanColumn) so it doesn't fight with the
+// vuedraggable card-drag or with buttons/inputs.
+const boardScrollRef = ref(null);
+const isPanning = ref(false);
+let panStartX = 0;
+let panStartScrollLeft = 0;
+
+function isInteractiveTarget(target) {
+  return !!target.closest('button, a, input, select, textarea, [data-id]');
+}
+
+function startPan(event) {
+  if (event.button !== 0 || isInteractiveTarget(event.target)) return;
+  const el = boardScrollRef.value;
+  if (!el) return;
+  isPanning.value = true;
+  panStartX = event.clientX;
+  panStartScrollLeft = el.scrollLeft;
+}
+
+function movePan(event) {
+  if (!isPanning.value || !boardScrollRef.value) return;
+  event.preventDefault();
+  boardScrollRef.value.scrollLeft = panStartScrollLeft - (event.clientX - panStartX);
+}
+
+function stopPan() {
+  isPanning.value = false;
+}
+
+onMounted(() => {
+  window.addEventListener('mousemove', movePan);
+  window.addEventListener('mouseup', stopPan);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('mousemove', movePan);
+  window.removeEventListener('mouseup', stopPan);
+});
 </script>
 
 <template>
@@ -101,6 +143,7 @@ onMounted(async () => {
           class="h-full w-80 shrink-0 overflow-hidden"
         >
           <CrmDealSidebar
+            :key="selectedDeal.id"
             :deal="selectedDeal"
             @close="handleSidebarClose"
             @deleted="handleSidebarClose"
@@ -108,7 +151,12 @@ onMounted(async () => {
         </div>
       </Transition>
 
-      <div class="flex gap-3 p-4 overflow-x-auto flex-1">
+      <div
+        ref="boardScrollRef"
+        class="flex gap-3 p-4 overflow-x-auto flex-1"
+        :class="isPanning ? 'cursor-grabbing select-none' : 'cursor-grab'"
+        @mousedown="startPan"
+      >
         <CrmKanbanColumn
           v-for="stage in stages"
           :key="stage.id"

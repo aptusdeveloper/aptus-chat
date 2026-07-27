@@ -335,7 +335,7 @@
     "SEND_EMAIL_PAYMENT_REQUIRED": "Email transcript is not available on your current plan. Please upgrade to use this feature.",
     "FORM": {
       "SEND_TO_CONTACT": "Enviar a transcrição ao cliente",
-      "SEND_TO_AGENT": "Enviar a transcrição para o agente atribuído",
+      "SEND_TO_AGENT": "Enviar a transcrição para o agente responsável",
       "SEND_TO_OTHER_EMAIL_ADDRESS": "Enviar a transcrição para outro endereço de e-mail",
       "EMAIL": {
         "PLACEHOLDER": "Insira um endereço de e-mail",
@@ -372,7 +372,7 @@
     }
   },
   "CONVERSATION_SIDEBAR": {
-    "ASSIGNEE_LABEL": "Agente atribuído",
+    "ASSIGNEE_LABEL": "Agente responsável",
     "SELF_ASSIGN": "Atribuir a mim",
     "TEAM_LABEL": "Equipa atribuída",
     "SELECT": {
