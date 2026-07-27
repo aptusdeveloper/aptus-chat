@@ -1,5 +1,5 @@
 class AptusHub::CustomerPortalService
-  DEFAULT_HISTORY_MONTHS = 6
+  class ConfigurationError < StandardError; end
 
   attr_reader :account, :user, :config
 
@@ -39,7 +39,9 @@ class AptusHub::CustomerPortalService
   end
 
   def payments(today: Time.zone.today)
-    history = month_ids(today, DEFAULT_HISTORY_MONTHS).map do |month|
+    ensure_go_live_on!
+
+    history = month_ids_from_go_live(today).map do |month|
       payment_history_item(month, today)
     end
 
@@ -47,7 +49,8 @@ class AptusHub::CustomerPortalService
       plan: {
         monthly_fee: config.monthly_fee,
         currency: config.currency,
-        payment_day: config.payment_day
+        payment_day: config.payment_day,
+        go_live_on: config.go_live_on.strftime('%Y-%m-%d')
       },
       current_month: history.first,
       history: history
@@ -131,9 +134,24 @@ class AptusHub::CustomerPortalService
     end
   end
 
-  def month_ids(today, count)
+  def ensure_go_live_on!
+    return if config.go_live_on.present?
+
+    raise ConfigurationError, 'Data de go-live do Hub Aptus nao configurada para esta conta.'
+  end
+
+  def month_ids_from_go_live(today)
     current_month = today.beginning_of_month
-    Array.new(count) { |offset| (current_month - offset.months).strftime('%Y-%m') }
+    first_month = config.go_live_on.beginning_of_month
+    return [] if first_month > current_month
+
+    months = []
+    cursor = current_month
+    while cursor >= first_month
+      months << cursor.strftime('%Y-%m')
+      cursor -= 1.month
+    end
+    months
   end
 
   def month_range(month)

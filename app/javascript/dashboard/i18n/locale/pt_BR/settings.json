@@ -1020,7 +1020,7 @@
       "DUE_DAY": "Vencimento",
       "DAY": "Dia {day}",
       "CURRENT_MONTH": "Mes atual",
-      "LAST_MONTHS": "Ultimos 6 meses",
+      "LAST_MONTHS": "Historico de pagamentos",
       "DUE_ON": "Vence em {date}",
       "EMPTY_VALUE": "-",
       "NO_PAYMENTS": "Nenhum pagamento registrado.",

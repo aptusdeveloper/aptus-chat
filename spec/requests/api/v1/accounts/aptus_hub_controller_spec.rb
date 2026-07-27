@@ -11,6 +11,7 @@ RSpec.describe 'Api::V1::Accounts::AptusHubController', type: :request do
       'enabled' => true,
       'bot_id' => 'bot-1',
       'bot_name' => 'Bot Aptus',
+      'go_live_on' => '2026-03-20',
       'monthly_fee' => 299.9,
       'currency' => 'BRL',
       'payment_day' => 10,
@@ -192,7 +193,7 @@ RSpec.describe 'Api::V1::Accounts::AptusHubController', type: :request do
   end
 
   describe 'GET /api/v1/accounts/:account_id/hub/payments' do
-    it 'returns each month with its own cost total, not just the flat monthly fee' do
+    it 'returns all months since the bot go-live with each month cost total' do
       travel_to Time.zone.local(2026, 7, 23) do
         stub_botpress_analytics_any(records: [{ llm: { cost: { sum: 4.0 } } }])
         stub_exchange_rate(bid: '5.00')
@@ -207,6 +208,8 @@ RSpec.describe 'Api::V1::Accounts::AptusHubController', type: :request do
 
       aggregate_failures do
         expect(body.dig('plan', 'monthly_fee')).to eq(299.9)
+        expect(body.dig('plan', 'go_live_on')).to eq('2026-03-20')
+        expect(body['history'].pluck('month')).to eq(%w[2026-07 2026-06 2026-05 2026-04 2026-03])
         expect(body.dig('current_month', 'month')).to eq('2026-07')
         expect(body.dig('current_month', 'status')).to eq('overdue')
         expect(body.dig('current_month', 'total')).to eq(current_month_total)
@@ -215,6 +218,15 @@ RSpec.describe 'Api::V1::Accounts::AptusHubController', type: :request do
         expect(current_month_total).to be_present
         expect(past_month_total).to be_present
       end
+    end
+
+    it 'returns a clear configuration error when go-live is missing' do
+      account.update!(custom_attributes: { 'aptus_hub' => hub_config.except('go_live_on') })
+
+      get "/api/v1/accounts/#{account.id}/hub/payments", headers: headers
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.parsed_body['error']).to eq('Data de go-live do Hub Aptus nao configurada para esta conta.')
     end
   end
 

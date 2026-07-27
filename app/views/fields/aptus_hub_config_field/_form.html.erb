@@ -8,16 +8,21 @@
       <div class="flex flex-col gap-1">
         <label class="text-sm text-slate-700"><%= meta[:label] %></label>
 
+        <% input_options = { class: "rounded-md border border-slate-300 px-2 py-1 text-sm w-full" } %>
+        <% input_options[:required] = true if meta[:required] %>
+
         <% if meta[:type] == :boolean %>
           <span>
             <%= check_box "account[aptus_hub]", key, { checked: ActiveModel::Type::Boolean.new.cast(value), class: "h-4 w-4 rounded border-slate-300" }, true, false %>
           </span>
         <% elsif meta[:type] == :select %>
-          <%= select_tag "account[aptus_hub][#{key}]", options_for_select(meta[:options], value), class: "rounded-md border border-slate-300 px-2 py-1 text-sm w-full" %>
+          <%= select_tag "account[aptus_hub][#{key}]", options_for_select(meta[:options], value), input_options %>
+        <% elsif meta[:type] == :date %>
+          <%= date_field "account[aptus_hub]", key, { value: value }.merge(input_options) %>
         <% elsif meta[:type] == :number %>
-          <%= number_field "account[aptus_hub]", key, value: value, step: 'any', class: "rounded-md border border-slate-300 px-2 py-1 text-sm w-full" %>
+          <%= number_field "account[aptus_hub]", key, { value: value, step: 'any' }.merge(input_options) %>
         <% else %>
-          <%= text_field "account[aptus_hub]", key, value: value, class: "rounded-md border border-slate-300 px-2 py-1 text-sm w-full" %>
+          <%= text_field "account[aptus_hub]", key, { value: value }.merge(input_options) %>
         <% end %>
       </div>
     <% end %>

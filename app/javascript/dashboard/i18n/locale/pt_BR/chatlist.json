@@ -144,10 +144,6 @@
     "SHOW_QUOTED_TEXT": "Mostrar Texto Citado",
     "MESSAGE_READ": "Lida",
     "SENDING": "Enviando",
-    "UNREAD_COUNT_OVERFLOW": "9+",
-    "ASSIGNEE_TYPE_TABS_CONTEXT_MENU": {
-      "SET_AS_DEFAULT": "Definir como padr?o",
-      "IS_DEFAULT": "Aba padr?o"
-    }
+    "UNREAD_COUNT_OVERFLOW": "9+"
   }
 }

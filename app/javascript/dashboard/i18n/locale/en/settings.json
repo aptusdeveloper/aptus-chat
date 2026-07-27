@@ -1020,7 +1020,7 @@
       "DUE_DAY": "Due date",
       "DAY": "Day {day}",
       "CURRENT_MONTH": "Current month",
-      "LAST_MONTHS": "Last 6 months",
+      "LAST_MONTHS": "Payment history",
       "DUE_ON": "Due on {date}",
       "EMPTY_VALUE": "-",
       "NO_PAYMENTS": "No payment registered.",

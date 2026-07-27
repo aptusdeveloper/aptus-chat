@@ -7,6 +7,7 @@ class AptusHubConfigField < Administrate::Field::Base
     { key: :bot_name, label: 'Bot name', type: :string, default: '' },
     { key: :status, label: 'Status', type: :select, options: %w[active paused cancelled], default: 'active' },
     { key: :ai_model, label: 'AI model', type: :string, default: '' },
+    { key: :go_live_on, label: 'Bot go-live date', type: :date, default: '', required: true },
     { key: :monthly_fee, label: 'Monthly fee', type: :number, default: 0 },
     { key: :bot_fixed_cost, label: 'Bot fixed cost (USD)', type: :number, default: 10 },
     { key: :currency, label: 'Currency', type: :select, options: %w[BRL USD], default: 'BRL' },

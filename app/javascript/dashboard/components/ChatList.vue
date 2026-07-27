@@ -680,17 +680,6 @@ function updateAssigneeTab(selectedTab) {
   }
 }
 
-function handleSetDefaultTab(key) {
-  const order = [...tabOrder.value];
-  const idx = order.indexOf(key);
-  if (idx <= 0) return;
-  order.splice(idx, 1);
-  order.unshift(key);
-  tabOrder.value = order;
-  saveTabOrder(order);
-  updateAssigneeTab(key);
-}
-
 function onBasicFilterChange(value, type) {
   if (type === 'status') {
     activeStatus.value = value;
@@ -1009,7 +998,6 @@ watch(conversationFilters, (newVal, oldVal) => {
       :items="assigneeTabItems"
       :active-tab="activeAssigneeTab"
       @chat-tab-change="updateAssigneeTab"
-      @set-default="handleSetDefaultTab"
       @reorder="handleReorderTabs"
     />
 

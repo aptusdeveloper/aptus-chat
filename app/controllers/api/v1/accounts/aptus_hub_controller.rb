@@ -4,6 +4,7 @@ class Api::V1::Accounts::AptusHubController < Api::V1::Accounts::BaseController
 
   rescue_from AptusHub::BotpressClient::Error, with: :render_hub_error
   rescue_from AptusHub::ExchangeRateClient::Error, with: :render_hub_error
+  rescue_from AptusHub::CustomerPortalService::ConfigurationError, with: :render_configuration_error
 
   def performance
     render json: portal_service.performance(from: period_from, to: period_to)
@@ -82,5 +83,9 @@ class Api::V1::Accounts::AptusHubController < Api::V1::Accounts::BaseController
 
   def render_hub_error(error)
     render json: { error: error.message }, status: :bad_gateway
+  end
+
+  def render_configuration_error(error)
+    render json: { error: error.message }, status: :unprocessable_content
   end
 end

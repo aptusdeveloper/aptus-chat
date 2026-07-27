@@ -36,6 +36,10 @@ class AptusHub::AccountConfig
     raw[:ai_model].presence || raw[:aiModel].presence
   end
 
+  def go_live_on
+    date_value(raw[:go_live_on].presence || raw[:goLiveOn])
+  end
+
   def monthly_fee
     numeric_value(raw[:monthly_fee].presence || raw[:monthlyFee], 0)
   end
@@ -128,6 +132,15 @@ class AptusHub::AccountConfig
     Float(value)
   rescue ArgumentError, TypeError
     fallback
+  end
+
+  def date_value(value)
+    return if value.blank?
+    return value if value.is_a?(Date)
+
+    Date.iso8601(value.to_s)
+  rescue ArgumentError, TypeError
+    nil
   end
 
   def extract_script_src(embed_code)
