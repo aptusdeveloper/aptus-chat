@@ -76,6 +76,11 @@ Logs em `/tmp/overmind-aptus.log` e `/tmp/ngrok-aptus.log`.
 - Prefer `with_modified_env` (from spec helpers) over stubbing `ENV` directly in specs
 - Specs in parallel/reloading environments: prefer comparing `error.class.name` over constant class equality when asserting raised errors
 
+## Database Access
+
+- To consult the database (inspect tables, schemas, run queries), always use `psql` commands via Bash instead of the `postgres` MCP tool.
+- Use compact, low-token flags: `psql "$DATABASE_URL" -qtAX -F',' -c "SELECT ..."` (no header/footer, no alignment, simple delimiter, ignores `.psqlrc`). Avoid the default aligned ASCII-table output — it wastes tokens on padding/borders.
+
 ## Codex Worktree Workflow
 
 - Use a separate git worktree + branch per task to keep changes isolated.

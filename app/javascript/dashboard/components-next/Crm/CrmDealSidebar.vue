@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
+import { format, parse, isValid } from 'date-fns';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import {
@@ -75,7 +76,9 @@ const headerStyle = computed(() => {
 
 const displayName = computed(() => props.deal.contact?.name || props.deal.name);
 
-const contactResponsible = computed(() => props.deal.contact_responsible ?? null);
+const contactResponsible = computed(
+  () => props.deal.contact_responsible ?? null
+);
 
 const contactResponsibleLabel = computed(() =>
   contactResponsible.value?.type === 'team'
@@ -95,7 +98,9 @@ const latestConversationInbox = computed(
   () => latestConversation.value?.inbox ?? null
 );
 
-const canOpenConversation = computed(() => Boolean(latestConversation.value?.id));
+const canOpenConversation = computed(() =>
+  Boolean(latestConversation.value?.id)
+);
 
 const canOpenContact = computed(() => Boolean(props.deal.contact?.id));
 
@@ -129,7 +134,9 @@ const actionMenuItems = computed(() => [
 ]);
 
 const displayedCustomAttributes = computed(() =>
-  isEditing.value ? draftCustomAttributes.value : props.deal.custom_attributes || {}
+  isEditing.value
+    ? draftCustomAttributes.value
+    : props.deal.custom_attributes || {}
 );
 
 const hasDraftChanges = computed(() => {
@@ -142,23 +149,6 @@ const hasDraftChanges = computed(() => {
       JSON.stringify(originalAttributes)
   );
 });
-
-watch(isEditing, value => {
-  if (!value) {
-    showStageDropdown.value = false;
-    resetDraftState();
-  }
-});
-
-watch(
-  () => props.deal.id,
-  () => {
-    isEditing.value = false;
-    showActionsDropdown.value = false;
-    showStageDropdown.value = false;
-    resetDraftState();
-  }
-);
 
 const customAttributeDefinitions = computed(() =>
   getters['attributes/getDealAttributesByPipeline'].value(
@@ -175,9 +165,13 @@ const customFields = computed(() =>
 
 function formatDateValue(value) {
   if (!value) return '---';
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleDateString('pt-BR');
+  const parsedDate = parse(value, 'yyyy-MM-dd', new Date());
+  if (isValid(parsedDate)) {
+    return format(parsedDate, 'dd/MM/yyyy');
+  }
+  const fallbackDate = new Date(value);
+  if (Number.isNaN(fallbackDate.getTime())) return value;
+  return fallbackDate.toLocaleDateString('pt-BR');
 }
 
 function formatAttributeValue(field) {
@@ -213,9 +207,13 @@ function getDraftAttributeValue(field) {
 
   if (field.attribute_display_type === 'date') {
     if (!value) return '';
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return '';
-    return date.toISOString().split('T')[0];
+    const parsedDate = parse(value, 'yyyy-MM-dd', new Date());
+    if (isValid(parsedDate)) {
+      return format(parsedDate, 'yyyy-MM-dd');
+    }
+    const fallbackDate = new Date(value);
+    if (Number.isNaN(fallbackDate.getTime())) return '';
+    return format(fallbackDate, 'yyyy-MM-dd');
   }
 
   return value;
@@ -235,6 +233,10 @@ function normalizeAttributeValue(type, value) {
     return Number.isNaN(numericValue) ? value : numericValue;
   }
 
+  if (type === 'date') {
+    return typeof value === 'string' ? value : '';
+  }
+
   return value;
 }
 
@@ -248,49 +250,6 @@ function updateDraftAttribute(field, value) {
   };
 }
 
-async function persistCustomAttributes(updatedAttributes) {
-  await store.dispatch('crmDeals/updateDeal', {
-    id: props.deal.id,
-    custom_attributes: updatedAttributes,
-  });
-}
-
-async function handleAttributeUpdate(key, value) {
-  if (isEditing.value) {
-    draftCustomAttributes.value = {
-      ...draftCustomAttributes.value,
-      [key]: value,
-    };
-    return;
-  }
-
-  try {
-    await persistCustomAttributes({
-      ...displayedCustomAttributes.value,
-      [key]: value,
-    });
-    useAlert(t('CRM.CUSTOM_FIELDS.UPDATE_SUCCESS'));
-  } catch (error) {
-    useAlert(t('CRM.CUSTOM_FIELDS.UPDATE_ERROR'));
-  }
-}
-
-async function handleAttributeDelete(key) {
-  if (isEditing.value) {
-    const { [key]: _removed, ...rest } = draftCustomAttributes.value;
-    draftCustomAttributes.value = rest;
-    return;
-  }
-
-  try {
-    const { [key]: _removed, ...rest } = displayedCustomAttributes.value;
-    await persistCustomAttributes(rest);
-    useAlert(t('CRM.CUSTOM_FIELDS.UPDATE_SUCCESS'));
-  } catch (error) {
-    useAlert(t('CRM.CUSTOM_FIELDS.UPDATE_ERROR'));
-  }
-}
-
 function initializeDraftState() {
   draftStageId.value = props.deal.crm_stage_id;
   draftCustomAttributes.value = { ...(props.deal.custom_attributes || {}) };
@@ -300,6 +259,23 @@ function resetDraftState() {
   draftStageId.value = null;
   draftCustomAttributes.value = {};
 }
+
+watch(isEditing, value => {
+  if (!value) {
+    showStageDropdown.value = false;
+    resetDraftState();
+  }
+});
+
+watch(
+  () => props.deal.id,
+  () => {
+    isEditing.value = false;
+    showActionsDropdown.value = false;
+    showStageDropdown.value = false;
+    resetDraftState();
+  }
+);
 
 function enterEditMode() {
   initializeDraftState();
@@ -415,7 +391,7 @@ function openDeleteDialog() {
 
 <template>
   <div
-    class="flex flex-col h-full bg-white dark:bg-n-solid-2 border-r border-n-weak w-80 shrink-0 overflow-y-auto"
+    class="flex flex-col h-full bg-white dark:bg-n-solid-2 border-r border-n-weak w-full shrink-0 overflow-y-auto"
   >
     <div
       class="flex flex-col gap-3 px-4 py-3 border-b border-n-weak"
@@ -460,7 +436,11 @@ function openDeleteDialog() {
           </div>
         </div>
       </div>
-      <div v-if="isEditing" v-on-clickaway="() => (showStageDropdown = false)" class="relative w-full">
+      <div
+        v-if="isEditing"
+        v-on-clickaway="() => (showStageDropdown = false)"
+        class="relative w-full"
+      >
         <button
           type="button"
           class="w-full flex items-center justify-between gap-3 px-2.5 py-2 rounded-lg border border-n-weak bg-white dark:bg-n-solid-3 text-n-slate-12 text-sm font-medium hover:bg-n-alpha-1 transition-colors"
@@ -575,94 +555,102 @@ function openDeleteDialog() {
         </div>
       </div>
 
-        <div class="flex flex-col -mx-4 border-t border-n-weak">
-          <div class="flex items-center justify-between px-4 pt-3 pb-1">
-            <p class="text-xs text-n-slate-9">
-              {{ t('CRM.CUSTOM_FIELDS.TITLE') }}
-            </p>
-          </div>
+      <div class="flex flex-col -mx-4 border-t border-n-weak">
+        <div class="flex items-center justify-between px-4 pt-3 pb-1">
+          <p class="text-xs text-n-slate-9">
+            {{ t('CRM.CUSTOM_FIELDS.TITLE') }}
+          </p>
+        </div>
 
+        <div
+          v-for="field in customFields"
+          :key="field.id"
+          class="border-b border-n-weak last:border-b-0 px-4 py-3"
+        >
           <div
-            v-for="field in customFields"
-            :key="field.id"
-            class="border-b border-n-weak last:border-b-0 px-4 py-3"
+            class="grid grid-cols-[minmax(120px,42%)_minmax(0,1fr)] items-start gap-x-4 gap-y-2"
           >
-            <div class="flex items-start justify-between gap-3">
-              <p class="m-0 text-sm font-medium text-n-slate-12 shrink-0 max-w-[48%]">
-                {{ field.attribute_display_name }}
-              </p>
-              <div class="flex-1 min-w-0">
-                <template v-if="isEditing">
-                  <label
-                    v-if="field.attribute_display_type === 'checkbox'"
-                    class="flex justify-end"
-                  >
-                    <input
-                      :checked="getDraftAttributeValue(field)"
-                      type="checkbox"
-                      class="h-4 w-4 rounded border-n-weak bg-transparent"
-                      @change="
-                        updateDraftAttribute(field, $event.target.checked)
-                      "
-                    />
-                  </label>
-
-                  <select
-                    v-else-if="field.attribute_display_type === 'list'"
-                    :value="getDraftAttributeValue(field)"
-                    class="w-full h-9 rounded-lg border border-n-weak bg-white dark:bg-n-solid-3 px-2 text-sm text-right text-n-slate-12"
-                    @change="updateDraftAttribute(field, $event.target.value)"
-                  >
-                    <option value="">---</option>
-                    <option
-                      v-for="option in field.attribute_values || []"
-                      :key="option"
-                      :value="option"
-                    >
-                      {{ option }}
-                    </option>
-                  </select>
-
+            <p class="m-0 pt-2 text-sm font-medium text-n-slate-12 leading-5">
+              {{ field.attribute_display_name }}
+            </p>
+            <div class="flex-1 min-w-0">
+              <template v-if="isEditing">
+                <label
+                  v-if="field.attribute_display_type === 'checkbox'"
+                  class="flex min-h-10 items-center justify-start sm:justify-end"
+                >
                   <input
-                    v-else
-                    :value="getDraftAttributeValue(field)"
-                    :type="
-                      field.attribute_display_type === 'link'
-                        ? 'url'
-                        : field.attribute_display_type
-                    "
-                    class="w-full h-9 rounded-lg border border-n-weak bg-white dark:bg-n-solid-3 px-2 text-sm text-right text-n-slate-12"
-                    @input="updateDraftAttribute(field, $event.target.value)"
+                    :checked="getDraftAttributeValue(field)"
+                    type="checkbox"
+                    class="h-4 w-4 rounded border-n-weak bg-transparent"
+                    @change="updateDraftAttribute(field, $event.target.checked)"
                   />
-                </template>
+                </label>
 
-                <template v-else>
-                  <a
-                    v-if="
-                      field.attribute_display_type === 'link' &&
-                      field.value
-                    "
-                    :href="field.value"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="block text-sm text-right text-n-slate-12 break-all hover:underline"
+                <select
+                  v-else-if="field.attribute_display_type === 'list'"
+                  :value="getDraftAttributeValue(field)"
+                  class="w-full min-h-10 rounded-lg border border-n-weak bg-white dark:bg-n-solid-3 px-3 text-sm text-n-slate-12"
+                  @change="updateDraftAttribute(field, $event.target.value)"
+                >
+                  <option value="">---</option>
+                  <option
+                    v-for="option in field.attribute_values || []"
+                    :key="option"
+                    :value="option"
                   >
-                    {{ formatAttributeValue(field) }}
-                  </a>
-                  <p
-                    v-else
-                    class="m-0 text-sm text-right text-n-slate-11 break-words"
-                  >
-                    {{ formatAttributeValue(field) }}
-                  </p>
-                </template>
-              </div>
+                    {{ option }}
+                  </option>
+                </select>
+
+                <textarea
+                  v-else-if="field.attribute_display_type === 'text'"
+                  :value="getDraftAttributeValue(field)"
+                  rows="2"
+                  class="w-full min-h-10 rounded-lg border border-n-weak bg-white dark:bg-n-solid-3 px-3 py-2 text-sm text-n-slate-12 resize"
+                  @input="updateDraftAttribute(field, $event.target.value)"
+                />
+
+                <input
+                  v-else
+                  :value="getDraftAttributeValue(field)"
+                  :type="
+                    field.attribute_display_type === 'link'
+                      ? 'url'
+                      : field.attribute_display_type
+                  "
+                  class="w-full min-h-10 rounded-lg border border-n-weak bg-white dark:bg-n-solid-3 px-3 text-sm text-n-slate-12"
+                  @input="updateDraftAttribute(field, $event.target.value)"
+                />
+              </template>
+
+              <template v-else>
+                <a
+                  v-if="field.attribute_display_type === 'link' && field.value"
+                  :href="field.value"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="block min-h-10 rounded-lg px-3 py-2 text-sm text-n-slate-12 break-all hover:underline"
+                >
+                  {{ formatAttributeValue(field) }}
+                </a>
+                <p
+                  v-else
+                  class="m-0 min-h-10 rounded-lg px-3 py-2 text-sm text-n-slate-11 break-words"
+                >
+                  {{ formatAttributeValue(field) }}
+                </p>
+              </template>
             </div>
           </div>
         </div>
+      </div>
     </div>
 
-    <div v-if="isEditing" class="mt-auto p-4 border-t border-n-weak flex flex-col gap-2">
+    <div
+      v-if="isEditing"
+      class="mt-auto p-4 border-t border-n-weak flex flex-col gap-2"
+    >
       <div class="flex gap-2">
         <Button
           class="flex-1"
