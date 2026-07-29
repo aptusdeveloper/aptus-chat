@@ -29,6 +29,7 @@
     },
     "PARSER": {
       "VARIABLES_LABEL": "Variáveis",
+      "HEADER_VARIABLES_LABEL": "Variável do Cabeçalho",
       "LANGUAGE": "Idioma",
       "CATEGORY": "Categoria",
       "VARIABLE_PLACEHOLDER": "Insira o valor para {variable}",

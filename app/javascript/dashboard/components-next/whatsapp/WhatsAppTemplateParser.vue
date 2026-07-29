@@ -16,12 +16,14 @@ import { useI18n } from 'vue-i18n';
 import Input from 'dashboard/components-next/input/Input.vue';
 import Button from 'dashboard/components-next/button/Button.vue';
 import TabBar from 'dashboard/components-next/tabbar/TabBar.vue';
+import WhatsAppMessagePreviewBubble from 'dashboard/components-next/whatsapp/WhatsAppMessagePreviewBubble.vue';
 import { useAlert } from 'dashboard/composables';
 import { uploadFile } from 'dashboard/helper/uploadHelper';
 import {
   buildTemplateParameters,
   allKeysRequired,
   replaceTemplateVariables,
+  processVariable,
   DEFAULT_LANGUAGE,
   DEFAULT_CATEGORY,
   COMPONENT_TYPES,
@@ -70,6 +72,45 @@ const bodyText = computed(() => {
 
 const hasMediaHeader = computed(() =>
   MEDIA_FORMATS.includes(headerComponent.value?.format)
+);
+
+// A TEXT header may itself carry a single {{1}} variable (Meta allows at
+// most one, but we handle it generically like body variables).
+const headerVariableKeys = computed(() => {
+  if (headerComponent.value?.format !== 'TEXT') return [];
+  const matches = headerComponent.value.text?.match(/{{([^}]+)}}/g) || [];
+  return matches.map(processVariable);
+});
+const hasHeaderVariable = computed(() => headerVariableKeys.value.length > 0);
+
+const renderedHeaderText = computed(() => {
+  if (headerComponent.value?.format !== 'TEXT') return '';
+  return replaceTemplateVariables(
+    headerComponent.value.text || '',
+    processedParams.value,
+    'header'
+  );
+});
+
+const footerComponent = computed(() =>
+  findComponentByType(props.template, COMPONENT_TYPES.FOOTER)
+);
+const footerText = computed(() => footerComponent.value?.text || '');
+
+const buttonsComponent = computed(() =>
+  findComponentByType(props.template, COMPONENT_TYPES.BUTTONS)
+);
+
+// Button labels never change based on the parameter the agent fills in
+// (e.g. a URL button's visible text stays the same regardless of the
+// dynamic suffix), so this is safe to use both for the live preview and
+// for what gets persisted alongside the sent message.
+const templateButtons = computed(
+  () =>
+    buttonsComponent.value?.buttons?.map(button => ({
+      type: button.type,
+      text: button.text,
+    })) || []
 );
 
 const formatType = computed(() => {
@@ -135,6 +176,7 @@ const isFormInvalid = computed(() => {
   if (
     !hasVariables.value &&
     !hasMediaHeader.value &&
+    !hasHeaderVariable.value &&
     !isCarouselTemplate.value
   ) {
     return false;
@@ -142,6 +184,13 @@ const isFormInvalid = computed(() => {
 
   if (hasMediaHeader.value && !processedParams.value.header?.media_url) {
     return true;
+  }
+
+  if (hasHeaderVariable.value) {
+    const hasEmptyHeaderVariable = headerVariableKeys.value.some(
+      key => !processedParams.value.header?.[key]
+    );
+    if (hasEmptyHeaderVariable) return true;
   }
 
   if (hasVariables.value && processedParams.value.body) {
@@ -261,6 +310,17 @@ const sendMessage = () => {
 
   const { name, category, language, namespace } = props.template;
 
+  const contentAttributes = {};
+  if (renderedHeaderText.value) {
+    contentAttributes.template_header = renderedHeaderText.value;
+  }
+  if (footerText.value) {
+    contentAttributes.template_footer = footerText.value;
+  }
+  if (templateButtons.value.length) {
+    contentAttributes.template_buttons = templateButtons.value;
+  }
+
   const payload = {
     message: renderedTemplate.value,
     templateParams: {
@@ -270,6 +330,7 @@ const sendMessage = () => {
       namespace,
       processed_params: processedParams.value,
     },
+    ...(Object.keys(contentAttributes).length && { contentAttributes }),
   };
   emit('sendMessage', payload);
 };
@@ -324,12 +385,14 @@ defineExpose({
         </span>
       </div>
 
-      <div class="flex flex-col gap-2">
-        <div class="rounded-md">
-          <div class="text-sm whitespace-pre-wrap text-n-slate-12">
-            {{ renderedTemplate }}
-          </div>
-        </div>
+      <div v-if="!isCarouselTemplate" class="flex justify-center">
+        <WhatsAppMessagePreviewBubble
+          :header-text="renderedHeaderText"
+          :header-format="headerComponent?.format"
+          :body-text="renderedTemplate"
+          :footer-text="footerText"
+          :buttons="templateButtons"
+        />
       </div>
 
       <div class="text-xs text-n-slate-11">
@@ -337,7 +400,14 @@ defineExpose({
       </div>
     </div>
 
-    <div v-if="hasVariables || hasMediaHeader || isCarouselTemplate">
+    <div
+      v-if="
+        hasVariables ||
+        hasMediaHeader ||
+        hasHeaderVariable ||
+        isCarouselTemplate
+      "
+    >
       <div v-if="hasMediaHeader" class="mb-4">
         <p class="mb-2.5 text-sm font-semibold">
           {{
@@ -368,6 +438,29 @@ defineExpose({
               t('WHATSAPP_TEMPLATES.PARSER.DOCUMENT_NAME_PLACEHOLDER')
             "
             @update:model-value="updateMediaName"
+          />
+        </div>
+      </div>
+
+      <!-- Header Variable Section -->
+      <div v-if="hasHeaderVariable" class="mb-4">
+        <p class="mb-2.5 text-sm font-semibold">
+          {{ t('WHATSAPP_TEMPLATES.PARSER.HEADER_VARIABLES_LABEL') }}
+        </p>
+        <div
+          v-for="key in headerVariableKeys"
+          :key="`header-${key}`"
+          class="flex items-center mb-2.5"
+        >
+          <Input
+            v-model="processedParams.header[key]"
+            type="text"
+            class="flex-1"
+            :placeholder="
+              t('WHATSAPP_TEMPLATES.PARSER.VARIABLE_PLACEHOLDER', {
+                variable: key,
+              })
+            "
           />
         </div>
       </div>

@@ -4,10 +4,24 @@ export const DEFAULT_CATEGORY = 'UTILITY';
 export const COMPONENT_TYPES = {
   HEADER: 'HEADER',
   BODY: 'BODY',
+  FOOTER: 'FOOTER',
   BUTTONS: 'BUTTONS',
   CAROUSEL: 'CAROUSEL',
 };
 export const MEDIA_FORMATS = ['IMAGE', 'VIDEO', 'DOCUMENT'];
+
+// Icon + a11y label per official WhatsApp template button type. QUICK_REPLY
+// (and any future/unrecognized type) intentionally falls back to no icon,
+// matching WhatsApp's own rendering.
+export const BUTTON_TYPE_META = {
+  URL: { icon: 'i-lucide-external-link', labelKey: 'URL' },
+  PHONE_NUMBER: { icon: 'i-lucide-phone', labelKey: 'PHONE_NUMBER' },
+  COPY_CODE: { icon: 'i-lucide-copy', labelKey: 'COPY_CODE' },
+  QUICK_REPLY: { icon: 'i-lucide-reply', labelKey: 'QUICK_REPLY' },
+};
+
+export const getButtonTypeMeta = type =>
+  BUTTON_TYPE_META[type?.toUpperCase()] || null;
 
 const PRIVATE_IPV4_PATTERNS = [
   /^10\./,
@@ -56,10 +70,14 @@ export const allKeysRequired = value => {
   return keys.every(key => value[key]);
 };
 
-export const replaceTemplateVariables = (templateText, processedParams) => {
+export const replaceTemplateVariables = (
+  templateText,
+  processedParams,
+  namespace = 'body'
+) => {
   return templateText.replace(/{{([^}]+)}}/g, (match, variable) => {
     const variableKey = processVariable(variable);
-    return processedParams.body?.[variableKey] || `{{${variable}}}`;
+    return processedParams[namespace]?.[variableKey] || `{{${variable}}}`;
   });
 };
 
@@ -130,18 +148,17 @@ export const buildTemplateParameters = (template, hasMediaHeaderValue) => {
   const bodyComponent = findComponentByType(template, COMPONENT_TYPES.BODY);
   const headerComponent = findComponentByType(template, COMPONENT_TYPES.HEADER);
 
-  if (!bodyComponent) return allVariables;
-
-  const templateString = bodyComponent.text;
-
-  // Process body variables
-  const matchedVariables = templateString.match(/{{([^}]+)}}/g);
-  if (matchedVariables) {
-    allVariables.body = {};
-    matchedVariables.forEach(variable => {
-      const key = processVariable(variable);
-      allVariables.body[key] = '';
-    });
+  // A carousel-only template can lack a top-level BODY component, so this
+  // can't early-return — header/button/carousel slots still need building.
+  if (bodyComponent) {
+    const matchedVariables = bodyComponent.text.match(/{{([^}]+)}}/g);
+    if (matchedVariables) {
+      allVariables.body = {};
+      matchedVariables.forEach(variable => {
+        const key = processVariable(variable);
+        allVariables.body[key] = '';
+      });
+    }
   }
 
   if (hasMediaHeaderValue) {
@@ -152,6 +169,19 @@ export const buildTemplateParameters = (template, hasMediaHeaderValue) => {
     // For document templates, include media_name field for filename support
     if (headerComponent.format.toLowerCase() === 'document') {
       allVariables.header.media_name = '';
+    }
+  }
+
+  // A TEXT header may itself carry a single {{1}} variable (Meta allows at
+  // most one). Distinct from the media_url/media_type slots above.
+  if (headerComponent?.format === 'TEXT') {
+    const headerVariables = headerComponent.text?.match(/{{([^}]+)}}/g);
+    if (headerVariables) {
+      if (!allVariables.header) allVariables.header = {};
+      headerVariables.forEach(variable => {
+        const key = processVariable(variable);
+        allVariables.header[key] = '';
+      });
     }
   }
 

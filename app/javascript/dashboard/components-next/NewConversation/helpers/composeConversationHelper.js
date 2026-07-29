@@ -165,13 +165,18 @@ export const prepareWhatsAppMessagePayload = ({
   selectedContact,
   message,
   templateParams,
+  contentAttributes,
   currentUser,
 }) => {
   return {
     inboxId: targetInbox.id,
     sourceId: targetInbox.sourceId,
     contactId: selectedContact.id,
-    message: { content: message, template_params: templateParams },
+    message: {
+      content: message,
+      template_params: templateParams,
+      content_attributes: contentAttributes,
+    },
     assigneeId: currentUser.id,
   };
 };
