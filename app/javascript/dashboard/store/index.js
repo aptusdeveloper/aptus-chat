@@ -62,6 +62,7 @@ import captainTools from './captain/tools';
 import captainCustomTools from './captain/customTools';
 import crmDeals from './modules/crmDeals';
 import crmAutomations from './modules/crmAutomations';
+import agenda from './modules/agenda';
 
 const plugins = [];
 
@@ -129,6 +130,7 @@ export default createStore({
     captainCustomTools,
     crmDeals,
     crmAutomations,
+    agenda,
   },
   plugins,
 });

@@ -4,6 +4,9 @@ import HubPerformance from 'dashboard/components-next/Hub/HubPerformance.vue';
 import HubTester from 'dashboard/components-next/Hub/HubTester.vue';
 import HubPayments from 'dashboard/components-next/Hub/HubPayments.vue';
 import HubPaymentDetails from 'dashboard/components-next/Hub/HubPaymentDetails.vue';
+import AgendaProfessionalsSettings from 'dashboard/components-next/Hub/Agenda/AgendaProfessionalsSettings.vue';
+import AgendaEventTypesSettings from 'dashboard/components-next/Hub/Agenda/AgendaEventTypesSettings.vue';
+import AgendaAppointmentsList from 'dashboard/components-next/Hub/Agenda/AgendaAppointmentsList.vue';
 
 const commonMeta = {
   permissions: ['administrator', 'agent'],
@@ -38,6 +41,24 @@ export const routes = [
         component: HubPayments,
         name: 'hub_payments',
         meta: adminMeta,
+      },
+      {
+        path: 'agenda',
+        component: AgendaProfessionalsSettings,
+        name: 'hub_agenda_professionals',
+        meta: commonMeta,
+      },
+      {
+        path: 'agenda/event-types',
+        component: AgendaEventTypesSettings,
+        name: 'hub_agenda_event_types',
+        meta: adminMeta,
+      },
+      {
+        path: 'agenda/appointments',
+        component: AgendaAppointmentsList,
+        name: 'hub_agenda_appointments',
+        meta: commonMeta,
       },
     ],
   },
