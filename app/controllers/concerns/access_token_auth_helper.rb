@@ -3,7 +3,10 @@ module AccessTokenAuthHelper
     'api/v1/accounts/conversations' => %w[show toggle_status toggle_typing_status toggle_priority create update custom_attributes],
     'api/v1/accounts/conversations/messages' => ['create'],
     'api/v1/accounts/conversations/assignments' => ['create'],
-    'api/v1/accounts/conversations/labels' => %w[index create]
+    'api/v1/accounts/conversations/labels' => %w[index create],
+    'api/v1/accounts/agenda_professionals' => %w[index show available_slots],
+    'api/v1/accounts/agenda_event_types' => %w[index show],
+    'api/v1/accounts/agenda_appointments' => %w[index show create update cancel reschedule]
   }.freeze
 
   def ensure_access_token
