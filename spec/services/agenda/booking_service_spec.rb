@@ -4,6 +4,10 @@ describe Agenda::BookingService do
   let!(:account) { create(:account) }
   let!(:professional) { create(:agenda_professional, account: account) }
   let!(:event_type) { create(:agenda_event_type, account: account, agenda_professional: professional, duration_minutes: 30) }
+  let!(:contact) { create(:contact, account: account) }
+  let!(:pipeline) { create(:crm_pipeline, account: account) }
+  let!(:stage) { create(:crm_stage, account: account, crm_pipeline: pipeline) }
+  let!(:deal) { create(:crm_deal, account: account, crm_pipeline: pipeline, crm_stage: stage, contact: contact) }
   let(:starts_at) { 1.day.from_now.change(hour: 9, min: 0) }
 
   describe '.create!' do
@@ -19,11 +23,13 @@ describe Agenda::BookingService do
     it 'passes through optional patient attributes' do
       appointment = described_class.create!(
         professional: professional, event_type: event_type, starts_at: starts_at, source: :staff,
-        attributes: { patient_name: 'Maria', patient_phone: '11999999999' }
+        attributes: { patient_name: 'Maria', patient_phone: '11999999999', contact_id: contact.id, crm_deal_id: deal.id }
       )
 
       expect(appointment.patient_name).to eq('Maria')
       expect(appointment.patient_phone).to eq('11999999999')
+      expect(appointment.contact).to eq(contact)
+      expect(appointment.crm_deal).to eq(deal)
     end
 
     it 'raises SlotUnavailable when the slot overlaps an existing confirmed appointment' do
@@ -48,7 +54,8 @@ describe Agenda::BookingService do
   describe '.reschedule!' do
     let!(:appointment) do
       create(:agenda_appointment, account: account, agenda_professional: professional, agenda_event_type: event_type,
-                                  starts_at: starts_at, ends_at: starts_at + 30.minutes, status: 'confirmed', patient_name: 'Maria')
+                                  starts_at: starts_at, ends_at: starts_at + 30.minutes, status: 'confirmed',
+                                  patient_name: 'Maria', contact: contact, crm_deal: deal)
     end
     let(:new_starts_at) { starts_at + 2.hours }
 
@@ -60,6 +67,8 @@ describe Agenda::BookingService do
       expect(new_appointment.starts_at).to eq(new_starts_at)
       expect(new_appointment.rescheduled_from_id).to eq(appointment.id)
       expect(new_appointment.patient_name).to eq('Maria')
+      expect(new_appointment.contact).to eq(contact)
+      expect(new_appointment.crm_deal).to eq(deal)
 
       appointment.reload
       expect(appointment).to be_cancelled

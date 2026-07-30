@@ -44,6 +44,7 @@ class CrmDeal < ApplicationRecord
   belongs_to :assignee, class_name: 'User', inverse_of: :crm_deals, optional: true
   has_many :crm_deal_conversations, dependent: :destroy
   has_many :conversations, through: :crm_deal_conversations
+  has_many :agenda_appointments, dependent: :nullify
 
   validates :account_id, presence: true
   validates :name, presence: true

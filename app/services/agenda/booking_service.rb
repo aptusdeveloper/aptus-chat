@@ -1,5 +1,7 @@
 class Agenda::BookingService
-  APPOINTMENT_ATTRIBUTE_KEYS = %i[contact_id conversation_id patient_name patient_phone notes].freeze
+  APPOINTMENT_ATTRIBUTE_KEYS = %i[
+    contact_id conversation_id crm_deal_id patient_name patient_phone notes
+  ].freeze
 
   def self.create!(professional:, event_type:, starts_at:, source:, attributes: {})
     ends_at = starts_at + event_type.duration_minutes.minutes
@@ -47,6 +49,7 @@ class Agenda::BookingService
       agenda_event_type: appointment.agenda_event_type,
       contact_id: appointment.contact_id,
       conversation_id: appointment.conversation_id,
+      crm_deal_id: appointment.crm_deal_id,
       patient_name: appointment.patient_name,
       patient_phone: appointment.patient_phone,
       notes: appointment.notes,

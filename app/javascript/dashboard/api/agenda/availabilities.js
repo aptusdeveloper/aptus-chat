@@ -24,6 +24,13 @@ class AgendaAvailabilitiesAPI extends ApiClient {
   delete(professionalId, id) {
     return axios.delete(`${this.url}/${professionalId}/availabilities/${id}`);
   }
+
+  bulkReplaceWeekly(professionalId, agendaAvailabilities) {
+    return axios.put(
+      `${this.url}/${professionalId}/availabilities/bulk_replace_weekly`,
+      { agenda_availabilities: agendaAvailabilities }
+    );
+  }
 }
 
 export default new AgendaAvailabilitiesAPI();

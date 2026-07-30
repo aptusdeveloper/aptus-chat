@@ -6,7 +6,7 @@ import HubPayments from 'dashboard/components-next/Hub/HubPayments.vue';
 import HubPaymentDetails from 'dashboard/components-next/Hub/HubPaymentDetails.vue';
 import AgendaProfessionalsSettings from 'dashboard/components-next/Hub/Agenda/AgendaProfessionalsSettings.vue';
 import AgendaEventTypesSettings from 'dashboard/components-next/Hub/Agenda/AgendaEventTypesSettings.vue';
-import AgendaAppointmentsList from 'dashboard/components-next/Hub/Agenda/AgendaAppointmentsList.vue';
+import AgendaCalendar from 'dashboard/components-next/Hub/Agenda/AgendaCalendar.vue';
 
 const commonMeta = {
   permissions: ['administrator', 'agent'],
@@ -56,7 +56,7 @@ export const routes = [
       },
       {
         path: 'agenda/appointments',
-        component: AgendaAppointmentsList,
+        component: AgendaCalendar,
         name: 'hub_agenda_appointments',
         meta: commonMeta,
       },

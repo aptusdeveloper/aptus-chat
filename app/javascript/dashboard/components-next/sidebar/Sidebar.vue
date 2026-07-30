@@ -561,6 +561,7 @@ const menuItems = computed(() => {
                 label: t('SIDEBAR.HUB_PERFORMANCE'),
                 icon: 'i-lucide-chart-no-axes-column',
                 to: accountScopedRoute('hub_performance'),
+                exact: true,
               },
               {
                 name: 'Hub Testar',
@@ -579,6 +580,35 @@ const menuItems = computed(() => {
                     },
                   ]
                 : []),
+            ],
+          },
+          {
+            name: 'Agenda',
+            label: t('SIDEBAR.AGENDA'),
+            icon: 'i-lucide-calendar-days',
+            children: [
+              {
+                name: 'Agenda Profissionais',
+                label: t('SIDEBAR.AGENDA_PROFESSIONALS'),
+                icon: 'i-lucide-users',
+                to: accountScopedRoute('hub_agenda_professionals'),
+              },
+              ...(isAdmin.value
+                ? [
+                    {
+                      name: 'Agenda Procedimentos',
+                      label: t('SIDEBAR.AGENDA_EVENT_TYPES'),
+                      icon: 'i-lucide-clipboard-list',
+                      to: accountScopedRoute('hub_agenda_event_types'),
+                    },
+                  ]
+                : []),
+              {
+                name: 'Agenda Agendamentos',
+                label: t('SIDEBAR.AGENDA_APPOINTMENTS'),
+                icon: 'i-lucide-calendar-check',
+                to: accountScopedRoute('hub_agenda_appointments'),
+              },
             ],
           },
         ]

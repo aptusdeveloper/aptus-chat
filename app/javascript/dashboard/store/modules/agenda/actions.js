@@ -95,6 +95,12 @@ export const actions = {
     return data.payload;
   },
 
+  updateAppointment: async ({ commit }, { id, ...appointmentData }) => {
+    const { data } = await AppointmentsAPI.update(id, appointmentData);
+    commit(types.UPSERT_AGENDA_APPOINTMENT, data.payload);
+    return data.payload;
+  },
+
   cancelAppointment: async ({ commit }, { id, reason }) => {
     const { data } = await AppointmentsAPI.cancel(id, reason);
     commit(types.UPSERT_AGENDA_APPOINTMENT, data.payload);
@@ -149,5 +155,20 @@ export const actions = {
       professionalId,
       availabilityId: id,
     });
+  },
+
+  replaceWeeklyAvailability: async (
+    { commit },
+    { professionalId, weeklyBlocks }
+  ) => {
+    const { data } = await AvailabilitiesAPI.bulkReplaceWeekly(
+      professionalId,
+      weeklyBlocks
+    );
+    commit(types.SET_AGENDA_AVAILABILITIES, {
+      professionalId,
+      availabilities: data.payload,
+    });
+    return data.payload;
   },
 };

@@ -5,7 +5,9 @@ class Api::V1::Accounts::AgendaAppointmentsController < Api::V1::Accounts::BaseC
   rescue_from CustomExceptions::Agenda::SlotUnavailable, with: :render_error_response
 
   def index
-    @appointments = filtered_appointments.order(:starts_at)
+    @appointments = filtered_appointments
+                    .includes(:agenda_professional, :agenda_event_type, :contact, :crm_deal)
+                    .order(:starts_at)
   end
 
   def show; end
@@ -39,7 +41,9 @@ class Api::V1::Accounts::AgendaAppointmentsController < Api::V1::Accounts::BaseC
   private
 
   def fetch_appointment
-    @appointment = Current.account.agenda_appointments.find(params[:id])
+    @appointment = Current.account.agenda_appointments
+                          .includes(:agenda_professional, :agenda_event_type, :contact, :crm_deal)
+                          .find(params[:id])
   end
 
   def filtered_appointments
@@ -51,6 +55,6 @@ class Api::V1::Accounts::AgendaAppointmentsController < Api::V1::Accounts::BaseC
   end
 
   def appointment_attributes
-    params.permit(:contact_id, :conversation_id, :patient_name, :patient_phone, :notes).to_h.symbolize_keys
+    params.permit(:contact_id, :conversation_id, :crm_deal_id, :patient_name, :patient_phone, :notes).to_h.symbolize_keys
   end
 end

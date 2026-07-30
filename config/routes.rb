@@ -210,7 +210,9 @@ Rails.application.routes.draw do
           end
           resources :agenda_professionals, only: [:index, :show, :create, :update, :destroy] do
             member { get :available_slots }
-            resources :availabilities, only: [:index, :create, :update, :destroy], controller: 'agenda_professionals/availabilities'
+            resources :availabilities, only: [:index, :create, :update, :destroy], controller: 'agenda_professionals/availabilities' do
+              collection { put :bulk_replace_weekly }
+            end
           end
           resources :agenda_event_types, only: [:index, :show, :create, :update, :destroy]
           resources :agenda_appointments, only: [:index, :show, :create, :update] do

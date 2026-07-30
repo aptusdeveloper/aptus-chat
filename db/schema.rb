@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_07_30_100400) do
+ActiveRecord::Schema[7.1].define(version: 2026_07_30_100500) do
   # These extensions should be enabled to support this database
   enable_extension "pg_stat_statements"
   enable_extension "pg_trgm"
@@ -131,12 +131,14 @@ ActiveRecord::Schema[7.1].define(version: 2026_07_30_100400) do
     t.text "notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "crm_deal_id"
     t.index ["account_id", "agenda_professional_id", "starts_at"], name: "index_agenda_appointments_on_account_professional_starts"
     t.index ["account_id", "status"], name: "index_agenda_appointments_on_account_id_and_status"
     t.index ["agenda_event_type_id"], name: "index_agenda_appointments_on_agenda_event_type_id"
     t.index ["agenda_professional_id"], name: "index_agenda_appointments_on_agenda_professional_id"
     t.index ["contact_id"], name: "index_agenda_appointments_on_contact_id"
     t.index ["conversation_id"], name: "index_agenda_appointments_on_conversation_id"
+    t.index ["crm_deal_id"], name: "index_agenda_appointments_on_crm_deal_id"
     t.index ["rescheduled_from_id"], name: "index_agenda_appointments_on_rescheduled_from_id"
   end
 
@@ -1554,6 +1556,7 @@ ActiveRecord::Schema[7.1].define(version: 2026_07_30_100400) do
   add_foreign_key "agenda_appointments", "agenda_appointments", column: "rescheduled_from_id"
   add_foreign_key "agenda_appointments", "agenda_event_types"
   add_foreign_key "agenda_appointments", "agenda_professionals"
+  add_foreign_key "agenda_appointments", "crm_deals"
   add_foreign_key "agenda_availabilities", "agenda_schedules"
   add_foreign_key "agenda_event_types", "agenda_professionals"
   add_foreign_key "agenda_schedules", "agenda_professionals"
