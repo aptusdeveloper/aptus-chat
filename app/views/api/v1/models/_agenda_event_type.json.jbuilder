@@ -1,0 +1,13 @@
+json.id resource.id
+json.agenda_professional_id resource.agenda_professional_id
+json.name resource.name
+json.duration_minutes resource.duration_minutes
+json.buffer_before_minutes resource.buffer_before_minutes
+json.buffer_after_minutes resource.buffer_after_minutes
+json.minimum_notice_minutes resource.minimum_notice_minutes
+json.slot_interval_minutes resource.slot_interval_minutes
+json.active resource.active
+json.description resource.description
+json.color resource.color
+json.created_at resource.created_at.to_i
+json.updated_at resource.updated_at.to_i

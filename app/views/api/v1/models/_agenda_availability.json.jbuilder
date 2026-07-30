@@ -1,0 +1,9 @@
+json.id resource.id
+json.agenda_schedule_id resource.agenda_schedule_id
+json.day_of_week resource.day_of_week
+json.date resource.date
+json.start_hour resource.start_hour
+json.start_minutes resource.start_minutes
+json.end_hour resource.end_hour
+json.end_minutes resource.end_minutes
+json.unavailable resource.unavailable

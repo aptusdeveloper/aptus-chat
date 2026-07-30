@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_07_14_150000) do
+ActiveRecord::Schema[7.1].define(version: 2026_07_30_100400) do
   # These extensions should be enabled to support this database
   enable_extension "pg_stat_statements"
   enable_extension "pg_trgm"
@@ -110,6 +110,97 @@ ActiveRecord::Schema[7.1].define(version: 2026_07_14_150000) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "agenda_appointments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.uuid "agenda_professional_id", null: false
+    t.uuid "agenda_event_type_id", null: false
+    t.integer "contact_id"
+    t.integer "conversation_id"
+    t.datetime "starts_at", null: false
+    t.datetime "ends_at", null: false
+    t.integer "status", default: 0, null: false
+    t.boolean "rescheduled", default: false, null: false
+    t.uuid "rescheduled_from_id"
+    t.datetime "cancelled_at"
+    t.string "cancellation_reason"
+    t.integer "source", default: 0, null: false
+    t.string "patient_name"
+    t.string "patient_phone"
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "agenda_professional_id", "starts_at"], name: "index_agenda_appointments_on_account_professional_starts"
+    t.index ["account_id", "status"], name: "index_agenda_appointments_on_account_id_and_status"
+    t.index ["agenda_event_type_id"], name: "index_agenda_appointments_on_agenda_event_type_id"
+    t.index ["agenda_professional_id"], name: "index_agenda_appointments_on_agenda_professional_id"
+    t.index ["contact_id"], name: "index_agenda_appointments_on_contact_id"
+    t.index ["conversation_id"], name: "index_agenda_appointments_on_conversation_id"
+    t.index ["rescheduled_from_id"], name: "index_agenda_appointments_on_rescheduled_from_id"
+  end
+
+  create_table "agenda_availabilities", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.uuid "agenda_schedule_id", null: false
+    t.integer "day_of_week"
+    t.date "date"
+    t.integer "start_hour"
+    t.integer "start_minutes"
+    t.integer "end_hour"
+    t.integer "end_minutes"
+    t.boolean "unavailable", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "agenda_schedule_id"], name: "idx_on_account_id_agenda_schedule_id_29ac4bdea8"
+    t.index ["agenda_schedule_id", "date"], name: "index_agenda_availabilities_on_agenda_schedule_id_and_date"
+    t.index ["agenda_schedule_id", "day_of_week"], name: "idx_on_agenda_schedule_id_day_of_week_d66c9549c9"
+    t.index ["agenda_schedule_id"], name: "index_agenda_availabilities_on_agenda_schedule_id"
+  end
+
+  create_table "agenda_event_types", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.uuid "agenda_professional_id"
+    t.string "name", null: false
+    t.integer "duration_minutes", null: false
+    t.integer "buffer_before_minutes", default: 0, null: false
+    t.integer "buffer_after_minutes", default: 0, null: false
+    t.integer "minimum_notice_minutes", default: 0, null: false
+    t.integer "slot_interval_minutes", default: 15, null: false
+    t.boolean "active", default: true, null: false
+    t.text "description"
+    t.string "color"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "agenda_professional_id"], name: "idx_on_account_id_agenda_professional_id_18fb9ca370"
+    t.index ["account_id"], name: "index_agenda_event_types_on_account_id"
+    t.index ["agenda_professional_id"], name: "index_agenda_event_types_on_agenda_professional_id"
+  end
+
+  create_table "agenda_professionals", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "user_id"
+    t.string "name", null: false
+    t.string "specialty"
+    t.string "timezone", default: "America/Sao_Paulo", null: false
+    t.boolean "active", default: true, null: false
+    t.string "color"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "active"], name: "index_agenda_professionals_on_account_id_and_active"
+    t.index ["account_id"], name: "index_agenda_professionals_on_account_id"
+    t.index ["user_id"], name: "index_agenda_professionals_on_user_id"
+  end
+
+  create_table "agenda_schedules", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.uuid "agenda_professional_id", null: false
+    t.string "name", default: "Padrão", null: false
+    t.string "timezone"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_agenda_schedules_on_account_id"
+    t.index ["agenda_professional_id"], name: "index_agenda_schedules_on_agenda_professional_id"
   end
 
   create_table "agent_bot_inboxes", force: :cascade do |t|
@@ -1460,6 +1551,12 @@ ActiveRecord::Schema[7.1].define(version: 2026_07_14_150000) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "agenda_appointments", "agenda_appointments", column: "rescheduled_from_id"
+  add_foreign_key "agenda_appointments", "agenda_event_types"
+  add_foreign_key "agenda_appointments", "agenda_professionals"
+  add_foreign_key "agenda_availabilities", "agenda_schedules"
+  add_foreign_key "agenda_event_types", "agenda_professionals"
+  add_foreign_key "agenda_schedules", "agenda_professionals"
   add_foreign_key "crm_automation_executions", "crm_automation_rules"
   add_foreign_key "crm_automation_executions", "crm_deals"
   add_foreign_key "crm_automation_rules", "crm_pipelines"

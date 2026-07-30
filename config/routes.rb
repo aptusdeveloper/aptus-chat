@@ -208,6 +208,17 @@ Rails.application.routes.draw do
           resources :crm_automation_rules, only: [:index, :create, :show, :update, :destroy] do
             post :clone, on: :member
           end
+          resources :agenda_professionals, only: [:index, :show, :create, :update, :destroy] do
+            member { get :available_slots }
+            resources :availabilities, only: [:index, :create, :update, :destroy], controller: 'agenda_professionals/availabilities'
+          end
+          resources :agenda_event_types, only: [:index, :show, :create, :update, :destroy]
+          resources :agenda_appointments, only: [:index, :show, :create, :update] do
+            member do
+              post :cancel
+              post :reschedule
+            end
+          end
           get 'hub/performance', to: 'aptus_hub#performance'
           get 'hub/webchat_config', to: 'aptus_hub#webchat_config'
           get 'hub/payments', to: 'aptus_hub#payments'

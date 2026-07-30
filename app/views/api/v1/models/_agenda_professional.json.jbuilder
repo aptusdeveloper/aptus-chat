@@ -1,0 +1,9 @@
+json.id resource.id
+json.name resource.name
+json.specialty resource.specialty
+json.timezone resource.timezone
+json.active resource.active
+json.color resource.color
+json.user_id resource.user_id
+json.created_at resource.created_at.to_i
+json.updated_at resource.updated_at.to_i
