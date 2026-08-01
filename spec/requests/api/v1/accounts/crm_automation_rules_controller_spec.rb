@@ -12,16 +12,19 @@ RSpec.describe 'Api::V1::Accounts::CrmAutomationRulesController', type: :request
       crm_automation_rule: {
         name: 'Boas-vindas na qualificacao',
         active: true,
-        crm_pipeline_id: pipeline.id,
-        trigger_type: 'deal_entered_stage',
-        conditions: [
+        triggers: [
           {
-            attribute_key: 'crm_stage_id',
-            filter_operator: 'equal_to',
-            values: [stage.id],
-            query_operator: 'AND'
+            trigger_type: 'deal_entered_stage',
+            crm_pipeline_id: pipeline.id,
+            stage_ids: [stage.id]
+          },
+          {
+            trigger_type: 'deal_stagnant',
+            crm_pipeline_id: nil,
+            days: 3
           }
         ],
+        conditions: [],
         actions: [
           {
             action_name: 'send_lead_message',
@@ -38,22 +41,28 @@ RSpec.describe 'Api::V1::Accounts::CrmAutomationRulesController', type: :request
 
   describe 'GET /api/v1/accounts/:account_id/crm_automation_rules' do
     it 'returns CRM automation rules for administrators' do
-      rule = create(:crm_automation_rule, account: account, crm_pipeline: pipeline)
+      rule = create(
+        :crm_automation_rule, account: account,
+                              triggers: [{ 'trigger_type' => 'deal_created', 'crm_pipeline_id' => pipeline.id, 'stage_ids' => [], 'days' => nil }]
+      )
 
       get "/api/v1/accounts/#{account.id}/crm_automation_rules",
           headers: administrator.create_new_auth_token
 
       expect(response).to have_http_status(:success)
       body = response.parsed_body
-      expect(body['payload'].first['id']).to eq(rule.id)
-      expect(body['payload'].first['crm_pipeline']['name']).to eq(pipeline.name)
+      response_rule = body['payload'].first
+      expect(response_rule['id']).to eq(rule.id)
+      expect(response_rule).not_to have_key('trigger_type')
+      expect(response_rule).not_to have_key('crm_pipeline_id')
+      expect(response_rule['triggers'].first['crm_pipeline_name']).to eq(pipeline.name)
     end
 
     it 'blocks agents' do
       get "/api/v1/accounts/#{account.id}/crm_automation_rules",
           headers: agent.create_new_auth_token
 
-      expect(response).to have_http_status(:forbidden)
+      expect(response).to have_http_status(:unauthorized)
     end
   end
 
@@ -68,7 +77,8 @@ RSpec.describe 'Api::V1::Accounts::CrmAutomationRulesController', type: :request
       expect(response).to have_http_status(:success)
       rule = CrmAutomationRule.last
       expect(rule.name).to eq('Boas-vindas na qualificacao')
-      expect(rule.trigger_type).to eq('deal_entered_stage')
+      expect(rule.triggers.first['trigger_type']).to eq('deal_entered_stage')
+      expect(rule.triggers.second['days']).to eq(3)
       expect(rule.actions.first['action_name']).to eq('send_lead_message')
     end
   end
@@ -96,7 +106,8 @@ RSpec.describe 'Api::V1::Accounts::CrmAutomationRulesController', type: :request
       end.to change(CrmAutomationRule, :count).by(1)
 
       expect(response).to have_http_status(:success)
-      expect(CrmAutomationRule.last.active).to be(false)
+      cloned_rule = CrmAutomationRule.find(response.parsed_body.dig('payload', 'id'))
+      expect(cloned_rule.active).to be(false)
     end
   end
 

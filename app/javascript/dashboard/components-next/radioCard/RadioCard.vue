@@ -35,6 +35,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  toggleable: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits(['select']);
@@ -42,7 +46,8 @@ const emit = defineEmits(['select']);
 const { t } = useI18n();
 
 const handleChange = () => {
-  if (!props.isActive && !props.disabled) {
+  if (props.disabled) return;
+  if (!props.isActive || props.toggleable) {
     emit('select', props.id);
   }
 };
@@ -73,7 +78,7 @@ const handleChange = () => {
           :value="id"
           :name="id"
           :disabled="disabled"
-          type="radio"
+          :type="toggleable ? 'checkbox' : 'radio'"
           class="shadow cursor-pointer grid place-items-center border-2 border-n-strong appearance-none rounded-full w-5 h-5 checked:bg-n-brand before:content-[''] before:bg-n-brand before:border-4 before:rounded-full before:border-n-strong checked:before:w-[18px] checked:before:h-[18px] checked:border checked:border-n-brand"
           @change="handleChange"
         />

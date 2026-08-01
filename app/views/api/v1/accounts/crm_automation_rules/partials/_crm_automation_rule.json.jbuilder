@@ -1,17 +1,18 @@
 json.id resource.id
 json.name resource.name
 json.active resource.active
-json.trigger_type resource.trigger_type
-json.crm_pipeline_id resource.crm_pipeline_id
 json.conditions resource.conditions
 json.actions resource.actions
 json.actions_count resource.actions.length
 
-if resource.crm_pipeline
-  json.crm_pipeline do
-    json.id resource.crm_pipeline.id
-    json.name resource.crm_pipeline.name
-  end
+json.triggers resource.triggers do |trigger|
+  trigger = trigger.with_indifferent_access
+  json.trigger_type trigger[:trigger_type]
+  json.crm_pipeline_id trigger[:crm_pipeline_id]
+  json.stage_ids trigger[:stage_ids] || []
+  json.days trigger[:days]
+  json.crm_pipeline_name pipelines_by_id[trigger[:crm_pipeline_id]]&.name
+  json.stage_names Array(trigger[:stage_ids]).filter_map { |id| stages_by_id[id]&.name }
 end
 
 json.created_at resource.created_at.to_i

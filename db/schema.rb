@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2026_07_30_100500) do
+ActiveRecord::Schema[7.1].define(version: 2026_07_31_010000) do
   # These extensions should be enabled to support this database
   enable_extension "pg_stat_statements"
   enable_extension "pg_trgm"
@@ -876,18 +876,16 @@ ActiveRecord::Schema[7.1].define(version: 2026_07_30_100500) do
 
   create_table "crm_automation_rules", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.bigint "account_id", null: false
-    t.uuid "crm_pipeline_id"
     t.string "name", null: false
-    t.string "trigger_type", null: false
     t.jsonb "conditions", default: [], null: false
     t.jsonb "actions", default: [], null: false
     t.boolean "active", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.jsonb "triggers", default: [], null: false
     t.index ["account_id", "active"], name: "index_crm_automation_rules_on_account_id_and_active"
     t.index ["conditions"], name: "index_crm_automation_rules_on_conditions", using: :gin
-    t.index ["crm_pipeline_id"], name: "index_crm_automation_rules_on_crm_pipeline_id"
-    t.index ["trigger_type"], name: "index_crm_automation_rules_on_trigger_type"
+    t.index ["triggers"], name: "index_crm_automation_rules_on_triggers", using: :gin
   end
 
   create_table "crm_deal_conversations", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1562,7 +1560,6 @@ ActiveRecord::Schema[7.1].define(version: 2026_07_30_100500) do
   add_foreign_key "agenda_schedules", "agenda_professionals"
   add_foreign_key "crm_automation_executions", "crm_automation_rules"
   add_foreign_key "crm_automation_executions", "crm_deals"
-  add_foreign_key "crm_automation_rules", "crm_pipelines"
   add_foreign_key "crm_deal_conversations", "crm_deals"
   add_foreign_key "crm_deals", "crm_pipelines"
   add_foreign_key "crm_deals", "crm_stages"

@@ -98,10 +98,9 @@ const setQuotedReplyFlagForInbox = (channelType, value, updateUISettings) => {
 /**
  * Fetches the signature flag for a specific channel type from UI settings.
  * @param {string} channelType - The type of the channel.
- * @param {Object} uiSettings - Reactive UI settings object.
  * @returns {boolean} The value of the signature enabled flag.
  */
-const fetchSignatureFlagFromUISettings = (channelType, uiSettings) => {
+const fetchSignatureFlagFromUISettings = channelType => {
   if (!channelType) return false;
 
   // APTUS-HIDDEN: assinatura de mensagens desativada no MVP — nunca aparece

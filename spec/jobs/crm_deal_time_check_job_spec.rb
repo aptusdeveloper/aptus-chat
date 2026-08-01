@@ -11,9 +11,8 @@ RSpec.describe CrmDealTimeCheckJob do
     rule = create(
       :crm_automation_rule,
       account: account,
-      crm_pipeline: matching_pipeline,
-      trigger_type: 'deal_stagnant',
-      conditions: [{ attribute_key: 'days_in_stage', filter_operator: 'gte', values: [1] }],
+      triggers: [{ 'trigger_type' => 'deal_stagnant', 'crm_pipeline_id' => matching_pipeline.id, 'stage_ids' => [], 'days' => 1 }],
+      conditions: [],
       actions: [{ action_name: 'update_field', action_params: { field: 'probability', value: 10 } }]
     )
 

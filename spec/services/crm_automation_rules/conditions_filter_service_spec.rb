@@ -36,6 +36,7 @@ RSpec.describe CrmAutomationRules::ConditionsFilterService do
   end
 
   it 'matches days in stage' do
+    deal.update_column(:stage_entered_at, 3.days.ago)
     rule = create(
       :crm_automation_rule,
       account: deal.account,

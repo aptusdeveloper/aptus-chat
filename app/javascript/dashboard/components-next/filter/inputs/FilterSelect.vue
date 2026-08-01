@@ -103,6 +103,7 @@ const updateSelected = newValue => {
             v-else
             :label="option.label"
             :icon="option.icon"
+            :class="option.indent ? 'pl-6' : null"
             @click="updateSelected(option.value)"
           />
         </template>

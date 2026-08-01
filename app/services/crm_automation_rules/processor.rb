@@ -27,14 +27,15 @@ class CrmAutomationRules::Processor
   private
 
   def rules
-    scope = CrmAutomationRule.active.where(trigger_type: @trigger_type, account_id: @account.id)
-    scope.select { |rule| rule.crm_pipeline_id.nil? || rule.crm_pipeline_id == @deal.crm_pipeline_id }
+    CrmAutomationRule.active.where(account_id: @account.id).with_trigger_type(@trigger_type)
   end
 
   def process_rule(rule)
+    matched_item = CrmAutomationRules::TriggerMatcher.matching_item(rule, trigger_types: [@trigger_type], deal: @deal)
+    return unless matched_item
     return if self.class.recently_executed?(rule, @deal)
     return unless CrmAutomationRules::ConditionsFilterService.match?(rule, @deal)
 
-    CrmAutomationRules::ActionService.new(rule, @deal).perform
+    CrmAutomationRules::ActionService.new(rule, @deal, trigger_type: @trigger_type).perform
   end
 end

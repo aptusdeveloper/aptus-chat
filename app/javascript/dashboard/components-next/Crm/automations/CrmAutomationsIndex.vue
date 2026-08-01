@@ -14,7 +14,6 @@ const route = useRoute();
 const { t } = useI18n();
 
 const automations = useMapGetter('crmAutomations/all');
-const pipelines = useMapGetter('crmDeals/pipelines');
 const uiFlags = useMapGetter('crmAutomations/uiFlags');
 const confirmDeleteId = ref(null);
 
@@ -27,16 +26,26 @@ const triggerLabels = computed(() =>
   }, {})
 );
 
-const pipelineName = automation => {
-  if (automation.crm_pipeline?.name) return automation.crm_pipeline.name;
-  const pipeline = pipelines.value.find(
-    item => item.id === automation.crm_pipeline_id
-  );
-  return pipeline?.name || t('CRM.AUTOMATIONS.ALL_PIPELINES');
-};
+const automationTriggers = automation => automation.triggers || [];
 
-const triggerName = automation =>
-  triggerLabels.value[automation.trigger_type] || automation.trigger_type;
+const triggerName = trigger =>
+  triggerLabels.value[trigger.trigger_type] || trigger.trigger_type;
+
+const triggerDetails = trigger => {
+  const details = [
+    trigger.crm_pipeline_name || t('CRM.AUTOMATIONS.FORM.ALL_PIPELINES_OPTION'),
+  ];
+
+  if (trigger.stage_names?.length) {
+    details.push(trigger.stage_names.join(', '));
+  }
+
+  if (trigger.days) {
+    details.push(`${trigger.days} ${t('CRM.AUTOMATIONS.LIST.DAYS_SUFFIX')}`);
+  }
+
+  return details.join(' · ');
+};
 
 const actionCount = automation =>
   automation.actions_count ?? automation.actions?.length ?? 0;
@@ -85,12 +94,7 @@ const deleteAutomation = async automation => {
 };
 
 onMounted(async () => {
-  await Promise.all([
-    store.dispatch('crmAutomations/fetch'),
-    pipelines.value.length
-      ? Promise.resolve()
-      : store.dispatch('crmDeals/fetchPipelines'),
-  ]);
+  await store.dispatch('crmAutomations/fetch');
 });
 </script>
 
@@ -156,9 +160,6 @@ onMounted(async () => {
                 {{ t('CRM.AUTOMATIONS.LIST.COLUMNS.STATUS') }}
               </th>
               <th class="px-4 py-3 text-left font-semibold">
-                {{ t('CRM.AUTOMATIONS.LIST.COLUMNS.PIPELINE') }}
-              </th>
-              <th class="px-4 py-3 text-left font-semibold">
                 {{ t('CRM.AUTOMATIONS.LIST.COLUMNS.TRIGGER') }}
               </th>
               <th class="px-4 py-3 text-left font-semibold">
@@ -211,10 +212,22 @@ onMounted(async () => {
                 </span>
               </td>
               <td class="px-4 py-3 text-n-slate-11">
-                {{ pipelineName(automation) }}
-              </td>
-              <td class="px-4 py-3 text-n-slate-11">
-                {{ triggerName(automation) }}
+                <div class="flex max-w-md flex-wrap gap-2">
+                  <span
+                    v-for="(trigger, triggerIndex) in automationTriggers(
+                      automation
+                    )"
+                    :key="`${automation.id}-${triggerIndex}`"
+                    class="inline-flex max-w-64 flex-col rounded-md bg-n-alpha-1 px-2 py-1 text-xs"
+                  >
+                    <span class="font-medium text-n-slate-12">
+                      {{ triggerName(trigger) }}
+                    </span>
+                    <span class="break-words text-n-slate-10">
+                      {{ triggerDetails(trigger) }}
+                    </span>
+                  </span>
+                </div>
               </td>
               <td class="px-4 py-3 text-n-slate-11">
                 {{ actionCount(automation) }}

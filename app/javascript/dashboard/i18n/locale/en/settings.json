@@ -1182,8 +1182,11 @@
         "CANCEL_SUCCESS": "Appointment cancelled",
         "RESCHEDULE": "Reschedule",
         "RESCHEDULE_SUCCESS": "Appointment rescheduled",
+        "RESCHEDULE_ERROR": "Couldn't reschedule. Please try again.",
+        "RESCHEDULE_ERROR_CONFLICT": "This time conflicts with another appointment for the same professional. Choose a different time.",
         "CREATE_SUCCESS": "Appointment created",
         "CREATE_ERROR": "Couldn't create appointment. Check the time and try again.",
+        "CREATE_ERROR_CONFLICT": "This time conflicts with another appointment for the same professional. Choose a different time.",
         "EDIT_LINKS": "Edit links",
         "LINKED_CONTACT": "Contact: {contact}",
         "LINKED_DEAL": "Deal: {deal}",
@@ -1205,7 +1208,14 @@
           "NOTES": "Notes",
           "NOTES_PLACEHOLDER": "Internal notes for this appointment",
           "SAVE": "Create appointment",
-          "MISSING_SETUP": "Create at least one active professional and one active procedure before scheduling."
+          "MISSING_SETUP": "Create at least one active professional and one active procedure before scheduling.",
+          "AVAILABILITY_WARNING": {
+            "TITLE": "Warning: time outside {professional}'s availability",
+            "AVAILABLE_HOURS": "Available hours that day: {hours}.",
+            "NO_AVAILABILITY_THIS_DAY": "This professional has no availability set up for that day.",
+            "CHANGE_TIME": "Change time",
+            "CONFIRM_ANYWAY": "Book anyway"
+          }
         }
       }
     }
@@ -1291,10 +1301,10 @@
         "EMPTY_SUBTITLE": "Create the first rule to act when a lead changes in CRM.",
         "CLONE_SUCCESS": "Automation duplicated successfully",
         "DELETE_SUCCESS": "Automation deleted successfully",
+        "DAYS_SUFFIX": "days",
         "COLUMNS": {
           "NAME": "Name",
           "STATUS": "Status",
-          "PIPELINE": "Pipeline",
           "TRIGGER": "Trigger",
           "ACTIONS": "Actions",
           "UPDATED": "Updated",
@@ -1308,6 +1318,8 @@
         "DEAL_ENTERED_STAGE_DESCRIPTION": "Fires when the deal enters the stage you select below.",
         "DEAL_STAGE_CHANGED": "Deal stage changed",
         "DEAL_STAGE_CHANGED_DESCRIPTION": "Fires whenever the deal moves to a different stage, any stage.",
+        "DEAL_UPDATED": "Deal updated",
+        "DEAL_UPDATED_DESCRIPTION": "Fires whenever any deal field is updated.",
         "DEAL_WON": "Deal won",
         "DEAL_WON_DESCRIPTION": "Fires when the deal is marked as won.",
         "DEAL_LOST": "Deal lost",
@@ -1327,11 +1339,17 @@
         "STAGE_REQUIRED": "Select a target stage for the \"Change stage\" action.",
         "PIPELINE_REQUIRED": "Select a target pipeline for the \"Change pipeline\" action.",
         "WEBHOOK_URL_REQUIRED": "Enter a URL for the \"Send webhook\" action.",
+        "TRIGGER_REQUIRED": "Add at least one trigger.",
+        "TRIGGER_STAGE_REQUIRED": "Select at least one stage for every stage trigger.",
+        "TRIGGER_DAYS_REQUIRED": "Enter a number of days greater than zero for every time trigger.",
         "PIPELINE": "Pipeline",
         "TRIGGER": "Trigger",
         "STAGE": "Stage",
         "SELECT_STAGE": "Select a stage",
         "DAYS": "Days",
+        "ADD_STAGE": "Add stage",
+        "ADD_ANOTHER_TRIGGER": "Add another {trigger}",
+        "ALL_PIPELINES_OPTION": "All pipelines",
         "ADD_CONDITION": "Add condition",
         "ADD_ACTION": "Add action",
         "NO_CONDITIONS": "No extra conditions.",

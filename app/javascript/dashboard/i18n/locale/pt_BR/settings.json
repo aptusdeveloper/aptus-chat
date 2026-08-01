@@ -1181,8 +1181,11 @@
         "CANCEL_SUCCESS": "Agendamento cancelado",
         "RESCHEDULE": "Remarcar",
         "RESCHEDULE_SUCCESS": "Agendamento remarcado",
+        "RESCHEDULE_ERROR": "Não foi possível remarcar. Tente novamente.",
+        "RESCHEDULE_ERROR_CONFLICT": "Esse horário conflita com outro agendamento do mesmo profissional. Escolha outro horário.",
         "CREATE_SUCCESS": "Agendamento criado",
         "CREATE_ERROR": "Não foi possível criar o agendamento. Verifique o horário e tente novamente.",
+        "CREATE_ERROR_CONFLICT": "Esse horário conflita com outro agendamento do mesmo profissional. Escolha outro horário.",
         "EDIT_LINKS": "Editar vínculos",
         "LINKED_CONTACT": "Contato: {contact}",
         "LINKED_DEAL": "Deal: {deal}",
@@ -1204,7 +1207,14 @@
           "NOTES": "Observações",
           "NOTES_PLACEHOLDER": "Observações internas sobre este agendamento",
           "SAVE": "Criar agendamento",
-          "MISSING_SETUP": "Cadastre pelo menos um profissional ativo e um procedimento ativo antes de agendar."
+          "MISSING_SETUP": "Cadastre pelo menos um profissional ativo e um procedimento ativo antes de agendar.",
+          "AVAILABILITY_WARNING": {
+            "TITLE": "Atenção: horário fora da disponibilidade de {professional}",
+            "AVAILABLE_HOURS": "Horário disponível nesse dia: {hours}.",
+            "NO_AVAILABILITY_THIS_DAY": "Esse profissional não tem horário cadastrado para esse dia.",
+            "CHANGE_TIME": "Trocar horário",
+            "CONFIRM_ANYWAY": "Marcar mesmo assim"
+          }
         }
       }
     }
@@ -1290,10 +1300,10 @@
         "EMPTY_SUBTITLE": "Crie a primeira regra para agir quando um lead mudar no CRM.",
         "CLONE_SUCCESS": "Automação duplicada com sucesso",
         "DELETE_SUCCESS": "Automação excluída com sucesso",
+        "DAYS_SUFFIX": "dias",
         "COLUMNS": {
           "NAME": "Nome",
           "STATUS": "Status",
-          "PIPELINE": "Funil",
           "TRIGGER": "Gatilho",
           "ACTIONS": "Ações",
           "UPDATED": "Atualizada",
@@ -1307,6 +1317,8 @@
         "DEAL_ENTERED_STAGE_DESCRIPTION": "Dispara quando o lead entra na etapa selecionada abaixo.",
         "DEAL_STAGE_CHANGED": "Lead mudou de etapa",
         "DEAL_STAGE_CHANGED_DESCRIPTION": "Dispara sempre que o lead muda de etapa, para qualquer etapa.",
+        "DEAL_UPDATED": "Lead atualizado",
+        "DEAL_UPDATED_DESCRIPTION": "Dispara sempre que qualquer campo do lead é atualizado.",
         "DEAL_WON": "Lead ganho",
         "DEAL_WON_DESCRIPTION": "Dispara quando o lead é marcado como ganho.",
         "DEAL_LOST": "Lead perdido",
@@ -1326,11 +1338,17 @@
         "STAGE_REQUIRED": "Selecione a etapa de destino da ação \"Mudar etapa\".",
         "PIPELINE_REQUIRED": "Selecione o funil de destino da ação \"Mudar funil\".",
         "WEBHOOK_URL_REQUIRED": "Informe a URL da ação \"Enviar webhook\".",
+        "TRIGGER_REQUIRED": "Adicione pelo menos um gatilho.",
+        "TRIGGER_STAGE_REQUIRED": "Selecione pelo menos uma etapa para cada gatilho de etapa.",
+        "TRIGGER_DAYS_REQUIRED": "Informe um número de dias maior que zero para cada gatilho de tempo.",
         "PIPELINE": "Funil",
         "TRIGGER": "Gatilho",
         "STAGE": "Etapa",
         "SELECT_STAGE": "Selecione uma etapa",
         "DAYS": "Dias",
+        "ADD_STAGE": "Adicionar etapa",
+        "ADD_ANOTHER_TRIGGER": "Adicionar outro {trigger}",
+        "ALL_PIPELINES_OPTION": "Todos os funis",
         "ADD_CONDITION": "Adicionar condição",
         "ADD_ACTION": "Adicionar ação",
         "NO_CONDITIONS": "Sem condições extras.",

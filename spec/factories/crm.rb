@@ -35,9 +35,8 @@ FactoryBot.define do
 
   factory :crm_automation_rule do
     account
-    crm_pipeline { nil }
     sequence(:name) { |n| "CRM Automation #{n}" }
-    trigger_type { 'deal_created' }
+    triggers { [{ 'trigger_type' => 'deal_created', 'crm_pipeline_id' => nil, 'stage_ids' => [], 'days' => nil }] }
     conditions { [] }
     actions { [] }
     active { true }
@@ -46,7 +45,7 @@ FactoryBot.define do
   factory :crm_automation_execution do
     crm_automation_rule
     crm_deal
-    trigger_type { crm_automation_rule.trigger_type }
+    trigger_type { crm_automation_rule.triggers.first['trigger_type'] }
     status { 'success' }
     executed_at { Time.current }
   end

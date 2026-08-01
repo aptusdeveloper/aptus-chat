@@ -1,6 +1,6 @@
 <script setup>
 /* eslint-disable @intlify/vue-i18n/no-dynamic-keys */
-import { computed, onMounted, reactive, ref, watch } from 'vue';
+import { computed, onMounted, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
 import { useStore, useMapGetter } from 'dashboard/composables/store';
@@ -35,44 +35,41 @@ const fileInputs = ref({});
 const form = reactive({
   name: '',
   active: true,
-  crm_pipeline_id: '',
-  trigger_type: 'deal_entered_stage',
-  trigger_stage_id: '',
-  trigger_days: 1,
+  triggers: [],
   conditions: [],
   actions: [],
 });
+
+let triggerKeySeq = 0;
+const nextTriggerKey = () => {
+  triggerKeySeq += 1;
+  return triggerKeySeq;
+};
 
 const isEdit = computed(() => route.name === 'crm_automation_edit');
 const automationId = computed(() => route.params.automationId);
 const accountId = computed(() => route.params.accountId);
 
-const allStages = computed(() =>
-  pipelines.value.flatMap(pipeline =>
-    (pipeline.stages || []).map(stage => ({
-      ...stage,
-      pipeline_name: pipeline.name,
-    }))
-  )
+// Unscoped stage pickers group stages under their pipeline name.
+const stageSelectOptions = computed(() =>
+  pipelines.value
+    .filter(pipeline => (pipeline.stages || []).length)
+    .flatMap(pipeline => [
+      {
+        value: `__pipeline__${pipeline.id}`,
+        label: pipeline.name,
+        disabled: true,
+      },
+      ...pipeline.stages.map(stage => ({
+        value: stage.id,
+        label: stage.name,
+        indent: true,
+      })),
+    ])
 );
-
-const selectedPipeline = computed(
-  () =>
-    pipelines.value.find(pipeline => pipeline.id === form.crm_pipeline_id) ||
-    null
-);
-
-const stageOptions = computed(() => {
-  if (selectedPipeline.value) return selectedPipeline.value.stages || [];
-  return allStages.value;
-});
 
 const customAttributes = computed(() =>
-  store.getters['attributes/getAttributesByModel']('deal_attribute').filter(
-    attribute =>
-      !form.crm_pipeline_id ||
-      attribute.crm_pipeline_id === form.crm_pipeline_id
-  )
+  store.getters['attributes/getAttributesByModel']('deal_attribute')
 );
 
 const conditionAttributes = computed(() => [
@@ -109,23 +106,11 @@ const fieldOptions = computed(() => [
   })),
 ]);
 
-const selectedTrigger = computed(() =>
-  TRIGGERS.find(trigger => trigger.id === form.trigger_type)
-);
-
 function conditionAttribute(condition) {
   return conditionAttributes.value.find(
     attribute => attribute.id === condition.attribute_key
   );
 }
-
-const pipelineOptions = computed(() => [
-  { value: '', label: t('CRM.AUTOMATIONS.ALL_PIPELINES') },
-  ...pipelines.value.map(pipeline => ({
-    value: pipeline.id,
-    label: pipeline.name,
-  })),
-]);
 
 const pipelineSelectOptions = computed(() =>
   pipelines.value.map(pipeline => ({
@@ -134,9 +119,10 @@ const pipelineSelectOptions = computed(() =>
   }))
 );
 
-const stageSelectOptions = computed(() =>
-  stageOptions.value.map(stage => ({ value: stage.id, label: stage.name }))
-);
+const triggerPipelineSelectOptions = computed(() => [
+  { value: '', label: t('CRM.AUTOMATIONS.FORM.ALL_PIPELINES_OPTION') },
+  ...pipelineSelectOptions.value,
+]);
 
 const agentSelectOptions = computed(() =>
   agents.value.map(agent => ({ value: agent.id, label: agent.name }))
@@ -255,15 +241,102 @@ const saveLabel = computed(() =>
     : t('CRM.FORM.SAVE')
 );
 
-const triggerNeedsStage = computed(() => selectedTrigger.value?.needsStage);
-const triggerNeedsDays = computed(() => selectedTrigger.value?.needsDays);
-
 const createCondition = () => ({
-  attribute_key: triggerNeedsStage.value ? 'amount' : 'crm_stage_id',
+  attribute_key: 'crm_stage_id',
   filter_operator: 'equal_to',
   values: [''],
   query_operator: 'AND',
 });
+
+function triggerMeta(triggerType) {
+  return TRIGGERS.find(trigger => trigger.id === triggerType) || {};
+}
+
+function triggerLabel(triggerType) {
+  const meta = triggerMeta(triggerType);
+  return meta.labelKey ? t(meta.labelKey) : triggerType;
+}
+
+function createTriggerEntry(triggerType) {
+  const meta = triggerMeta(triggerType);
+  return {
+    clientKey: nextTriggerKey(),
+    trigger_type: triggerType,
+    crm_pipeline_id: '',
+    stage_ids: meta.needsStage ? [''] : [],
+    days: meta.needsDays ? 1 : null,
+  };
+}
+
+const triggerGroups = computed(() =>
+  TRIGGERS.map(trigger => ({
+    meta: trigger,
+    entries: form.triggers.filter(entry => entry.trigger_type === trigger.id),
+  })).filter(group => group.entries.length)
+);
+
+function triggerTypeIsActive(triggerType) {
+  return form.triggers.some(entry => entry.trigger_type === triggerType);
+}
+
+function addTriggerEntry(triggerType) {
+  form.triggers.push(createTriggerEntry(triggerType));
+}
+
+function toggleTriggerType(triggerType) {
+  if (triggerTypeIsActive(triggerType)) {
+    form.triggers = form.triggers.filter(
+      entry => entry.trigger_type !== triggerType
+    );
+    return;
+  }
+
+  addTriggerEntry(triggerType);
+}
+
+function removeTriggerEntry(entry) {
+  const index = form.triggers.findIndex(
+    item => item.clientKey === entry.clientKey
+  );
+  if (index >= 0) form.triggers.splice(index, 1);
+}
+
+function stageOptionsForPipeline(pipelineId) {
+  if (!pipelineId) return stageSelectOptions.value;
+
+  const pipeline = pipelines.value.find(item => item.id === pipelineId);
+  return (pipeline?.stages || []).map(stage => ({
+    value: stage.id,
+    label: stage.name,
+  }));
+}
+
+function updateTriggerPipeline(entry) {
+  if (!triggerMeta(entry.trigger_type).needsStage) return;
+
+  const availableStageIds = new Set(
+    stageOptionsForPipeline(entry.crm_pipeline_id)
+      .filter(option => !option.disabled)
+      .map(option => option.value)
+  );
+  entry.stage_ids = entry.stage_ids.filter(stageId =>
+    availableStageIds.has(stageId)
+  );
+  if (!entry.stage_ids.length) entry.stage_ids = [''];
+}
+
+function addTriggerStage(entry) {
+  entry.stage_ids.push('');
+}
+
+function removeTriggerStage(entry, index) {
+  entry.stage_ids.splice(index, 1);
+  if (!entry.stage_ids.length) entry.stage_ids.push('');
+}
+
+function validTriggerDays(days) {
+  return Number.isFinite(Number(days)) && Number(days) > 0;
+}
 
 const createDefaultButton = index => ({
   title: t('CRM.AUTOMATIONS.MESSAGE.BUTTON_DEFAULT'),
@@ -300,10 +373,7 @@ function resetForm() {
   Object.assign(form, {
     name: '',
     active: true,
-    crm_pipeline_id: '',
-    trigger_type: 'deal_entered_stage',
-    trigger_stage_id: '',
-    trigger_days: 1,
+    triggers: [],
     conditions: [],
     actions: [createAction()],
   });
@@ -457,6 +527,35 @@ function validateActions() {
   return true;
 }
 
+function validateTriggers() {
+  if (!form.triggers.length) {
+    error.value = t('CRM.AUTOMATIONS.FORM.TRIGGER_REQUIRED');
+    return false;
+  }
+
+  const missingStage = form.triggers.find(
+    trigger =>
+      triggerMeta(trigger.trigger_type).needsStage &&
+      !Array(trigger.stage_ids).some(stageId => stageId)
+  );
+  if (missingStage) {
+    error.value = t('CRM.AUTOMATIONS.FORM.TRIGGER_STAGE_REQUIRED');
+    return false;
+  }
+
+  const missingDays = form.triggers.find(
+    trigger =>
+      triggerMeta(trigger.trigger_type).needsDays &&
+      !validTriggerDays(trigger.days)
+  );
+  if (missingDays) {
+    error.value = t('CRM.AUTOMATIONS.FORM.TRIGGER_DAYS_REQUIRED');
+    return false;
+  }
+
+  return true;
+}
+
 function normalizeAction(action) {
   if (action.action_name === 'send_lead_message') {
     return normalizeLeadMessageAction(action);
@@ -468,44 +567,8 @@ function normalizeAction(action) {
   };
 }
 
-function systemConditions() {
-  const conditions = [];
-
-  if (triggerNeedsStage.value && form.trigger_stage_id) {
-    conditions.push({
-      attribute_key: 'crm_stage_id',
-      filter_operator: 'equal_to',
-      values: [form.trigger_stage_id],
-      query_operator: 'AND',
-    });
-  }
-
-  if (form.trigger_type === 'deal_stagnant' && form.trigger_days) {
-    conditions.push({
-      attribute_key: 'days_in_stage',
-      filter_operator: 'gte',
-      values: [Number(form.trigger_days)],
-      query_operator: 'AND',
-    });
-  }
-
-  if (
-    form.trigger_type === 'deal_close_date_approaching' &&
-    form.trigger_days
-  ) {
-    conditions.push({
-      attribute_key: 'close_date',
-      filter_operator: 'days_before',
-      values: [Number(form.trigger_days)],
-      query_operator: 'AND',
-    });
-  }
-
-  return conditions;
-}
-
 function normalizeConditions() {
-  const manualConditions = form.conditions
+  return form.conditions
     .filter(condition => condition.attribute_key && condition.filter_operator)
     .map(condition => {
       const operator = OPERATORS.find(
@@ -518,16 +581,27 @@ function normalizeConditions() {
         query_operator: condition.query_operator || 'AND',
       };
     });
+}
 
-  return [...systemConditions(), ...manualConditions];
+function normalizeTriggers() {
+  return form.triggers.map(trigger => {
+    const meta = triggerMeta(trigger.trigger_type);
+    return {
+      trigger_type: trigger.trigger_type,
+      crm_pipeline_id: trigger.crm_pipeline_id || null,
+      stage_ids: meta.needsStage
+        ? [...new Set(Array(trigger.stage_ids).filter(Boolean))]
+        : [],
+      days: meta.needsDays ? Number(trigger.days) : null,
+    };
+  });
 }
 
 function buildPayload() {
   return {
     name: form.name.trim(),
     active: form.active,
-    crm_pipeline_id: form.crm_pipeline_id || null,
-    trigger_type: form.trigger_type,
+    triggers: normalizeTriggers(),
     conditions: normalizeConditions(),
     actions: form.actions.map(normalizeAction),
   };
@@ -585,54 +659,35 @@ function hydrateAction(action) {
 }
 
 function hydrateConditions(conditions = []) {
-  const manualConditions = [];
+  form.conditions = conditions.map(condition => ({
+    attribute_key: condition.attribute_key,
+    filter_operator: condition.filter_operator,
+    values: condition.values?.length ? condition.values : [''],
+    query_operator: condition.query_operator || 'AND',
+  }));
+}
 
-  conditions.forEach(condition => {
-    if (
-      triggerNeedsStage.value &&
-      condition.attribute_key === 'crm_stage_id' &&
-      !form.trigger_stage_id
-    ) {
-      form.trigger_stage_id = condition.values?.[0] || '';
-      return;
-    }
+function hydrateTriggerStageIds(trigger, meta) {
+  if (!meta.needsStage) return [];
+  return trigger.stage_ids?.length ? [...trigger.stage_ids] : [''];
+}
 
-    if (
-      form.trigger_type === 'deal_stagnant' &&
-      condition.attribute_key === 'days_in_stage'
-    ) {
-      form.trigger_days = condition.values?.[0] || 1;
-      return;
-    }
-
-    if (
-      form.trigger_type === 'deal_close_date_approaching' &&
-      condition.attribute_key === 'close_date' &&
-      condition.filter_operator === 'days_before'
-    ) {
-      form.trigger_days = condition.values?.[0] || 1;
-      return;
-    }
-
-    manualConditions.push({
-      attribute_key: condition.attribute_key,
-      filter_operator: condition.filter_operator,
-      values: condition.values?.length ? condition.values : [''],
-      query_operator: condition.query_operator || 'AND',
-    });
-  });
-
-  form.conditions = manualConditions;
+function hydrateTrigger(trigger) {
+  const meta = triggerMeta(trigger.trigger_type);
+  return {
+    clientKey: nextTriggerKey(),
+    trigger_type: trigger.trigger_type,
+    crm_pipeline_id: trigger.crm_pipeline_id || '',
+    stage_ids: hydrateTriggerStageIds(trigger, meta),
+    days: meta.needsDays ? Number(trigger.days) || 1 : null,
+  };
 }
 
 function hydrateForm(record) {
   Object.assign(form, {
     name: record.name || '',
     active: record.active,
-    crm_pipeline_id: record.crm_pipeline_id || '',
-    trigger_type: record.trigger_type || 'deal_entered_stage',
-    trigger_stage_id: '',
-    trigger_days: 1,
+    triggers: (record.triggers || []).map(hydrateTrigger),
     actions: record.actions?.length
       ? record.actions.map(hydrateAction)
       : [createAction()],
@@ -664,6 +719,7 @@ async function saveAutomation() {
     return;
   }
 
+  if (!validateTriggers()) return;
   if (!validateActions()) return;
 
   try {
@@ -692,18 +748,6 @@ function goBack() {
     params: { accountId: accountId.value },
   });
 }
-
-watch(
-  () => form.crm_pipeline_id,
-  () => {
-    if (
-      form.trigger_stage_id &&
-      !stageOptions.value.some(stage => stage.id === form.trigger_stage_id)
-    ) {
-      form.trigger_stage_id = '';
-    }
-  }
-);
 
 onMounted(async () => {
   await Promise.all([
@@ -776,20 +820,11 @@ onMounted(async () => {
               {{ t('CRM.AUTOMATIONS.FORM.SECTIONS.IDENTITY') }}
             </h3>
           </div>
-          <div class="grid gap-3 md:grid-cols-[1fr_16rem]">
+          <div class="grid gap-3">
             <Input
               v-model="form.name"
               :label="t('CRM.AUTOMATIONS.FORM.NAME')"
             />
-            <label class="block">
-              <span class="mb-1 block text-xs text-n-slate-11">
-                {{ t('CRM.AUTOMATIONS.FORM.PIPELINE') }}
-              </span>
-              <FilterSelect
-                v-model="form.crm_pipeline_id"
-                :options="pipelineOptions"
-              />
-            </label>
           </div>
         </CardLayout>
 
@@ -806,39 +841,124 @@ onMounted(async () => {
               v-for="trigger in TRIGGERS"
               :id="trigger.id"
               :key="trigger.id"
-              :is-active="form.trigger_type === trigger.id"
+              toggleable
+              :is-active="triggerTypeIsActive(trigger.id)"
               :label="t(trigger.labelKey)"
               :description="t(trigger.descriptionKey)"
-              @select="value => (form.trigger_type = value)"
+              @select="toggleTriggerType"
             />
           </div>
 
-          <div
-            v-if="triggerNeedsStage || triggerNeedsDays"
-            class="grid gap-3 md:grid-cols-[16rem_16rem]"
-          >
-            <label v-if="triggerNeedsStage" class="block">
-              <span class="mb-1 block text-xs text-n-slate-11">
-                {{ t('CRM.AUTOMATIONS.FORM.STAGE') }}
-              </span>
-              <FilterSelect
-                v-model="form.trigger_stage_id"
-                :options="stageSelectOptions"
-                :label="
-                  !form.trigger_stage_id
-                    ? t('CRM.AUTOMATIONS.FORM.SELECT_STAGE')
-                    : null
-                "
-              />
-            </label>
+          <div v-if="triggerGroups.length" class="grid gap-3">
+            <section
+              v-for="group in triggerGroups"
+              :key="group.meta.id"
+              class="grid gap-3 rounded-lg p-3 outline outline-1 -outline-offset-1 outline-n-weak dark:outline-n-strong"
+            >
+              <div class="flex flex-wrap items-center gap-2">
+                <i
+                  class="h-4 w-4 flex-shrink-0 text-n-slate-9"
+                  :class="group.meta.icon"
+                />
+                <h4 class="text-sm font-medium text-n-slate-12">
+                  {{ t(group.meta.labelKey) }}
+                </h4>
+                <Button
+                  class="ml-auto"
+                  faded
+                  slate
+                  sm
+                  type="button"
+                  icon="i-lucide-plus"
+                  :label="
+                    t('CRM.AUTOMATIONS.FORM.ADD_ANOTHER_TRIGGER', {
+                      trigger: t(group.meta.labelKey),
+                    })
+                  "
+                  @click="addTriggerEntry(group.meta.id)"
+                />
+              </div>
 
-            <Input
-              v-if="triggerNeedsDays"
-              v-model.number="form.trigger_days"
-              type="number"
-              min="1"
-              :label="t('CRM.AUTOMATIONS.FORM.DAYS')"
-            />
+              <div
+                v-for="(entry, entryIndex) in group.entries"
+                :key="entry.clientKey"
+                class="grid gap-3 rounded-lg bg-n-alpha-1 p-3"
+              >
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-medium text-n-slate-10">
+                    {{ triggerLabel(entry.trigger_type) }} {{ entryIndex + 1 }}
+                  </span>
+                  <Button
+                    class="ml-auto"
+                    sm
+                    solid
+                    slate
+                    type="button"
+                    icon="i-lucide-trash"
+                    @click="removeTriggerEntry(entry)"
+                  />
+                </div>
+
+                <div class="grid gap-3 md:grid-cols-2">
+                  <label class="block">
+                    <span class="mb-1 block text-xs text-n-slate-11">
+                      {{ t('CRM.AUTOMATIONS.FORM.PIPELINE') }}
+                    </span>
+                    <FilterSelect
+                      v-model="entry.crm_pipeline_id"
+                      :options="triggerPipelineSelectOptions"
+                      @update:model-value="updateTriggerPipeline(entry)"
+                    />
+                  </label>
+
+                  <Input
+                    v-if="group.meta.needsDays"
+                    v-model.number="entry.days"
+                    type="number"
+                    min="1"
+                    :label="t('CRM.AUTOMATIONS.FORM.DAYS')"
+                  />
+                </div>
+
+                <div v-if="group.meta.needsStage" class="grid gap-2">
+                  <span class="text-xs text-n-slate-11">
+                    {{ t('CRM.AUTOMATIONS.FORM.STAGE') }}
+                  </span>
+                  <div
+                    v-for="(stageId, stageIndex) in entry.stage_ids"
+                    :key="stageIndex"
+                    class="flex flex-wrap items-center gap-2"
+                  >
+                    <FilterSelect
+                      v-model="entry.stage_ids[stageIndex]"
+                      :options="stageOptionsForPipeline(entry.crm_pipeline_id)"
+                      :label="
+                        !stageId ? t('CRM.AUTOMATIONS.FORM.SELECT_STAGE') : null
+                      "
+                    />
+                    <Button
+                      sm
+                      solid
+                      slate
+                      type="button"
+                      icon="i-lucide-trash"
+                      @click="removeTriggerStage(entry, stageIndex)"
+                    />
+                  </div>
+                  <div>
+                    <Button
+                      icon="i-lucide-plus"
+                      faded
+                      slate
+                      sm
+                      type="button"
+                      :label="t('CRM.AUTOMATIONS.FORM.ADD_STAGE')"
+                      @click="addTriggerStage(entry)"
+                    />
+                  </div>
+                </div>
+              </div>
+            </section>
           </div>
         </CardLayout>
 

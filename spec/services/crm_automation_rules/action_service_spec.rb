@@ -9,7 +9,7 @@ RSpec.describe CrmAutomationRules::ActionService do
   def perform_rule(actions)
     deal
     rule = create(:crm_automation_rule, account: account, actions: actions)
-    described_class.new(rule, deal).perform
+    described_class.new(rule, deal, trigger_type: rule.triggers.first['trigger_type']).perform
     rule
   end
 

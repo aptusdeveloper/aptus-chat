@@ -22,7 +22,6 @@ class CrmPipeline < ApplicationRecord
   belongs_to :account
   has_many :crm_stages, dependent: :destroy
   has_many :crm_deals, dependent: :destroy
-  has_many :crm_automation_rules, dependent: :destroy
 
   validates :account_id, presence: true
   validates :name, presence: true, length: { maximum: 255 }

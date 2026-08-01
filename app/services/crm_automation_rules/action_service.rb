@@ -19,9 +19,8 @@ class CrmAutomationRules::ActionService
     position
   ].freeze
 
-  def initialize(rule, deal)
-    @rule    = rule
-    @deal    = deal
+  def initialize(rule, deal, trigger_type:)
+    @rule, @deal, @trigger_type = rule, deal, trigger_type # rubocop:disable Style/ParallelAssignment
     @account = deal.account
   end
 
@@ -204,7 +203,7 @@ class CrmAutomationRules::ActionService
     CrmAutomationExecution.create!(
       crm_automation_rule: @rule,
       crm_deal: @deal,
-      trigger_type: @rule.trigger_type,
+      trigger_type: @trigger_type,
       status: status,
       executed_at: Time.current,
       error_message: error_message

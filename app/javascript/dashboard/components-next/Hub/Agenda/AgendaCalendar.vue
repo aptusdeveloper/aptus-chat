@@ -63,8 +63,6 @@ function professionalColor(id) {
   return professionals.value.find(p => p.id === id)?.color || '#64748B';
 }
 
-const CANCELLED_ACCENT_COLOR = '#94A3B8';
-
 function hexToRgb(hex) {
   const clean = hex.replace('#', '');
   const full =
@@ -82,7 +80,6 @@ function hexToRgb(hex) {
 }
 
 function appointmentAccentColor(appointment) {
-  if (appointment.status === 'cancelled') return CANCELLED_ACCENT_COLOR;
   return professionalColor(appointment.agenda_professional_id);
 }
 
@@ -262,6 +259,28 @@ function defaultProfessionalId() {
   );
 }
 
+// ----- Availability warning (shared between create and reschedule) -----
+const availabilityWarningDialogRef = ref(null);
+const pendingAvailabilityAction = ref(null);
+
+function openAvailabilityWarning({ professionalId, startsAt, run }) {
+  pendingAvailabilityAction.value = { professionalId, startsAt, run };
+  availabilityWarningDialogRef.value?.open();
+}
+
+function closeAvailabilityWarning() {
+  pendingAvailabilityAction.value = null;
+  availabilityWarningDialogRef.value?.close();
+}
+
+async function confirmDespiteAvailability() {
+  if (!pendingAvailabilityAction.value) return;
+  const { run } = pendingAvailabilityAction.value;
+  pendingAvailabilityAction.value = null;
+  availabilityWarningDialogRef.value?.close();
+  await run();
+}
+
 // ----- Create appointment dialog -----
 const createDialogRef = ref(null);
 const isCreating = ref(false);
@@ -394,12 +413,14 @@ watch(
 
 const appointmentsByDay = computed(() => {
   const map = new Map();
-  appointments.value.forEach(appointment => {
-    const key = format(parseISO(appointment.starts_at), 'yyyy-MM-dd');
-    const list = map.get(key) || [];
-    list.push(appointment);
-    map.set(key, list);
-  });
+  appointments.value
+    .filter(appointment => appointment.status !== 'cancelled')
+    .forEach(appointment => {
+      const key = format(parseISO(appointment.starts_at), 'yyyy-MM-dd');
+      const list = map.get(key) || [];
+      list.push(appointment);
+      map.set(key, list);
+    });
   map.forEach(list =>
     list.sort((a, b) => new Date(a.starts_at) - new Date(b.starts_at))
   );
@@ -442,17 +463,13 @@ function slotTimeLabel(minutesFromMidnight) {
 }
 
 // ----- Business-hours shading (only meaningful with a single professional selected) -----
-const selectedProfessionalAvailabilities = computed(() =>
-  selectedProfessionalId.value
-    ? store.getters['agenda/availabilitiesForProfessional'](
-        selectedProfessionalId.value
-      )
-    : []
-);
+// Also reused to warn when creating an appointment outside a professional's availability.
+function businessWindowsForProfessionalDay(professionalId, day) {
+  if (!professionalId) return [];
 
-function businessWindowsForDay(day) {
   const dayKey = format(day, 'yyyy-MM-dd');
-  const all = selectedProfessionalAvailabilities.value;
+  const all =
+    store.getters['agenda/availabilitiesForProfessional'](professionalId);
   const overrides = all.filter(a => a.date === dayKey);
   const source = overrides.length
     ? overrides
@@ -465,6 +482,10 @@ function businessWindowsForDay(day) {
       end: a.end_hour * 60 + a.end_minutes,
     }))
     .sort((a, b) => a.start - b.start);
+}
+
+function businessWindowsForDay(day) {
+  return businessWindowsForProfessionalDay(selectedProfessionalId.value, day);
 }
 
 function closedRangesForDay(day) {
@@ -497,6 +518,19 @@ function isDayFullyClosed(day) {
   return (
     !!selectedProfessionalId.value && businessWindowsForDay(day).length === 0
   );
+}
+
+function appointmentFallsWithinAvailability(
+  professionalId,
+  startDate,
+  durationMinutes
+) {
+  const windows = businessWindowsForProfessionalDay(professionalId, startDate);
+  if (!windows.length) return false;
+
+  const startMinutes = startDate.getHours() * 60 + startDate.getMinutes();
+  const endMinutes = startMinutes + durationMinutes;
+  return windows.some(w => startMinutes >= w.start && endMinutes <= w.end);
 }
 
 watch(
@@ -543,31 +577,101 @@ async function loadAppointments() {
   });
 }
 
-async function createAppointment() {
-  if (!canSubmitCreateAppointment.value) return;
+function buildCreatePayload() {
+  return {
+    agenda_professional_id: createForm.professionalId,
+    agenda_event_type_id: createForm.eventTypeId,
+    starts_at: new Date(createForm.startsAt).toISOString(),
+    source: 'staff',
+    contact_id: createForm.contactId || undefined,
+    crm_deal_id: createForm.crmDealId || undefined,
+    patient_name: createForm.patientName || undefined,
+    patient_phone: createForm.patientPhone || undefined,
+    notes: createForm.notes || undefined,
+  };
+}
 
+async function submitCreateAppointment(payload) {
   isCreating.value = true;
   try {
-    await store.dispatch('agenda/createAppointment', {
-      agenda_professional_id: createForm.professionalId,
-      agenda_event_type_id: createForm.eventTypeId,
-      starts_at: new Date(createForm.startsAt).toISOString(),
-      source: 'staff',
-      contact_id: createForm.contactId || undefined,
-      crm_deal_id: createForm.crmDealId || undefined,
-      patient_name: createForm.patientName || undefined,
-      patient_phone: createForm.patientPhone || undefined,
-      notes: createForm.notes || undefined,
-    });
+    await store.dispatch('agenda/createAppointment', payload);
     createDialogRef.value?.close();
     useAlert(t('HUB.AGENDA.APPOINTMENTS.CREATE_SUCCESS'));
     loadAppointments();
   } catch (error) {
-    useAlert(t('HUB.AGENDA.APPOINTMENTS.CREATE_ERROR'));
+    if (error?.response?.status === 422) {
+      useAlert(t('HUB.AGENDA.APPOINTMENTS.CREATE_ERROR_CONFLICT'));
+    } else {
+      useAlert(t('HUB.AGENDA.APPOINTMENTS.CREATE_ERROR'));
+    }
   } finally {
     isCreating.value = false;
   }
 }
+
+async function checkAvailabilityBeforeSubmit(
+  professionalId,
+  eventTypeId,
+  startsAt
+) {
+  await store.dispatch('agenda/fetchAvailabilities', professionalId);
+  const eventType = eventTypes.value.find(item => item.id === eventTypeId);
+  if (!eventType) return true;
+
+  return appointmentFallsWithinAvailability(
+    professionalId,
+    new Date(startsAt),
+    eventType.duration_minutes
+  );
+}
+
+async function createAppointment() {
+  if (!canSubmitCreateAppointment.value) return;
+
+  isCreating.value = true;
+  const withinAvailability = await checkAvailabilityBeforeSubmit(
+    createForm.professionalId,
+    createForm.eventTypeId,
+    createForm.startsAt
+  );
+  isCreating.value = false;
+
+  const payload = buildCreatePayload();
+
+  if (!withinAvailability) {
+    openAvailabilityWarning({
+      professionalId: createForm.professionalId,
+      startsAt: createForm.startsAt,
+      run: () => submitCreateAppointment(payload),
+    });
+    return;
+  }
+
+  await submitCreateAppointment(payload);
+}
+
+const availabilityWarningDescription = computed(() => {
+  if (!pendingAvailabilityAction.value) return '';
+
+  const { professionalId, startsAt } = pendingAvailabilityAction.value;
+  const windows = businessWindowsForProfessionalDay(
+    professionalId,
+    new Date(startsAt)
+  );
+  if (!windows.length) {
+    return t(
+      'HUB.AGENDA.APPOINTMENTS.FORM.AVAILABILITY_WARNING.NO_AVAILABILITY_THIS_DAY'
+    );
+  }
+
+  const hours = windows
+    .map(w => `${slotTimeLabel(w.start)}–${slotTimeLabel(w.end)}`)
+    .join(', ');
+  return t(
+    'HUB.AGENDA.APPOINTMENTS.FORM.AVAILABILITY_WARNING.AVAILABLE_HOURS',
+    { hours }
+  );
+});
 
 function viewModeLabel(mode) {
   const labels = {
@@ -690,17 +794,45 @@ async function confirmCancel(appointment, hide) {
   hide();
 }
 
+async function submitReschedule(appointment, state, hide) {
+  try {
+    await store.dispatch('agenda/rescheduleAppointment', {
+      id: appointment.id,
+      startsAt: new Date(state.time).toISOString(),
+    });
+    state.mode = null;
+    useAlert(t('HUB.AGENDA.APPOINTMENTS.RESCHEDULE_SUCCESS'));
+    loadAppointments();
+    hide();
+  } catch (error) {
+    if (error?.response?.status === 422) {
+      useAlert(t('HUB.AGENDA.APPOINTMENTS.RESCHEDULE_ERROR_CONFLICT'));
+    } else {
+      useAlert(t('HUB.AGENDA.APPOINTMENTS.RESCHEDULE_ERROR'));
+    }
+  }
+}
+
 async function confirmReschedule(appointment, hide) {
   const state = stateFor(appointment.id);
   if (!state.time) return;
-  await store.dispatch('agenda/rescheduleAppointment', {
-    id: appointment.id,
-    startsAt: new Date(state.time).toISOString(),
-  });
-  state.mode = null;
-  useAlert(t('HUB.AGENDA.APPOINTMENTS.RESCHEDULE_SUCCESS'));
-  loadAppointments();
-  hide();
+
+  const withinAvailability = await checkAvailabilityBeforeSubmit(
+    appointment.agenda_professional_id,
+    appointment.agenda_event_type_id,
+    state.time
+  );
+
+  if (!withinAvailability) {
+    openAvailabilityWarning({
+      professionalId: appointment.agenda_professional_id,
+      startsAt: state.time,
+      run: () => submitReschedule(appointment, state, hide),
+    });
+    return;
+  }
+
+  await submitReschedule(appointment, state, hide);
 }
 
 async function confirmLinksUpdate(appointment) {
@@ -860,7 +992,12 @@ async function confirmLinksUpdate(appointment) {
             :key="day.toISOString()"
             type="button"
             class="min-h-24 p-1.5 text-left border-r border-n-weak last:border-r-0 hover:bg-n-alpha-1 align-top"
-            :class="!isSameMonth(day, anchorDate) && 'bg-n-alpha-1 opacity-50'"
+            :class="[
+              !isSameMonth(day, anchorDate) && 'bg-n-alpha-1 opacity-50',
+              isSameMonth(day, anchorDate) &&
+                isDayFullyClosed(day) &&
+                'bg-n-slate-3 dark:bg-n-solid-2',
+            ]"
             @click="openDay(day)"
           >
             <span
@@ -871,16 +1008,17 @@ async function confirmLinksUpdate(appointment) {
             >
               {{ format(day, 'd') }}
             </span>
+            <span
+              v-if="isSameMonth(day, anchorDate) && isDayFullyClosed(day)"
+              class="block text-[10px] text-n-slate-9"
+            >
+              {{ t('HUB.AGENDA.APPOINTMENTS.DAY_UNAVAILABLE') }}
+            </span>
             <div class="mt-1 flex flex-col gap-0.5">
               <span
                 v-for="appointment in appointmentsFor(day).slice(0, 3)"
                 :key="appointment.id"
-                class="flex items-center gap-1 truncate rounded text-[11px] border-l-2 px-1 py-0.5"
-                :class="
-                  appointment.status === 'cancelled'
-                    ? 'text-n-slate-10 line-through'
-                    : 'text-n-slate-12'
-                "
+                class="flex items-center gap-1 truncate rounded text-[11px] border-l-2 px-1 py-0.5 text-n-slate-12"
                 :style="{
                   borderColor: appointmentAccentColor(appointment),
                   backgroundColor: appointmentTint(appointment),
@@ -961,12 +1099,12 @@ async function confirmLinksUpdate(appointment) {
               <div
                 v-for="(range, rangeIndex) in closedRangesForDay(day)"
                 :key="`closed-${rangeIndex}`"
-                class="absolute inset-x-0 bg-n-slate-2/70 dark:bg-n-solid-2/70 pointer-events-none"
+                class="absolute inset-x-0 bg-n-slate-5 dark:bg-n-solid-3 pointer-events-none"
                 :style="{ top: range.top, height: range.height }"
               />
               <p
                 v-if="isDayFullyClosed(day)"
-                class="absolute inset-0 flex items-center justify-center text-[11px] text-n-slate-9 pointer-events-none"
+                class="absolute inset-x-0 top-2 flex items-center justify-center text-[11px] text-n-slate-9 pointer-events-none"
               >
                 {{ t('HUB.AGENDA.APPOINTMENTS.DAY_UNAVAILABLE') }}
               </p>
@@ -1014,29 +1152,21 @@ async function confirmLinksUpdate(appointment) {
                 @hide="resetAction(appointment.id)"
               >
                 <div
-                  class="absolute inset-x-0.5 z-30 min-h-8 rounded-md border-l-[3px] px-2 py-1 text-left text-[11px] leading-tight overflow-hidden cursor-pointer shadow-sm ring-1 ring-black/5 transition-shadow hover:shadow-md"
+                  class="absolute inset-x-0.5 z-30 min-h-5 flex items-center rounded-md border-l-[3px] px-1.5 py-0.5 text-left text-[11px] leading-tight overflow-hidden cursor-pointer shadow-sm ring-1 ring-black/5 transition-shadow hover:shadow-md"
                   :style="{
                     ...blockStyle(appointment),
                     borderColor: appointmentAccentColor(appointment),
                     backgroundColor: appointmentTint(appointment),
                   }"
                 >
-                  <p
-                    class="font-medium truncate"
-                    :class="
-                      appointment.status === 'cancelled'
-                        ? 'text-n-slate-10 line-through'
-                        : 'text-n-slate-12'
-                    "
-                  >
-                    {{ format(parseISO(appointment.starts_at), 'HH:mm') }}
-                    {{ appointment.patient_name }}
-                  </p>
-                  <p class="truncate text-n-slate-10">
-                    {{ professionalName(appointment.agenda_professional_id) }}
-                    <template v-if="appointment.status === 'cancelled'">
-                      · {{ appointmentStatusLabel(appointment.status) }}
-                    </template>
+                  <p class="w-full truncate text-n-slate-12">
+                    <span class="font-medium">
+                      {{ format(parseISO(appointment.starts_at), 'HH:mm') }}
+                    </span>
+                    {{
+                      appointment.patient_name ||
+                      t('HUB.AGENDA.APPOINTMENTS.NO_PATIENT_NAME')
+                    }}
                   </p>
                 </div>
 
@@ -1258,14 +1388,6 @@ async function confirmLinksUpdate(appointment) {
         <p class="text-sm text-n-slate-10 max-w-xs">
           {{ t('HUB.AGENDA.APPOINTMENTS.EMPTY') }}
         </p>
-        <Button
-          size="sm"
-          class="pointer-events-auto"
-          icon="i-lucide-plus"
-          :disabled="!canCreateAppointment"
-          :label="t('HUB.AGENDA.APPOINTMENTS.NEW')"
-          @click="openCreateDialog()"
-        />
       </div>
     </div>
 
@@ -1354,5 +1476,27 @@ async function confirmLinksUpdate(appointment) {
         </div>
       </div>
     </Dialog>
+
+    <Dialog
+      ref="availabilityWarningDialogRef"
+      width="sm"
+      type="alert"
+      :title="
+        t('HUB.AGENDA.APPOINTMENTS.FORM.AVAILABILITY_WARNING.TITLE', {
+          professional: professionalName(
+            pendingAvailabilityAction?.professionalId
+          ),
+        })
+      "
+      :description="availabilityWarningDescription"
+      :cancel-button-label="
+        t('HUB.AGENDA.APPOINTMENTS.FORM.AVAILABILITY_WARNING.CHANGE_TIME')
+      "
+      :confirm-button-label="
+        t('HUB.AGENDA.APPOINTMENTS.FORM.AVAILABILITY_WARNING.CONFIRM_ANYWAY')
+      "
+      @confirm="confirmDespiteAvailability"
+      @close="closeAvailabilityWarning"
+    />
   </div>
 </template>

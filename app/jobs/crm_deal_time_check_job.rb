@@ -28,11 +28,14 @@ class CrmDealTimeCheckJob < ApplicationJob
   end
 
   def process_rule_for_deal(rule, deal)
-    return if rule.crm_pipeline_id.present? && rule.crm_pipeline_id != deal.crm_pipeline_id
+    matched_item = CrmAutomationRules::TriggerMatcher.matching_item(
+      rule, trigger_types: CrmAutomationRule::TIME_TRIGGERS, deal: deal
+    )
+    return unless matched_item
     return if already_executed_today?(rule, deal)
     return unless CrmAutomationRules::ConditionsFilterService.match?(rule, deal)
 
-    CrmAutomationRules::ActionService.new(rule, deal).perform
+    CrmAutomationRules::ActionService.new(rule, deal, trigger_type: matched_item['trigger_type']).perform
   end
 
   def already_executed_today?(rule, deal)

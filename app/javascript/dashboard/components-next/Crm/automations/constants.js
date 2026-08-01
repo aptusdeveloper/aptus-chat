@@ -19,6 +19,12 @@ export const TRIGGERS = [
     icon: 'i-lucide-arrow-right-left',
   },
   {
+    id: 'deal_updated',
+    labelKey: 'CRM.AUTOMATIONS.TRIGGERS.DEAL_UPDATED',
+    descriptionKey: 'CRM.AUTOMATIONS.TRIGGERS.DEAL_UPDATED_DESCRIPTION',
+    icon: 'i-lucide-refresh-cw',
+  },
+  {
     id: 'deal_won',
     labelKey: 'CRM.AUTOMATIONS.TRIGGERS.DEAL_WON',
     descriptionKey: 'CRM.AUTOMATIONS.TRIGGERS.DEAL_WON_DESCRIPTION',

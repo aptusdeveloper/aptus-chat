@@ -2,19 +2,31 @@ require 'rails_helper'
 
 RSpec.describe CrmAutomationRules::Processor do
   let(:deal) { create(:crm_deal) }
+  let(:stage_trigger) do
+    [
+      {
+        'trigger_type' => 'deal_entered_stage',
+        'crm_pipeline_id' => deal.crm_pipeline_id,
+        'stage_ids' => [deal.crm_stage_id],
+        'days' => nil
+      }
+    ]
+  end
 
   it 'processes deal_entered_stage rules' do
     rule = create(
       :crm_automation_rule,
       account: deal.account,
-      crm_pipeline: deal.crm_pipeline,
-      trigger_type: 'deal_entered_stage',
+      triggers: stage_trigger,
       conditions: [
         { attribute_key: 'crm_stage_id', filter_operator: 'equal_to', values: [deal.crm_stage_id] }
       ]
     )
 
-    expect(CrmAutomationRules::ActionService).to receive(:new).with(rule, deal).and_call_original
+    expect(CrmAutomationRules::ActionService)
+      .to receive(:new)
+      .with(rule, deal, trigger_type: 'deal_entered_stage')
+      .and_call_original
 
     described_class.run(trigger_type: 'deal_entered_stage', deal: deal)
   end
@@ -23,8 +35,7 @@ RSpec.describe CrmAutomationRules::Processor do
     rule = create(
       :crm_automation_rule,
       account: deal.account,
-      crm_pipeline: deal.crm_pipeline,
-      trigger_type: 'deal_entered_stage'
+      triggers: stage_trigger
     )
     create(:crm_automation_execution, crm_automation_rule: rule, crm_deal: deal, executed_at: Time.current)
 
@@ -37,13 +48,15 @@ RSpec.describe CrmAutomationRules::Processor do
     rule = create(
       :crm_automation_rule,
       account: deal.account,
-      crm_pipeline: deal.crm_pipeline,
-      trigger_type: 'deal_entered_stage'
+      triggers: stage_trigger
     )
     create(:crm_automation_execution, crm_automation_rule: rule, crm_deal: deal, executed_at: Time.current)
     deal.update!(name: 'Updated deal name')
 
-    expect(CrmAutomationRules::ActionService).to receive(:new).with(rule, deal).and_call_original
+    expect(CrmAutomationRules::ActionService)
+      .to receive(:new)
+      .with(rule, deal, trigger_type: 'deal_entered_stage')
+      .and_call_original
 
     described_class.run(trigger_type: 'deal_entered_stage', deal: deal)
   end
@@ -52,8 +65,7 @@ RSpec.describe CrmAutomationRules::Processor do
     rule = create(
       :crm_automation_rule,
       account: deal.account,
-      crm_pipeline: deal.crm_pipeline,
-      trigger_type: 'deal_entered_stage'
+      triggers: stage_trigger
     )
     create(
       :crm_automation_execution,
@@ -63,7 +75,10 @@ RSpec.describe CrmAutomationRules::Processor do
       executed_at: 1.minute.ago
     )
 
-    expect(CrmAutomationRules::ActionService).to receive(:new).with(rule, deal).and_call_original
+    expect(CrmAutomationRules::ActionService)
+      .to receive(:new)
+      .with(rule, deal, trigger_type: 'deal_entered_stage')
+      .and_call_original
 
     described_class.run(trigger_type: 'deal_entered_stage', deal: deal)
   end
