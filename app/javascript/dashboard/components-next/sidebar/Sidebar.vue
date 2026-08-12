@@ -90,12 +90,22 @@ const hasAptusHub = computed(() => {
   return isEnabled && !!aptusHubConfig.value.bot_id;
 });
 
+// Hub-only accounts (clients who use the bot but none of the messaging product)
+// see the Hub section and nothing else.
+const isHubOnly = computed(() => {
+  return (
+    hasAptusHub.value &&
+    (aptusHubConfig.value.hub_only === true ||
+      aptusHubConfig.value.hub_only === 'true')
+  );
+});
+
 const { isAdmin } = useAdmin();
 
 const fetchConversationUnreadCounts = ([currentAccountId, isEnabled]) => {
   if (!currentAccountId) return;
 
-  if (!isEnabled) {
+  if (!isEnabled || isHubOnly.value) {
     store.dispatch('conversationUnreadCounts/clear');
     return;
   }
@@ -226,6 +236,9 @@ const getSidebarSectionSort = useMapGetter(
 );
 
 onMounted(() => {
+  // None of these feed the Hub-only sidebar, and the API rejects them for those accounts.
+  if (isHubOnly.value) return;
+
   store.dispatch('labels/get');
   store.dispatch('inboxes/get');
   store.dispatch('notifications/unReadCount');
@@ -331,7 +344,41 @@ const newReportRoutes = () => [
 const reportRoutes = computed(() => newReportRoutes());
 */
 
+const hubMenuItem = computed(() => ({
+  name: 'Hub',
+  label: t('SIDEBAR.HUB'),
+  icon: 'i-lucide-bot',
+  children: [
+    {
+      name: 'Hub Desempenho',
+      label: t('SIDEBAR.HUB_PERFORMANCE'),
+      icon: 'i-lucide-chart-no-axes-column',
+      to: accountScopedRoute('hub_performance'),
+      exact: true,
+    },
+    {
+      name: 'Hub Testar',
+      label: t('SIDEBAR.HUB_TEST'),
+      icon: 'i-lucide-square-play',
+      to: accountScopedRoute('hub_tester'),
+    },
+    ...(isAdmin.value
+      ? [
+          {
+            name: 'Hub Pagamentos',
+            label: t('SIDEBAR.HUB_PAYMENTS'),
+            icon: 'i-lucide-credit-card',
+            to: accountScopedRoute('hub_payments'),
+            activeOn: ['hub_payment_details'],
+          },
+        ]
+      : []),
+  ],
+}));
+
 const menuItems = computed(() => {
+  if (isHubOnly.value) return [hubMenuItem.value];
+
   return [
     {
       name: 'Inbox',
@@ -551,37 +598,7 @@ const menuItems = computed(() => {
     },
     ...(hasAptusHub.value
       ? [
-          {
-            name: 'Hub',
-            label: t('SIDEBAR.HUB'),
-            icon: 'i-lucide-bot',
-            children: [
-              {
-                name: 'Hub Desempenho',
-                label: t('SIDEBAR.HUB_PERFORMANCE'),
-                icon: 'i-lucide-chart-no-axes-column',
-                to: accountScopedRoute('hub_performance'),
-                exact: true,
-              },
-              {
-                name: 'Hub Testar',
-                label: t('SIDEBAR.HUB_TEST'),
-                icon: 'i-lucide-square-play',
-                to: accountScopedRoute('hub_tester'),
-              },
-              ...(isAdmin.value
-                ? [
-                    {
-                      name: 'Hub Pagamentos',
-                      label: t('SIDEBAR.HUB_PAYMENTS'),
-                      icon: 'i-lucide-credit-card',
-                      to: accountScopedRoute('hub_payments'),
-                      activeOn: ['hub_payment_details'],
-                    },
-                  ]
-                : []),
-            ],
-          },
+          hubMenuItem.value,
           {
             name: 'Agenda',
             label: t('SIDEBAR.AGENDA'),

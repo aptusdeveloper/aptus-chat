@@ -37,9 +37,24 @@ export const defaultRedirectPage = (to, permissions) => {
   return `accounts/${accountId}/${route ? route.path : 'dashboard'}`;
 };
 
-const validateActiveAccountRoutes = (to, user) => {
+export const isAHubRoute = routeName =>
+  [
+    'hub',
+    'hub_performance',
+    'hub_tester',
+    'hub_payments',
+    'hub_payment_details',
+  ].includes(routeName);
+
+const validateActiveAccountRoutes = (to, user, currentAccount) => {
   // If the current account is active, then check for the route permissions
   const accountDashboardURL = `accounts/${to.params.accountId}/dashboard`;
+
+  // Hub-only accounts have no access to the rest of the product, so any route
+  // outside the Hub — including one typed straight into the address bar — lands there.
+  if (currentAccount?.hub_only && !isAHubRoute(to.name)) {
+    return `accounts/${to.params.accountId}/hub`;
+  }
 
   // If the user is trying to access suspended route, redirect them to dashboard
   if (to.name === 'account_suspended') {
@@ -64,7 +79,7 @@ export const validateLoggedInRoutes = (to, user) => {
   const isCurrentAccountActive = currentAccount.status === 'active';
 
   if (isCurrentAccountActive) {
-    return validateActiveAccountRoutes(to, user);
+    return validateActiveAccountRoutes(to, user, currentAccount);
   }
 
   // If the current account is not active, then redirect the user to the suspended screen

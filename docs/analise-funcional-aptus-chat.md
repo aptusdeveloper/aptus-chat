@@ -17,6 +17,10 @@
 > - `feat(crm): add CRM module...` (08/07) e `feat(crm): custom attributes...` (21/07) — já cobertos pela versão original.
 > - `d4977a402 Add CRM automations builder` (23/07) e `03565663a chore(crm-automations): rework condition/action inputs...` (24/07) — o motor de automação do CRM (seção 8.7) **ganhou UI completa** nesse meio tempo; a versão anterior deste doc ainda o descrevia como "só configurável via banco de dados", o que deixou de ser verdade.
 > - `4f34c9c27 Add customer Hub MVP` (23/07) e `0803853e8 feat(aptus-hub): expand Hub tabs...` (24/07) — um módulo inteiramente novo, **Aptus Hub**, não existia na versão anterior deste documento. Ver seção 28.
+>
+> **Atualização de 2026-08-12**: adicionado o modo **conta só-Hub** (`hub_only`), que permite entregar a plataforma a um cliente que usa apenas a gestão do bot — o caso da Izzy Cannabis, que opera CRM e mensageria no Kommo. Ver 3.4 (modelo de acesso) e 28.7 (comportamento e provisionamento). Isso fecha a lacuna nº 2 da seção 27 e o item 12 da seção 26.
+>
+> **Defasagem conhecida deste documento**: entre 24/07 e hoje o produto ganhou um módulo **Agenda** dentro do Hub (profissionais, procedimentos, consultas, motor de disponibilidade e API consumida pelo bot via integração `aptus-agenda`), além de uma reformulação do construtor de automações do CRM para múltiplos gatilhos. Nenhum dos dois está descrito aqui — as menções a Agenda nas seções 5 e 28.7 são incidentais, não um catálogo. Uma próxima revisão precisa cobrir esses dois módulos.
 > - `3d0354b82 fix(sidebar): split CRM into Funil/Automações submenu...` (24/07) — reflete-se na seção 5.
 > - `f4d92919b Fix CRM automation action execution` (23/07) — incorporado na seção 8.7.
 
@@ -35,6 +39,7 @@ O **Aptus Chat** (nome interno atual, que será renomeado para **Aptus Hub**) é
 5. **Automação de atendimento** — regras que reagem a eventos de conversa (criação, atualização, nova mensagem) e disparam ações como atribuir, rotular, mudar status, enviar e-mail, dispararwebhook.
 6. **Configurações extensas de conta** — canais, labels, atributos personalizados, automações, bots via webhook, macros, respostas prontas, integrações, papéis customizados (Enterprise), SLA (Enterprise), fluxo de auto-resolução de conversas.
 7. **Aptus Hub** (módulo novo, adicionado em 23–24/07) — portal por conta, habilitado manualmente pelo Super Admin, onde agentes/administradores daquela conta acompanham o desempenho do bot Botpress (sessões, mensagens, usuários, custo de LLM/tokens), testam o bot ao vivo via webchat embutido, e veem o detalhamento financeiro mensal (custo do bot + mensalidade Aptus, convertido USD→BRL com markup e imposto configuráveis). Ver seção 28.
+8. **Conta só-Hub** (`hub_only`, 12/08) — uma conta pode ser recortada para entregar **apenas** o Hub, escondendo e bloqueando conversas, CRM, contatos e configurações. É o formato para o cliente que contrata só o bot e usa CRM/mensageria em outra ferramenta. Ver 3.4 e 28.7.
 
 ## Estágio atual do produto
 
@@ -48,6 +53,7 @@ O sistema está em fase de **adaptação de um produto open source maduro (Chatw
 - Configurar regras de automação para reduzir trabalho manual do time de atendimento.
 - Administrar quem tem acesso a quê, dentro de um modelo de dois papéis (agente/administrador), com um mecanismo mais granular de papéis customizados já implementado no código, porém desligado por padrão.
 - Acompanhar, por conta/cliente, o desempenho e o custo do bot Botpress associado, e testar o bot ao vivo, pelo módulo Aptus Hub (quando habilitado para a conta).
+- Entregar a um cliente que só contratou o bot uma conta enxuta, em que a plataforma inteira se resume ao Hub — sem expor conversas, funil, contatos ou configurações que ele não usa.
 
 ## Principais diferenças em relação ao Chatwoot original
 
@@ -55,6 +61,7 @@ O sistema está em fase de **adaptação de um produto open source maduro (Chatw
 |---|---|
 | **CRM Kanban** | Não existe no Chatwoot original — é uma adição 100% nova da Aptus (ver seção 8), incluindo motor de automação com UI própria. |
 | **Aptus Hub** | Módulo novo (23–24/07), também 100% Aptus — portal de desempenho/custo/teste do bot por conta (ver seção 28). |
+| **Conta só-Hub** | Recorte de conta (`hub_only`) que entrega apenas o Hub e bloqueia o resto do produto em menu, rota e API — não existe conceito equivalente no Chatwoot original (ver 3.4 e 28.7). |
 | **Escopo reduzido de MVP** | Reports, Central de Ajuda, Campanhas, Companies, IA “Captain” e assinatura de mensagens foram retirados da navegação, mas não do código. |
 | **Marca própria** | Nome da instalação, logotipo e tela de login já rebrandeados para Aptus; o sistema se comporta como “instância com marca própria” em vários pontos de lógica de paywall. |
 | **Cadastro público desativado** | Só é possível entrar no sistema por convite de um administrador — não há tela pública de criação de conta. |
@@ -164,18 +171,37 @@ Um administrador pode criar uma role customizada (ex: “Supervisor”) combinan
 
 > **Nuance técnica relevante**: mesmo com a tela bloqueada, o endpoint de API para criar papéis customizados não tem uma segunda verificação da feature flag — só exige que quem chame seja administrador. Ou seja, tecnicamente um administrador poderia criar papéis customizados via chamada direta à API mesmo com a tela desabilitada. Isso é um ponto para validação/decisão de produto (ver seção 21).
 
-## 3.4 Super Administrador da instalação
+## 3.4 Contas só-Hub (`hub_only`) — recorte de acesso por conta, não por papel
+
+Além dos papéis acima, existe um segundo eixo de restrição, aplicado à **conta inteira** em vez do usuário: uma conta marcada como `hub_only` só dá acesso ao módulo Hub. Isso atende o cliente que contrata só o bot (usa CRM e mensageria em outra ferramenta, como o Kommo) e não tem uso para conversas, contatos, funil ou configurações.
+
+Não é um papel novo: o usuário continua sendo `administrator` ou `agent` da conta. O que muda é o alcance da conta:
+
+| Camada | Comportamento numa conta `hub_only` |
+|---|---|
+| Menu lateral | Só o grupo Hub (sem Agenda, sem Settings, sem Conversas/CRM/Contatos) |
+| Rota | Qualquer rota fora do Hub — inclusive digitada na barra de endereço — redireciona para `hub_performance` |
+| Login | Entra direto no Hub; o wizard de onboarding (dados da conta → setup de inbox) é pulado |
+| API | Todo controller sob `Api::V1::Accounts::BaseController` responde 404, exceto o do próprio Hub |
+
+O modelo pretendido é **um único usuário por conta só-Hub**, com papel `administrator` — assim a aba Pagamentos (que exige admin, ver 28.4) funciona sem que isso abra Settings, já que Settings deixa de existir na navegação e na API.
+
+Contas comuns não são afetadas: o flag nasce desligado. Ver 28.7 para o provisionamento.
+
+## 3.5 Super Administrador da instalação
 
 - Representa quem administra a instalação inteira, não uma conta específica (equivalente a “administrador de sistema” ou “dono da plataforma”).
 - É criado marcando a coluna `type` do usuário como `SuperAdmin` — isso pode ser feito por outro Super Admin, pela tela `/super_admin/users`.
 - Entra pela URL `/super_admin` com um login próprio (mesmo mecanismo de autenticação, mas rota separada).
 - Detalhes completos de tudo o que o Super Admin pode fazer estão na seção 16.
 
-## 3.5 Contatos (usuários finais) — não são “usuários” do sistema
+## 3.6 Contatos (usuários finais) — não são “usuários” do sistema
 
 Pessoas que enviam mensagens pelos canais (WhatsApp, site, etc.) são tratadas como **Contatos**, uma entidade totalmente separada de `User`. Contatos nunca acessam o painel do Aptus Chat — eles só existem como registros de dados dentro de uma conta, vinculados a conversas. Ver seção 7 para detalhes.
 
-## 3.6 Matriz de permissões resumida
+> Numa conta `hub_only` (ver 3.4) não existem contatos, porque não existe canal de mensageria — o bot daquele cliente conversa por fora (Kommo, WhatsApp de outro provedor) e o aptus-chat só acompanha o desempenho dele.
+
+## 3.7 Matriz de permissões resumida
 
 | Funcionalidade | Tipo de usuário | Ver | Criar | Editar | Excluir | Observações |
 |---|---|---|---|---|---|---|
@@ -208,6 +234,8 @@ Pessoas que enviam mensagens pelos canais (WhatsApp, site, etc.) são tratadas c
 | Configurações da Conta | Administrador | Sim | — | Sim | — | Agente sem acesso |
 | Billing | — | — | — | — | — | Só Chatwoot Cloud; redireciona sozinho neste self-hosted |
 | Super Admin (instalação) | Super Admin | Tudo | Tudo | Tudo | Tudo | Fora do escopo de conta |
+
+> A matriz acima vale para contas comuns. Numa conta `hub_only` (ver 3.4), tudo que não é Hub sai da matriz: some do menu, a rota redireciona e a API responde 404 — independentemente do papel do usuário.
 
 Referências para conferência:
 - `app/models/account_user.rb`, `app/models/user.rb`, `app/models/super_admin.rb`
@@ -327,6 +355,8 @@ Ordem exata em que aparece para o usuário (`app/javascript/dashboard/components
 | 6 | **Settings** (ícone engrenagem) | — | Depende do item (ver abaixo) | Sempre visível o grupo | 18 subitens (ver seção 14) | — |
 
 > **Nota sobre o item Hub**: diferente de todos os outros itens do menu (que são incondicionais ou dependem de uma feature flag global), o Hub é **ligado individualmente por conta**, criado para o caso de uso de portal do cliente. Ver seção 28 para o detalhamento completo.
+
+> **Nota sobre contas só-Hub**: a tabela acima descreve o menu de uma conta comum. Uma conta marcada como `hub_only` (ver 28.7) **não mostra nenhum dos itens 1 a 4 nem o item 6** — o menu inteiro se resume ao grupo Hub, e o grupo Agenda também some. É o único caso em que Inbox, Conversation, CRM, Contacts e Settings deixam de aparecer.
 
 ## Itens removidos do menu (APTUS-HIDDEN) — não fazem parte do catálogo de disponíveis
 
@@ -1155,6 +1185,7 @@ Referências para conferência:
 | CRM | Kanban de negócios/funis/estágios | Menu → CRM → Funil | Agente (negócios)/Admin (funis) | Disponível | Não | Funcionalidade nova da Aptus |
 | CRM | Automação de negócios (motor + UI) | Menu → CRM → Automações | Admin | Disponível | Não | UI completa desde 23–24/07 (ver 8.7) |
 | Hub | Portal do bot/cliente (desempenho, teste, pagamentos) | Menu → Hub | Agente/Admin, só se habilitado por conta | Disponível com condição | Não | Módulo novo, 23–24/07 (ver seção 28) |
+| Hub | Conta só-Hub (`hub_only`) — cliente sem mensageria | Super Admin → Accounts → Aptus Hub | Configurado pelo Super Admin; conta com 1 admin | Disponível com condição | Não | Esconde e bloqueia todo o resto do produto (ver 3.4 e 28.7) |
 | Inboxes | Canais (WhatsApp, e-mail, site, etc.) | Configurações → Inboxes | Admin | Disponível | — | Twitter/360dialog fora do assistente |
 | Inboxes | Canal de voz | Configurações → Inboxes | Admin | Disponível com condição | — | Feature paga, off por padrão |
 | Times/Agentes | Convite, papéis, times, distribuição automática | Configurações → Agents/Teams | Admin | Disponível | Sim (confirmação) | — |
@@ -1228,9 +1259,12 @@ Referências para conferência:
    - O `CLAUDE.md` do workspace principal descreve `aptus-hub` como "painel admin, em desenvolvimento", destinado a analytics do bot para o cliente operador — exatamente o que o novo módulo Hub do aptus-chat (seção 28) já entrega.
    - Confirmar com o time se um dos dois será descontinuado, se vão coexistir com propósitos diferentes, ou se o Hub do aptus-chat é a nova direção e o projeto Angular separado deve ser abandonado.
 
-12. Validar se a policy do Hub (`administrator?` ou `agent?` da própria conta) é o modelo de acesso pretendido para clientes
-   - Hoje, qualquer pessoa convidada como agente/admin de uma conta-cliente vê o Hub *e* a caixa de entrada de conversas, CRM e demais telas dessa conta — não existe hoje um papel "só enxerga o Hub".
-   - Confirmar se o modelo real é "o cliente é convidado como agente/admin da própria conta e atende ele mesmo pelo Chatwoot", ou se é esperado um papel mais restrito antes de convidar o primeiro cliente real.
+12. ~~Validar se a policy do Hub (`administrator?` ou `agent?` da própria conta) é o modelo de acesso pretendido para clientes~~
+   - **RESOLVIDO em 2026-08-12.** A decisão foi que existem os dois modelos: o cliente que atende pelo próprio Chatwoot continua sendo agente/admin de uma conta comum, e o cliente que só quer a gestão do bot recebe uma conta marcada como `hub_only`, com um único usuário `administrator`. A `AptusHubPolicy` não mudou. Ver 3.4 e 28.7.
+
+13. Validar o gate de conta só-Hub numa conta real antes de entregar ao cliente
+   - Criar a conta pelo Super Admin com `hub_only` ligado, logar como o usuário e confirmar: pouso em `/hub`, menu só com Hub, e rotas digitadas na mão (`/dashboard`, `/crm`, `/settings/inboxes`, `/hub/agenda`) caindo em `hub_performance`.
+   - Com o log do Rails aberto, recarregar o Hub e confirmar que nenhuma chamada responde 404 — um 404 inesperado significa controller faltando na allowlist de `ensure_hub_only_scope!`.
 ```
 
 ---
@@ -1258,14 +1292,14 @@ O Aptus Chat, hoje, entrega de forma sólida e funcional: atendimento multicanal
 
 - Edição incompleta de campos do negócio (valor, responsável, contato) pela interface.
 - Integração OpenAI e Notion, hoje inertes.
-- Aptus Hub: métricas e webchat de teste funcionam de ponta a ponta; mas não existe hoje um fluxo de onboarding guiado — habilitar o Hub para um cliente novo depende de um Super Admin preencher manualmente ~12 campos em Super Admin → Accounts (bot_id, monthly_fee, bot_fixed_cost, markup, tax, etc.), sem validação cruzada com o que está de fato configurado no Botpress Cloud/Firestore do `aws-backend`.
+- Aptus Hub: métricas e webchat de teste funcionam de ponta a ponta; mas não existe hoje um fluxo de onboarding guiado — habilitar o Hub para um cliente novo depende de um Super Admin preencher manualmente ~14 campos em Super Admin → Accounts (bot_id, hub_only, monthly_fee, bot_fixed_cost, markup, tax, etc.), sem validação cruzada com o que está de fato configurado no Botpress Cloud/Firestore do `aws-backend`. O modo `hub_only` (28.7) reduz o esforço de decisão, mas não o de digitação.
 
 ## Lacunas que merecem atenção antes do primeiro cliente real (não bloqueiam o piloto interno, mas bloqueiam produção)
 
 Esta análise foi encomendada para responder "o que falta de essencial para usarmos como MVP com os primeiros clientes" — as próximas quatro são as lacunas mais diretamente ligadas a essa pergunta, e nenhuma delas é sobre uma tela faltando (o produto, tela por tela, já está bem coberto):
 
 1. **Decisão de arquitetura pendente: dois "Hub" concorrentes.** O workspace tem um projeto `aptus-hub` (Angular, porta 4200, "em desenvolvimento") descrito no `CLAUDE.md` principal como o painel onde o cliente operador verá analytics do próprio bot — e agora existe um módulo `Hub` dentro do próprio aptus-chat que já faz exatamente isso (e mais: pagamentos, teste ao vivo), rodando em produção real (Rails, não maquete). Levar os primeiros clientes ao ar sem decidir qual dos dois é "o produto" arrisca investimento duplicado.
-2. **Modelo de acesso do cliente ainda não diferenciado do modelo de acesso do agente de atendimento.** A policy do Hub (`administrator? || agent?`) é a mesma do resto da conta — hoje não há como convidar um cliente para "só ver o Hub" sem também lhe dar acesso à caixa de entrada de conversas, CRM e configurações daquela conta. Se o modelo pretendido é "o próprio cliente atende pelo Chatwoot", isso é aceitável; se não, falta uma role.
+2. ~~**Modelo de acesso do cliente ainda não diferenciado do modelo de acesso do agente de atendimento.**~~ **Fechado em 2026-08-12** pelo modo conta só-Hub (`hub_only`): a restrição foi resolvida no nível da **conta**, não do papel — uma conta marcada como `hub_only` esconde e bloqueia todo o resto do produto (menu, rota e API), com um único usuário `administrator`. Contas comuns seguem com o modelo antigo, em que o cliente é agente/admin e atende pelo próprio Chatwoot. Ver 3.4 e 28.7.
 3. **Provisionamento do Hub é 100% manual e sem validação.** Ativar o Hub para uma conta nova depende de um humano preencher campos de texto livre no Super Admin (inclusive o `bot_id` do Botpress) sem nenhuma checagem de que aquele bot existe, pertence ao workspace certo, ou está de fato integrado com a inbox WhatsApp daquela conta. Um erro de digitação silenciosamente mostra dados errados ou nenhum dado.
 4. **Credenciais do Botpress usadas pelo Hub são globais**, não por cliente (`BOTPRESS_API_URL`/`API_KEY`/`WORKSPACE_ID` do `.env`, decisão explícita registrada no commit `0803853e8`) — coerente com o resto do ecossistema Aptus (mesmo padrão do `aws-backend`), mas vale confirmar que o token global tem escopo para ler analytics de todos os bots de todos os clientes, incluindo os que ainda não existem.
 
@@ -1282,7 +1316,7 @@ Esta análise foi encomendada para responder "o que falta de essencial para usar
 
 ## Sugestão de ordem para a futura revisão funcional
 
-1. Usuários, contas e permissões (papéis, custom roles, super admin) — incluindo a decisão de role do cliente no Hub.
+1. Usuários, contas e permissões (papéis, custom roles, super admin) — a decisão de acesso do cliente no Hub já foi tomada (conta `hub_only`, ver 3.4/28.7); resta o resto.
 2. Menu e navegação (decidir o destino definitivo das áreas ocultas: remover de vez, ou manter prontas para reativação futura).
 3. Conversas e mensageria (núcleo do produto).
 4. Contatos e empresas (decidir o destino de "Companies").
@@ -1310,6 +1344,8 @@ Um portal, dentro da própria conta do Chatwoot, para acompanhar o bot Botpress 
 **Quem pode acessar:** Qualquer agente ou administrador da conta (`AptusHubPolicy` — mesma regra do resto do Chatwoot, sem role específica de “cliente”).
 **Condição de exibição:** Só aparece no menu, e só responde na API (`ensure_hub_available!`), se a conta tiver `custom_attributes.aptus_hub.enabled = true` **e** `bot_id` preenchido. Ambos são configurados pelo Super Admin da instalação (ver 28.5) — não há self-service para o próprio cliente habilitar.
 
+> Uma conta pode ainda ser marcada como **só-Hub** (`hub_only`), caso em que o Hub deixa de ser mais um item do menu e passa a ser o produto inteiro daquela conta. Ver 28.7.
+
 ## 28.2 Aba “Desempenho” (`hub_performance`)
 
 **Objetivo:** visão consolidada do uso do bot no período (padrão: mês corrente, sem seletor de período visível na versão atual).
@@ -1333,7 +1369,7 @@ Um portal, dentro da própria conta do Chatwoot, para acompanhar o bot Botpress 
 
 ## 28.5 Provisionamento pelo Super Admin
 
-Desde `0803853e8`, todo o Hub é configurável por conta (antes só via SQL/console), em Super Admin → Accounts → editar conta → campo “Aptus Hub” (`AptusHubConfigField`, reaproveitando o padrão de campo customizado do Administrate já usado por `AccountLimitsField`): habilitado (sim/não), ID/nome/status/modelo de IA do bot, mensalidade, custo fixo do bot em USD (padrão US$10 — bate com o valor de referência já usado internamente pela Aptus), moeda, dia de vencimento, taxa de markup (padrão 14%), taxa de imposto (padrão 7%), URL do script de webchat. Tudo fica armazenado em `Account#aptus_hub` (`store_accessor` sobre `custom_attributes`), preservando o histórico de pagamentos/feedback já gravado.
+Desde `0803853e8`, todo o Hub é configurável por conta (antes só via SQL/console), em Super Admin → Accounts → editar conta → campo “Aptus Hub” (`AptusHubConfigField`, reaproveitando o padrão de campo customizado do Administrate já usado por `AccountLimitsField`): habilitado (sim/não), **só-Hub (sim/não, ver 28.7)**, ID/nome/status/modelo de IA do bot, mensalidade, custo fixo do bot em USD (padrão US$10 — bate com o valor de referência já usado internamente pela Aptus), moeda, dia de vencimento, taxa de markup (padrão 14%), taxa de imposto (padrão 7%), URL do script de webchat. Tudo fica armazenado em `Account#aptus_hub` (`store_accessor` sobre `custom_attributes`), preservando o histórico de pagamentos/feedback já gravado.
 **Limitação confirmada:** o formulário aceita qualquer texto no campo `bot_id` — não há validação contra o Botpress Cloud (não confirma se o bot existe, se pertence ao workspace configurado, ou se está de fato ligado à inbox WhatsApp daquela conta). Um erro de digitação some silenciosamente atrás de um erro genérico "Não foi possível buscar os dados do bot agora" na tela do cliente.
 
 ## 28.6 Relação com o restante do ecossistema Aptus
@@ -1342,9 +1378,41 @@ Desde `0803853e8`, todo o Hub é configurável por conta (antes só via SQL/cons
 - O valor padrão de custo fixo do bot (US$10) e o conceito de mensalidade por cliente batem com a precificação padrão já usada internamente pela Aptus para seus bots.
 - **Sobreposição a resolver**: o `CLAUDE.md` do workspace descreve `aptus-hub` (projeto Angular separado, porta 4200) como "em desenvolvimento", destinado a que "o cliente operador acessará para ver analytics do próprio bot, quando em produção" — a mesma proposta de valor que este módulo, dentro do aptus-chat, já entrega funcionando hoje. Não há, nesta análise, evidência de que essa sobreposição já tenha sido resolvida (ver seção 27).
 
+## 28.7 Conta só-Hub (`hub_only`)
+
+**O que é:** um recorte de conta para o cliente que contrata apenas o bot e não usa nada da plataforma de atendimento — caso da Izzy Cannabis, que já opera CRM e mensageria no Kommo. A conta existe só para acompanhar e pagar o bot.
+
+**Como é ligado:** um campo booleano **Hub only** no mesmo formulário de provisionamento do Hub (Super Admin → Accounts → editar conta → “Aptus Hub”), gravado em `custom_attributes.aptus_hub.hub_only`. Não há migração nem tabela nova — é mais uma chave do `store_accessor` já existente. Nasce desligado, então nenhuma conta atual muda de comportamento.
+
+**O que muda, em quatro camadas:**
+
+| Camada | Onde | Comportamento |
+|---|---|---|
+| Menu | `Sidebar.vue` (`isHubOnly`) | O menu inteiro vira apenas o grupo Hub. Agenda, Settings, Inbox, Conversation, CRM e Contacts somem |
+| Rota | `routeHelpers.js` (`isAHubRoute`) | Qualquer rota fora do Hub, inclusive digitada na barra de endereço, redireciona para `hub_performance` |
+| Entrada | `routes/index.js` | O pouso pós-login é o Hub em vez da home de conversas, e o wizard de onboarding é pulado (é setup de inbox, inútil aqui) |
+| API | `Api::V1::Accounts::BaseController` (`ensure_hub_only_scope!`) | Todo controller com escopo de conta responde 404, exceto `aptus_hub`. O payload que o dashboard carrega no boot vem de `Api::V1::AccountsController`, que herda de `Api::BaseController` e não passa por esse gate |
+
+O corte na sidebar também suprime as seis chamadas de boot (`labels`, `inboxes`, `teams`, `attributes`, `customViews` ×2, `notifications/unReadCount`) — é o que permite que a allowlist da API tenha um controller só.
+
+**Modelo de acesso pretendido:** um único usuário por conta, com papel `administrator`. O papel admin é o que libera a aba Pagamentos (`AptusHubPolicy#payments?`), e o `hub_only` é o que impede que esse mesmo papel abra Settings. A `AptusHubPolicy` não foi alterada, então contas comuns que já usam o Hub seguem com o comportamento anterior.
+
+**Provisionamento (replicável para qualquer cliente futuro):**
+
+1. **Super Admin → Accounts → New.** Nome do cliente, locale `pt_BR`, status `active`. Usar o formulário do Super Admin, **não** o `AccountBuilder` via console: o builder grava `onboarding_step`, e embora contas `hub_only` pulem o wizard, a conta criada pelo Administrate já nasce limpa.
+2. **Seção “Aptus Hub” do mesmo formulário:** `enabled` ✓, `hub_only` ✓, `bot_id`, `bot_name`, `status`, `ai_model`, `go_live_on`, `monthly_fee`, `bot_fixed_cost` (US$ 10), `currency`, `payment_day`, `markup_rate` (0.14), `tax_rate` (0.07), `webchat_script_url` — sem esta última a aba Testar mostra estado vazio.
+3. **Super Admin → Account Users:** vincular o usuário único com papel `administrator` (criar antes em Super Admin → Users, se necessário).
+4. **Senha:** o cliente recebe o e-mail de confirmação do Devise, que depende de `SMTP_ADDRESS` configurado — sem SMTP nada é enviado e a falha é silenciosa (ver seção 13). Alternativa: definir a senha pelo Super Admin.
+5. **Conferir antes de entregar:** logar como o cliente e confirmar o pouso em `/app/accounts/:id/hub`, o menu só com Hub, e **dados reais na aba Desempenho** — é a única forma de saber se o `bot_id` está correto, já que ele não é validado contra o Botpress Cloud (ver 28.5).
+
+**Limitação herdada:** os pontos de atenção de 28.4 e 28.5 continuam valendo — `bot_id` sem validação, credenciais globais do Botpress, e a aba Pagamentos disparando até 12 chamadas HTTP externas sem cache.
+
 Referências para conferência:
 - `app/controllers/api/v1/accounts/aptus_hub_controller.rb`, `app/policies/aptus_hub_policy.rb`
-- `app/services/aptus_hub/account_config.rb`, `botpress_client.rb`, `customer_portal_service.rb`, `payment_cost_calculator.rb`, `exchange_rate_client.rb`
+- `app/controllers/api/v1/accounts/base_controller.rb` (`ensure_hub_only_scope!`, `HUB_ONLY_CONTROLLERS`)
+- `app/services/aptus_hub/account_config.rb` (`hub_only?`, `serialized_for_account`), `botpress_client.rb`, `customer_portal_service.rb`, `payment_cost_calculator.rb`, `exchange_rate_client.rb`
 - `app/fields/aptus_hub_config_field.rb`, `app/dashboards/account_dashboard.rb`, `app/views/fields/aptus_hub_config_field/`
+- `app/views/api/v1/models/_user.json.jbuilder` (expõe `hub_only` no array `accounts`, lido pelo guard do roteador)
 - `app/javascript/dashboard/components-next/Hub/*.vue`, `app/javascript/dashboard/routes/dashboard/hub/routes.js`
-- `app/javascript/dashboard/components-next/sidebar/Sidebar.vue` (bloco `hasAptusHub`)
+- `app/javascript/dashboard/components-next/sidebar/Sidebar.vue` (blocos `hasAptusHub` e `isHubOnly`)
+- `app/javascript/dashboard/helper/routeHelpers.js` (`isAHubRoute`), `app/javascript/dashboard/routes/index.js`

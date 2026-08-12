@@ -36,7 +36,12 @@ export const validateAuthenticateRoutePermission = async (to, next) => {
   const userAccount = accounts.find(a => a.id === routeAccountId);
   const isAdmin = userAccount?.role === 'administrator';
   const isActive = userAccount?.status === 'active';
+  // Hub-only clients have no inbox to set up and no conversations to land on,
+  // so they skip onboarding and enter through the Hub instead of the dashboard.
+  const isHubOnly = Boolean(userAccount?.hub_only);
+  const landingPath = isHubOnly ? 'hub' : 'dashboard';
   const needsOnboarding =
+    !isHubOnly &&
     ONBOARDING_STEPS.includes(userAccount?.onboarding_step) &&
     isAdmin &&
     isActive;
@@ -44,7 +49,7 @@ export const validateAuthenticateRoutePermission = async (to, next) => {
   if (to.name === 'no_accounts' || !to.name) {
     const target = needsOnboarding
       ? onboardingPath(userAccount?.onboarding_step)
-      : 'dashboard';
+      : landingPath;
     return next(frontendURL(`accounts/${routeAccountId}/${target}`));
   }
 
@@ -56,7 +61,7 @@ export const validateAuthenticateRoutePermission = async (to, next) => {
     );
   }
   if (!needsOnboarding && isOnOnboardingView(to)) {
-    return next(frontendURL(`accounts/${routeAccountId}/dashboard`));
+    return next(frontendURL(`accounts/${routeAccountId}/${landingPath}`));
   }
 
   const nextRoute = validateLoggedInRoutes(to, store.getters.getCurrentUser);

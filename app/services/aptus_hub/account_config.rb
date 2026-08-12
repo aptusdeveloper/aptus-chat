@@ -16,6 +16,12 @@ class AptusHub::AccountConfig
     ActiveModel::Type::Boolean.new.cast(raw[:enabled])
   end
 
+  # When true, the account is a Hub-only client: the dashboard renders just the Hub
+  # section and the rest of the account API is out of reach.
+  def hub_only?
+    ActiveModel::Type::Boolean.new.cast(raw[:hub_only]) || false
+  end
+
   def bot_id
     raw[:bot_id].presence
   end
@@ -96,6 +102,7 @@ class AptusHub::AccountConfig
   def serialized_for_account
     {
       enabled: enabled?,
+      hub_only: hub_only?,
       bot_id: bot_id
     }.compact
   end

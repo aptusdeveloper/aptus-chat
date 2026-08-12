@@ -3,6 +3,7 @@ require 'administrate/field/base'
 class AptusHubConfigField < Administrate::Field::Base
   FIELDS = [
     { key: :enabled, label: 'Enabled', type: :boolean, default: false },
+    { key: :hub_only, label: 'Hub only (cliente vê apenas o Hub)', type: :boolean, default: false },
     { key: :bot_id, label: 'Bot ID (Botpress)', type: :string, default: '' },
     { key: :bot_name, label: 'Bot name', type: :string, default: '' },
     { key: :status, label: 'Status', type: :select, options: %w[active paused cancelled], default: 'active' },
