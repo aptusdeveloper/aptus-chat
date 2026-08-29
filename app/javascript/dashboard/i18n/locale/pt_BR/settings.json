@@ -989,9 +989,7 @@
       "LOADING": "Carregando desempenho...",
       "HISTORY": "Historico de uso",
       "EMPTY_HISTORY": "Ainda sem historico no periodo.",
-      "CHANNELS": "Canais conectados",
-      "CONNECTED": "Conectado",
-      "NO_CHANNELS": "Nenhum canal conectado nesta conta.",
+      "INTEGRATIONS": "Integrações do bot",
       "USERS_BREAKDOWN": "{new} novos • {returning} recorrentes",
       "FILTER": {
         "TODAY": "Hoje",
@@ -1001,7 +999,13 @@
         "FROM": "De",
         "TO": "Ate",
         "CANCEL": "Cancelar",
-        "APPLY": "Aplicar"
+        "APPLY": "Aplicar",
+        "GO_LIVE_NOTICE": {
+          "TITLE": "Período anterior ao go-live",
+          "DESCRIPTION": "O bot entrou no ar em {goLive}, então não há dados antes dessa data. O período será ajustado para {from} até {to}.",
+          "CONFIRM": "Ok, ajustar",
+          "CANCEL": "Voltar"
+        }
       },
       "CHART": {
         "MESSAGES": "Mensagens",
@@ -1051,6 +1055,7 @@
         "EXCHANGE_RATE_LIVE_HINT": "Esta e a cotacao atual. O valor final sera travado quando este mes fechar.",
         "API_COST_BRL": "Custo de uso (BRL, com markup e impostos)",
         "MONTHLY_FEE": "Mensalidade Aptus",
+        "MONTHLY_FEE_PRORATED": "(proporcional: {billed} de {total} dias)",
         "TOTAL": "Total",
         "METRICS": "Metricas do mes"
       }

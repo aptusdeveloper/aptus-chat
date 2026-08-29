@@ -23,6 +23,9 @@ const error = ref('');
 
 const month = computed(() => route.params.month);
 const costs = computed(() => data.value?.costs || {});
+const isProrated = computed(
+  () => costs.value.monthly_fee_billed_days < costs.value.monthly_fee_month_days
+);
 const metrics = computed(() => data.value?.metrics || {});
 
 const metricStats = computed(() => [
@@ -200,6 +203,14 @@ onMounted(loadDetails);
             <div class="flex items-center justify-between px-4 py-3">
               <span class="text-n-slate-10">
                 {{ t('HUB.PAYMENTS.DETAILS.MONTHLY_FEE') }}
+                <span v-if="isProrated" class="text-n-slate-9">
+                  {{
+                    t('HUB.PAYMENTS.DETAILS.MONTHLY_FEE_PRORATED', {
+                      billed: costs.monthly_fee_billed_days,
+                      total: costs.monthly_fee_month_days,
+                    })
+                  }}
+                </span>
               </span>
               <span class="text-n-slate-12">
                 {{ formatCurrency(costs.monthly_fee, costs.currency) }}

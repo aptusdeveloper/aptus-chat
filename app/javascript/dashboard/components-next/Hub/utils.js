@@ -55,6 +55,7 @@ export const formatMonthLabel = month => {
 export const paymentStatusLabel = status => {
   const labels = {
     paid: 'Pago',
+    open: 'Em aberto',
     pending: 'Pendente',
     overdue: 'Vencido',
   };
@@ -65,6 +66,7 @@ export const paymentStatusLabel = status => {
 export const paymentStatusClass = status => {
   const classes = {
     paid: 'bg-n-teal-3 text-n-teal-11',
+    open: 'bg-n-slate-3 text-n-slate-11',
     pending: 'bg-n-amber-3 text-n-amber-11',
     overdue: 'bg-n-ruby-3 text-n-ruby-11',
   };

@@ -7,6 +7,10 @@ class AptusHub::BotpressClient
   # instead of calling this client again.
   CACHE_TTL = 1.minute
 
+  # A bot's installed integrations only change on a deploy, so they can be cached
+  # for much longer than the analytics numbers.
+  BOT_CACHE_TTL = 1.hour
+
   ANALYTICS_FIELD_MAP = {
     sessions: :sessions,
     user_messages: :userMessages,
@@ -31,7 +35,53 @@ class AptusHub::BotpressClient
     raise Error, 'Nao foi possivel buscar os dados do bot agora.'
   end
 
+  # Returns the bot's enabled integrations as [{ name:, title:, icon_url: }].
+  def integrations(bot_id:)
+    cache_key = format(Redis::RedisKeys::APTUS_HUB_BOT_KEY, bot_id: bot_id)
+    cached = Redis::Alfred.get(cache_key)
+    return JSON.parse(cached, symbolize_names: true) if cached.present?
+
+    result = parse_integrations_response(fetch_bot_from_botpress(bot_id))
+    Redis::Alfred.setex(cache_key, result.to_json, BOT_CACHE_TTL)
+    result
+  rescue Error
+    raise
+  rescue StandardError => e
+    Rails.logger.error "[AptusHub] Botpress integrations failed for #{bot_id}: #{e.message}"
+    raise Error, 'Nao foi possivel buscar as integracoes do bot agora.'
+  end
+
   private
+
+  def fetch_bot_from_botpress(bot_id)
+    response = HTTParty.get(
+      "#{api_url}/admin/bots/#{CGI.escape(bot_id)}",
+      headers: headers,
+      timeout: 30
+    )
+
+    raise Error, 'Nao foi possivel buscar as integracoes do bot agora.' unless response.success?
+
+    response
+  end
+
+  def parse_integrations_response(response)
+    body = response.parsed_response
+    body = JSON.parse(response.body) if body.is_a?(String)
+
+    (body.dig('bot', 'integrations') || {}).values.filter_map do |integration|
+      next unless integration['enabled']
+
+      {
+        name: integration['name'],
+        title: integration['title'].presence || integration['name'],
+        icon_url: integration['iconUrl']
+      }
+    end
+  rescue JSON::ParserError => e
+    Rails.logger.error "[AptusHub] Invalid Botpress bot response: #{e.message}"
+    raise Error, 'Nao foi possivel ler as integracoes do bot agora.'
+  end
 
   def fetch_from_botpress(bot_id, from, to)
     response = HTTParty.get(

@@ -95,7 +95,7 @@ gerar o token** está em modo Development — um número conectado via um app de
   (`./send_whatsapp.sh 5531999999999 "mensagem"`).
 
 **Atenção:** ambos usam as credenciais atuais de
-`/Users/ederambrosio/Projetos/Aptus/aplicativo-aptus-chat-dados.md` — que são do app
+`/Users/ederambrosio/Projetos/Aptus/docs/privado/credenciais/aplicativo-aptus-chat-dados.md` — que são do app
 **aptus-chat-teste, Cenário A** (número de teste da Meta, modo Development). Ou seja, herdam a
 restrição de destinatários: `send_test_whatsapp.sh` funciona porque o número pessoal já está
 cadastrado como destinatário de teste, mas `send_whatsapp.sh` só vai funcionar pra outros números se

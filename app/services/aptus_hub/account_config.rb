@@ -42,6 +42,10 @@ class AptusHub::AccountConfig
     raw[:ai_model].presence || raw[:aiModel].presence
   end
 
+  def logo_url
+    raw[:logo_url].presence || raw[:logoUrl].presence
+  end
+
   def go_live_on
     date_value(raw[:go_live_on].presence || raw[:goLiveOn])
   end
@@ -72,7 +76,7 @@ class AptusHub::AccountConfig
       raw[:payment_day].presence ||
       raw[:paymentDate].presence ||
       raw[:payment_date].presence ||
-      10
+      5
     ).to_i
     day.clamp(1, 31)
   end

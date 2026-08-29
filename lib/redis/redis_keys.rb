@@ -88,5 +88,6 @@ module Redis::RedisKeys
   ## Aptus Hub
   # Short-lived cache for the current (still-open) month, to avoid hammering the Botpress/exchange rate APIs
   APTUS_HUB_ANALYTICS_KEY = 'APTUS_HUB::ANALYTICS::V1::%<bot_id>s::%<from>s::%<to>s'.freeze
+  APTUS_HUB_BOT_KEY = 'APTUS_HUB::BOT::V1::%<bot_id>s'.freeze
   APTUS_HUB_EXCHANGE_RATE_KEY = 'APTUS_HUB::EXCHANGE_RATE::V1'.freeze
 end

@@ -990,9 +990,7 @@
       "LOADING": "Loading performance...",
       "HISTORY": "Usage history",
       "EMPTY_HISTORY": "No history in this period yet.",
-      "CHANNELS": "Connected channels",
-      "CONNECTED": "Connected",
-      "NO_CHANNELS": "No channel connected to this account.",
+      "INTEGRATIONS": "Bot integrations",
       "USERS_BREAKDOWN": "{new} new • {returning} returning",
       "FILTER": {
         "TODAY": "Today",
@@ -1002,7 +1000,13 @@
         "FROM": "From",
         "TO": "To",
         "CANCEL": "Cancel",
-        "APPLY": "Apply"
+        "APPLY": "Apply",
+        "GO_LIVE_NOTICE": {
+          "TITLE": "Period before go-live",
+          "DESCRIPTION": "The bot went live on {goLive}, so there is no data before that date. The period will be adjusted to {from} through {to}.",
+          "CONFIRM": "Ok, adjust",
+          "CANCEL": "Go back"
+        }
       },
       "CHART": {
         "MESSAGES": "Messages",
@@ -1052,6 +1056,7 @@
         "EXCHANGE_RATE_LIVE_HINT": "This is the current rate. The final rate will be locked in once this month closes.",
         "API_COST_BRL": "Usage cost (BRL, incl. markup and taxes)",
         "MONTHLY_FEE": "Aptus monthly fee",
+        "MONTHLY_FEE_PRORATED": "(pro rata: {billed} of {total} days)",
         "TOTAL": "Total",
         "METRICS": "Metrics for this month"
       }

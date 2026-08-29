@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n';
 import { vOnClickOutside } from '@vueuse/components';
 import { useAdmin } from 'dashboard/composables/useAdmin';
 import AptusHubAPI from 'dashboard/api/aptusHub';
+import Dialog from 'dashboard/components-next/dialog/Dialog.vue';
 import {
   formatCurrency,
   formatDate,
@@ -61,9 +62,21 @@ const showCustomPopover = ref(false);
 const draftFrom = ref(filters.value.from);
 const draftTo = ref(filters.value.to);
 
+const goLiveDialogRef = ref(null);
+const pendingRange = ref(null);
+
 const metrics = computed(() => data.value?.metrics || {});
-const channels = computed(() => data.value?.channels || []);
+const integrations = computed(() => data.value?.integrations || []);
+const goLiveOn = computed(() => data.value?.bot?.go_live_on || '');
 const history = computed(() => data.value?.usage_history || []);
+
+const goLiveNoticeDescription = computed(() =>
+  t('HUB.PERFORMANCE.FILTER.GO_LIVE_NOTICE.DESCRIPTION', {
+    goLive: formatDate(goLiveOn.value),
+    from: formatDate(pendingRange.value?.from),
+    to: formatDate(pendingRange.value?.to),
+  })
+);
 
 const activeMetricKey = ref('total_messages');
 
@@ -223,11 +236,45 @@ async function loadPerformance() {
   }
 }
 
-function selectPreset(preset) {
-  activePreset.value = preset.key;
+function commitRange(range, presetKey) {
+  activePreset.value = presetKey;
   showCustomPopover.value = false;
-  filters.value = presetDayRange(preset.days);
+  filters.value = { from: range.from, to: range.to };
   loadPerformance();
+}
+
+// The bot has no history before go-live. A range reaching further back is trimmed,
+// but only after the client acknowledges the dialog, so the numbers on screen are
+// never silently different from the dates they picked.
+function requestRange(range, presetKey) {
+  const goLive = goLiveOn.value;
+
+  if (!goLive || range.from >= goLive) {
+    commitRange(range, presetKey);
+    return;
+  }
+
+  pendingRange.value = {
+    from: goLive,
+    to: range.to < goLive ? goLive : range.to,
+    presetKey,
+  };
+  goLiveDialogRef.value?.open();
+}
+
+function confirmPendingRange() {
+  const { from, to, presetKey } = pendingRange.value;
+  goLiveDialogRef.value?.close();
+  pendingRange.value = null;
+  commitRange({ from, to }, presetKey);
+}
+
+function discardPendingRange() {
+  pendingRange.value = null;
+}
+
+function selectPreset(preset) {
+  requestRange(presetDayRange(preset.days), preset.key);
 }
 
 function toggleCustomPopover() {
@@ -246,10 +293,7 @@ function closeCustomPopover() {
 }
 
 function applyCustomRange() {
-  activePreset.value = 'custom';
-  filters.value = { from: draftFrom.value, to: draftTo.value };
-  showCustomPopover.value = false;
-  loadPerformance();
+  requestRange({ from: draftFrom.value, to: draftTo.value }, 'custom');
 }
 
 onMounted(loadPerformance);
@@ -271,7 +315,14 @@ onMounted(loadPerformance);
       class="mb-4 rounded-lg border border-n-weak bg-white dark:bg-n-solid-2 p-4"
     >
       <div class="flex flex-wrap items-center gap-3">
+        <img
+          v-if="data.bot.logo_url"
+          :src="data.bot.logo_url"
+          :alt="data.bot.name"
+          class="size-10 rounded-lg object-cover border border-n-weak shrink-0"
+        />
         <div
+          v-else
           class="grid place-content-center size-10 rounded-lg bg-n-alpha-2 shrink-0"
         >
           <i class="i-lucide-bot w-5 h-5 text-n-slate-11" />
@@ -529,31 +580,37 @@ onMounted(loadPerformance);
       >
         <div class="px-4 py-3 border-b border-n-weak">
           <h3 class="text-sm font-semibold text-n-slate-12">
-            {{ t('HUB.PERFORMANCE.CHANNELS') }}
+            {{ t('HUB.PERFORMANCE.INTEGRATIONS') }}
           </h3>
         </div>
-        <div v-if="channels.length" class="divide-y divide-n-weak">
+        <div class="flex flex-wrap gap-3 px-4 py-4">
           <div
-            v-for="channel in channels"
-            :key="channel.id"
-            class="flex items-center gap-3 px-4 py-3"
+            v-for="integration in integrations"
+            :key="integration.name"
+            class="flex items-center gap-2 px-3 py-2 rounded-lg border border-n-weak"
           >
-            <i class="i-lucide-mailbox w-4 h-4 text-n-slate-9" />
-            <div class="min-w-0 mr-auto">
-              <p class="text-sm font-medium text-n-slate-12 truncate">
-                {{ channel.name }}
-              </p>
-              <p class="text-xs text-n-slate-9">{{ channel.channel_type }}</p>
-            </div>
-            <span class="text-xs text-n-teal-11">
-              {{ t('HUB.PERFORMANCE.CONNECTED') }}
+            <img
+              :src="integration.icon_url"
+              :alt="integration.name"
+              class="w-5 h-5 shrink-0"
+            />
+            <span class="text-sm font-medium text-n-slate-12">
+              {{ integration.name }}
             </span>
           </div>
         </div>
-        <div v-else class="px-4 py-6 text-sm text-n-slate-10">
-          {{ t('HUB.PERFORMANCE.NO_CHANNELS') }}
-        </div>
       </section>
     </template>
+
+    <Dialog
+      ref="goLiveDialogRef"
+      type="alert"
+      :title="t('HUB.PERFORMANCE.FILTER.GO_LIVE_NOTICE.TITLE')"
+      :description="goLiveNoticeDescription"
+      :confirm-button-label="t('HUB.PERFORMANCE.FILTER.GO_LIVE_NOTICE.CONFIRM')"
+      :cancel-button-label="t('HUB.PERFORMANCE.FILTER.GO_LIVE_NOTICE.CANCEL')"
+      @confirm="confirmPendingRange"
+      @close="discardPendingRange"
+    />
   </div>
 </template>

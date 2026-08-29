@@ -32,6 +32,7 @@ RSpec.describe 'Api::V1::Accounts::AptusHubController', type: :request do
   before do
     account.update!(custom_attributes: { 'aptus_hub' => hub_config })
     Redis::Alfred.scan_each(match: 'APTUS_HUB::*') { |key| Redis::Alfred.delete(key) }
+    stub_botpress_bot
   end
 
   describe 'GET /api/v1/accounts/:account_id/hub/performance' do
@@ -61,6 +62,51 @@ RSpec.describe 'Api::V1::Accounts::AptusHubController', type: :request do
       expect(body.dig('metrics', 'sessions')).to eq(2)
       expect(body.dig('metrics', 'total_messages')).to eq(7)
       expect(body.dig('metrics', 'total_users')).to eq(2)
+    end
+
+    it 'charges the go-live month pro rata, ignoring spend before go-live' do
+      travel_to Time.zone.local(2026, 4, 5) do
+        stub_botpress_analytics(records: [{ llm: { cost: { sum: 1.0 } } }], from: '2026-03-20', to: '2026-03-31')
+        stub_exchange_rate(bid: '5.00')
+
+        get "/api/v1/accounts/#{account.id}/hub/payments/2026-03", headers: headers
+      end
+
+      costs = response.parsed_body['costs']
+      # go-live on the 20th of a 31-day month: 12 of 31 days billed.
+      expect(costs['monthly_fee_billed_days']).to eq(12)
+      expect(costs['monthly_fee']).to eq((299.9 * 12 / 31).round(2))
+      expect(response.parsed_body['due_on']).to eq('2026-04-10')
+    end
+
+    it 'never counts anything before the go-live date' do
+      stub_botpress_analytics(records: [], from: '2026-03-20', to: '2026-07-23')
+
+      get "/api/v1/accounts/#{account.id}/hub/performance",
+          headers: headers,
+          params: { from: '2026-01-01', to: '2026-07-23' }
+
+      expect(response).to have_http_status(:success)
+      expect(response.parsed_body.dig('period', 'from')).to eq('2026-03-20')
+      expect(response.parsed_body.dig('bot', 'go_live_on')).to eq('2026-03-20')
+    end
+
+    it 'exposes WhatsApp plus only the client-facing integrations of the bot' do
+      stub_botpress_analytics(records: [])
+
+      get "/api/v1/accounts/#{account.id}/hub/performance",
+          headers: headers,
+          params: { from: '2026-07-01', to: '2026-07-23' }
+
+      integrations = response.parsed_body['integrations']
+      expect(integrations.pluck('name')).to eq(['WhatsApp', 'Kommo', 'Google Calendar'])
+      expect(integrations.pluck('icon_url')).to eq(
+        [
+          '/assets/images/dashboard/hub/whatsapp.svg',
+          '/assets/images/dashboard/hub/kommo.svg',
+          'https://mediafiles.botpress.test/googlecalendar.svg'
+        ]
+      )
     end
 
     it 'returns a friendly error when Botpress fails' do
@@ -211,7 +257,9 @@ RSpec.describe 'Api::V1::Accounts::AptusHubController', type: :request do
         expect(body.dig('plan', 'go_live_on')).to eq('2026-03-20')
         expect(body['history'].pluck('month')).to eq(%w[2026-07 2026-06 2026-05 2026-04 2026-03])
         expect(body.dig('current_month', 'month')).to eq('2026-07')
-        expect(body.dig('current_month', 'status')).to eq('overdue')
+        # The running month has no closed amount yet, and is only due next month.
+        expect(body.dig('current_month', 'status')).to eq('open')
+        expect(body.dig('current_month', 'due_on')).to eq('2026-08-10')
         expect(body.dig('current_month', 'total')).to eq(current_month_total)
         expect(body['history'].second['month']).to eq('2026-06')
         expect(body['history'].second['status']).to eq('paid')
@@ -327,6 +375,26 @@ RSpec.describe 'Api::V1::Accounts::AptusHubController', type: :request do
       .to_return(
         status: status,
         body: { records: records }.to_json,
+        headers: { 'Content-Type' => 'application/json' }
+      )
+  end
+
+  def stub_botpress_bot(status: 200)
+    integrations = {
+      'intver_1' => { 'name' => 'googlecalendar', 'title' => 'Google Calendar', 'enabled' => true,
+                      'iconUrl' => 'https://mediafiles.botpress.test/googlecalendar.svg' },
+      'intver_2' => { 'name' => 'aptus/kommo-izzy', 'title' => 'aptus/kommo-izzy', 'enabled' => true,
+                      'iconUrl' => 'https://mediafiles.botpress.test/kommo.svg' },
+      'intver_3' => { 'name' => 'openai', 'title' => 'OpenAI', 'enabled' => true,
+                      'iconUrl' => 'https://mediafiles.botpress.test/openai.svg' },
+      'intver_4' => { 'name' => 'aptus/kommo-bp', 'title' => 'aptus/kommo-bp', 'enabled' => false,
+                      'iconUrl' => 'https://mediafiles.botpress.test/kommo-bp.svg' }
+    }
+
+    stub_request(:get, 'https://botpress.test/admin/bots/bot-1')
+      .to_return(
+        status: status,
+        body: { bot: { integrations: integrations } }.to_json,
         headers: { 'Content-Type' => 'application/json' }
       )
   end

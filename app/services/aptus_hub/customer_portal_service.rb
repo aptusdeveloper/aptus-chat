@@ -1,6 +1,26 @@
 class AptusHub::CustomerPortalService
   class ConfigurationError < StandardError; end
 
+  # WhatsApp is the channel every bot answers on, so the client always sees it here
+  # even though it reaches the bot through this inbox rather than through a Botpress
+  # integration of its own.
+  WHATSAPP_INTEGRATION = {
+    name: 'WhatsApp',
+    icon_url: '/assets/images/dashboard/hub/whatsapp.svg'
+  }.freeze
+
+  # A bot carries a dozen Botpress integrations the client has no reason to see
+  # (LLM providers, chart/PDF helpers). Only the ones they recognize as their own
+  # tooling are surfaced, in this order, under a name they actually use.
+  #
+  # Each client gets their own private Kommo build (kommo-izzy, ...) carrying the
+  # client's own logo, so the Kommo brand icon is served locally instead of whatever
+  # that particular build ships. Integrations with no icon here keep the Botpress one.
+  CLIENT_FACING_INTEGRATIONS = {
+    'kommo' => { name: 'Kommo', icon_url: '/assets/images/dashboard/hub/kommo.svg' },
+    'googlecalendar' => { name: 'Google Calendar' }
+  }.freeze
+
   attr_reader :account, :user, :config
 
   def initialize(
@@ -17,6 +37,7 @@ class AptusHub::CustomerPortalService
   end
 
   def performance(from:, to:)
+    from = effective_from(from)
     analytics = fetch_analytics(from, to)
     history = AptusHub::UsageHistoryBuilder.build(analytics[:records], analytics[:metrics])
 
@@ -24,7 +45,7 @@ class AptusHub::CustomerPortalService
       bot: bot_payload,
       period: period_payload(from, to),
       metrics: admin ? analytics[:metrics] : analytics[:metrics].except(:llm_cost),
-      channels: channels_payload,
+      integrations: integrations_payload,
       usage_history: admin ? history : history.map { |point| point.except(:llm_cost) }
     }
   end
@@ -112,8 +133,17 @@ class AptusHub::CustomerPortalService
       id: config.bot_id,
       name: config.bot_name,
       status: config.status,
-      ai_model: config.ai_model
+      ai_model: config.ai_model,
+      logo_url: config.logo_url,
+      go_live_on: config.go_live_on&.strftime('%Y-%m-%d')
     }
+  end
+
+  # There is no bot history before go-live, so a range starting earlier is pulled
+  # forward. The dashboard warns the client before sending such a range, but the
+  # numbers themselves are only ever counted from go-live on.
+  def effective_from(from)
+    [from, config.go_live_on].compact.max
   end
 
   def period_payload(from, to)
@@ -123,15 +153,23 @@ class AptusHub::CustomerPortalService
     }
   end
 
-  def channels_payload
-    account.inboxes.order(:name).map do |inbox|
-      {
-        id: inbox.id,
-        name: inbox.name,
-        channel_type: inbox.channel_type,
-        status: 'connected'
-      }
+  def integrations_payload
+    installed = @botpress_client.integrations(bot_id: config.bot_id)
+
+    installed_payload = CLIENT_FACING_INTEGRATIONS.filter_map do |slug, entry|
+      integration = installed.find { |item| integration_slug(item[:name]).start_with?(slug) }
+      next if integration.nil?
+
+      { name: entry[:name], icon_url: entry[:icon_url] || integration[:icon_url] }
     end
+
+    [WHATSAPP_INTEGRATION, *installed_payload]
+  end
+
+  # Botpress prefixes private integrations with the workspace handle
+  # ("aptus/kommo-izzy"), which the allowlist above does not care about.
+  def integration_slug(name)
+    name.to_s.split('/').last.to_s
   end
 
   def ensure_go_live_on!
@@ -154,10 +192,12 @@ class AptusHub::CustomerPortalService
     months
   end
 
+  # The go-live month is only billed from the go-live date on: whatever the bot spent
+  # before that was our own testing, and must never reach the client's invoice.
   def month_range(month)
     year, month_number = month.split('-').map(&:to_i)
     from = Date.new(year, month_number, 1)
-    [from, from.end_of_month]
+    [effective_from(from), from.end_of_month]
   end
 
   def payment_history_item(month, today)
@@ -175,13 +215,18 @@ class AptusHub::CustomerPortalService
 
   def payment_status(month, payment, today)
     return 'paid' if payment&.dig(:status) == 'paid'
+    # The running month has no closed amount yet, so it is neither due nor late.
+    return 'open' if month >= today.strftime('%Y-%m')
 
     due_date_for(month) < today ? 'overdue' : 'pending'
   end
 
+  # Part of the bill is the month's variable API usage, which is only known once the
+  # month closes, so a month is always due on the following one.
   def due_date_for(month)
     year, month_number = month.split('-').map(&:to_i)
-    last_day = Date.new(year, month_number, 1).end_of_month.day
-    Date.new(year, month_number, [config.payment_day, last_day].min)
+    reference = Date.new(year, month_number, 1).next_month
+    last_day = reference.end_of_month.day
+    Date.new(reference.year, reference.month, [config.payment_day, last_day].min)
   end
 end
